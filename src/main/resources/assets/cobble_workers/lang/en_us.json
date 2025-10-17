@@ -1,0 +1,25 @@
+{
+    "itemGroup.cobble_workers": "Cobble Workers",
+    "item.cobble_workers.retrieve_worker": "Retrieve Worker",
+    "block.cobble_workers.craft_station": "Craft Station",
+    "block.cobble_workers.mystery_mine": "Mystery Mine",
+    "gui.cobble_workers.craft_station": "Craft Station",
+    "gui.cobble_workers.mystery_mine": "Mystery Mine",
+    "gui.cobble_workers.party": "Party",
+    "gui.cobble_workers.speed": "Speed: x%s",
+    "gui.cobble_workers.mult_chance": "Mult Chance: %s",
+    "message.cobble_workers.has_pokemon": "Remove worker before breaking!",
+
+
+    "jei.cobble_workers.craft_station.crafting_time": "Time: %ss",
+    "jei.cobble_workers.craft_station.mult_stat": "%s impacts output",
+    "jei.cobble_workers.craft_station.speed_stat": "%s impacts time",
+    "jei.cobble_workers.craft_station.elemental_type": "%s",
+
+    "jei.cobble_workers.mystery_mine.crafting_time": "Time: %ss",
+    "jei.cobble_workers.mystery_mine.mult_stat": "%s impacts output",
+    "jei.cobble_workers.mystery_mine.speed_stat": "%s impacts time",
+    "jei.cobble_workers.mystery_mine.elemental_type": "%s",
+    "jei.cobble_workers.mystery_mine.chance": "Chance: %s",
+    "jei.cobble_workers.mystery_mine.consume_chance": "Chance to consume: %s"
+}

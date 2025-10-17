@@ -1,0 +1,213 @@
+package io.github.chakyl.cobbleworkers.screen;
+
+import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.CobblemonItems;
+import com.cobblemon.mod.common.CobblemonSounds;
+import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
+import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
+import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import io.github.chakyl.cobbleworkers.CobbleWorkers;
+import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
+import io.github.chakyl.cobbleworkers.blockentity.MysteryMineBlockEntity;
+import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
+import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
+import io.github.chakyl.cobbleworkers.utils.PokeUtils;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.SlotItemHandler;
+
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
+
+import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonItemForm;
+
+public class MysteryMineMenu extends AbstractWorkerMenu {
+    public final MysteryMineBlockEntity blockEntity;
+    private final Level level;
+    private final ContainerData data;
+    private final Player player;
+    private final PlayerPartyStore party;
+    private final SimpleContainer partyContainer = new SimpleContainer(6);
+    private final ArrayList<Slot> partySlots = new ArrayList<>(6);
+
+    public MysteryMineMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
+    }
+
+    public MysteryMineMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
+        super(CobbleWorkersRegistery.MenuRegistry.MYSTERY_MINE.get(), pContainerId, inv, entity, data);
+        checkContainerSize(inv, 2);
+        blockEntity = ((MysteryMineBlockEntity) entity);
+        this.level = inv.player.level();
+        this.data = data;
+        this.player = inv.player;
+        PokemonStoreManager storage = Cobblemon.INSTANCE.getStorage();
+        try {
+            this.party = storage.getParty(inv.player.getUUID());
+        } catch (NoPokemonStoreException e) {
+            throw new RuntimeException(e);
+        }
+        addPlayerInventory(inv);
+        addPlayerHotbar(inv);
+        getPartySlots();
+        this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP).ifPresent(iItemHandler -> {
+            this.addSlot(new SlotItemHandler(iItemHandler, 0, 91, 20));
+        });
+        this.blockEntity.getPokemonCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
+            this.addSlot(new WorkerSlot(iItemHandler, 0, 11, 19));
+        });
+        addDataSlots(data);
+    }
+
+    protected void getPartySlots() {
+        for (int i = 0; i < 6; ++i) {
+            this.partySlots.add(this.addSlot(new PartySlot(this.partyContainer, i, i % 2 == 0 ? 186 : 217, (((i / 2) * 31) + (i % 2 == 0 ? 20 : 28)))));
+            this.partyContainer.addItem(getPokemonItemForm(this.party.get(i)));
+        }
+    }
+
+    public int getScaledProgress() {
+        int progress = Mth.floor(this.data.get(0) * this.getSpeedModifier());
+        int maxProgress = this.data.get(1);
+        int progressArrowSize = 24;
+        return maxProgress != 0 && progress != 0 ? Mth.clamp(progress * progressArrowSize / maxProgress, 1, progressArrowSize) : 0;
+    }
+
+    // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
+    // must assign a slot number to each of the slots used by the GUI.
+    // For this container, we can see both the tile inventory's slots as well as the player inventory slots and the hotbar.
+    // Each time we add a Slot to the container, it automatically increases the slotIndex, which means
+    //  0 - 8 = hotbar slots (which will map to the InventoryPlayer slot numbers 0 - 8)
+    //  9 - 35 = player inventory slots (which map to the InventoryPlayer slot numbers 9 - 35)
+    //  36 - 44 = TileInventory slots, which map to our TileEntity slot numbers 0 - 8)
+    private static final int HOTBAR_SLOT_COUNT = 9;
+    private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
+    private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
+    private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_COLUMN_COUNT * PLAYER_INVENTORY_ROW_COUNT;
+    private static final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
+    private static final int VANILLA_FIRST_SLOT_INDEX = 0;
+    private static final int PARTY_SLOT_COUNT = 6;
+    private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT + PARTY_SLOT_COUNT;
+
+    // THIS YOU HAVE TO DEFINE!
+    private static final int TE_INVENTORY_SLOT_COUNT = 1;  // must be the number of slots you have!
+
+    @Override
+    public ItemStack quickMoveStack(Player playerIn, int pIndex) {
+        Slot sourceSlot = slots.get(pIndex);
+        if (sourceSlot == null || !sourceSlot.hasItem() || (pIndex >= TE_INVENTORY_FIRST_SLOT_INDEX - PARTY_SLOT_COUNT && pIndex < TE_INVENTORY_FIRST_SLOT_INDEX) || pIndex == slots.size()-1)
+            return ItemStack.EMPTY;  //EMPTY_ITEM
+        ItemStack sourceStack = sourceSlot.getItem();
+        ItemStack copyOfSourceStack = sourceStack.copy();
+        // Check if the slot clicked is one of the vanilla container slots
+        if (pIndex < TE_INVENTORY_FIRST_SLOT_INDEX) {
+            // This is a vanilla container slot so merge the stack into the tile inventory
+            if (!moveItemStackTo(sourceStack, TE_INVENTORY_FIRST_SLOT_INDEX, TE_INVENTORY_FIRST_SLOT_INDEX
+                    + TE_INVENTORY_SLOT_COUNT, false)) {
+                return ItemStack.EMPTY;  // EMPTY_ITEM
+            }
+        } else if (pIndex < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
+            // This is a TE slot so merge the stack into the players inventory
+            if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            return ItemStack.EMPTY;
+        }
+        // If stack size == 0 (the entire stack was moved) set slot contents to null
+        if (sourceStack.getCount() == 0) {
+            sourceSlot.set(ItemStack.EMPTY);
+        } else {
+            sourceSlot.setChanged();
+        }
+        sourceSlot.onTake(playerIn, sourceStack);
+        return copyOfSourceStack;
+    }
+
+    public double getSpeedModifier() {
+        return this.blockEntity.getSpeedModifier();
+    }
+
+    public int getMultChance() {
+        return this.blockEntity.getMultChance();
+    }
+
+    @Override
+    public boolean stillValid(Player pPlayer) {
+        return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
+                pPlayer, CobbleWorkersRegistery.BlockRegistry.MYSTERY_MINE.get());
+    }
+
+    private class PartySlot extends Slot {
+        public PartySlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return false;
+        }
+
+        @Override
+        public boolean allowModification(Player pPlayer) {
+            return false;
+        }
+
+        @Override
+        public Optional<ItemStack> tryRemove(int pCount, int pDecrement, Player pPlayer) {
+            CobbleWorkers.LOGGER.info("transfering");
+            MysteryMineMenu.this.transferFromPartyToWorkerSlot(player, this);
+            return Optional.empty();
+        }
+    }
+
+    // TODO Extract logic in a shareable way
+    private void transferFromPartyToWorkerSlot(Player player, MysteryMineMenu.PartySlot partySlot) {
+        if (this.level.isClientSide()) return;
+        int slotIndex = partySlot.index - 36;
+        WorkerSlot workerSlot = (WorkerSlot) this.slots.get(this.slots.size() - 1);
+        ItemStack newWorker = partySlot.getItem().copy();
+        Pokemon newWorkerPokemon = null;
+        ItemStack oldWorker = workerSlot.getItem().copy();
+
+        if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
+            newWorkerPokemon = this.party.get(slotIndex);
+        }
+        if (newWorkerPokemon == null && oldWorker.isEmpty()) return;
+        if (oldWorker.isEmpty()) {
+            partySlot.set(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get().getDefaultInstance());
+            this.party.remove(Objects.requireNonNull(newWorkerPokemon));
+        } else {
+            if (newWorkerPokemon != null) {
+                this.party.remove(Objects.requireNonNull(newWorkerPokemon));
+                this.party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, this.level));
+            }
+            partySlot.set(oldWorker);
+        }
+        partySlot.setChanged();
+        if (newWorker.is(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get())) {
+            workerSlot.set(ItemStack.EMPTY);
+            this.party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, this.level));
+        } else if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
+            workerSlot.set(newWorker);
+        }
+        level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
+        workerSlot.setChanged();
+    }
+}

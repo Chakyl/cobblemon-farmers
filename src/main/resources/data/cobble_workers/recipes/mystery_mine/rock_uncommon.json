@@ -1,0 +1,98 @@
+{
+  "type": "cobble_workers:mystery_mine",
+  "elemental_type": "rock",
+  "crafting_time": 200,
+  "consume_chance": 0.5,
+  "speed_stat": "ATTACK",
+  "mult_stat": "SPECIAL_ATTACK",
+  "ingredient": {
+    "tag": "cobble_workers:uncommon_berries"
+  },
+  "results": [
+    {
+      "item": "minecraft:cobblestone",
+      "count": 1,
+      "weight": 128
+    },
+    {
+      "item": "minecraft:raw_copper",
+      "count": 1,
+      "weight": 3
+    },
+    {
+      "item": "minecraft:coal",
+      "count": 2,
+      "weight": 4
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 1,
+      "weight": 2
+    }
+  ]
+}

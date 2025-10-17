@@ -1,0 +1,18 @@
+{
+  "type": "cobble_workers:mystery_mine",
+  "elemental_type": "rock",
+  "crafting_time": 20,
+  "consume_chance": 0.1,
+  "speed_stat": "ATTACK",
+  "mult_stat": "SPECIAL_ATTACK",
+  "ingredient": {
+    "tag": "cobble_workers:uncommon_berries"
+  },
+  "results": [
+    {
+      "item": "minecraft:blackstone",
+      "count": 1,
+      "weight": 16
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "cobble_workers:item/retrieve_worker"
+  }
+}
