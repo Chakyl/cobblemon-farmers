@@ -19,13 +19,12 @@ import net.minecraft.world.entity.player.Inventory;
 
 import static io.github.chakyl.cobbleworkers.utils.GuiUtils.renderPokemon;
 
-public class MysteryMineScreen extends AbstractContainerScreen<MysteryMineMenu> {
+public class GardeningStationScreen extends AbstractContainerScreen<GardeningStationMenu> {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobbleWorkers.MODID, "textures/gui/craft_station.png");
-    public static final ResourceLocation ELEMENT_TEXTURE = new ResourceLocation("cobblemon:textures/gui/types_small.png");
     private static final Component CONTAINER_LABEL = Component.translatable("gui.cobble_workers.craft_station");
     private static final ResourceLocation COBBLE_FONT = CobblemonResources.INSTANCE.getDEFAULT_LARGE();
 
-    public MysteryMineScreen(MysteryMineMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
+    public GardeningStationScreen(GardeningStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.imageWidth = 245;
         this.inventoryLabelX = 26;
@@ -63,12 +62,14 @@ public class MysteryMineScreen extends AbstractContainerScreen<MysteryMineMenu> 
         Pokemon pokemon = this.menu.getWorkerPokemon();
         if (pokemon != null) {
             RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.literal("Lv." + pokemon.getLevel()), 8, 15, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
-            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.mystery_mine.type." + pokemon.getPrimaryType().getName().toLowerCase()), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.gardening_station.type." + pokemon.getPrimaryType().getName().toLowerCase()), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
             if (pokemon.getSecondaryType() != null) {
-                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.mystery_mine.type." + pokemon.getSecondaryType().getName().toLowerCase()), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
+                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.gardening_station.type." + pokemon.getSecondaryType().getName().toLowerCase()), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
             }
         }
+
     }
+
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {

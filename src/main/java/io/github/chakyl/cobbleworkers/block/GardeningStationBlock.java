@@ -1,7 +1,6 @@
 package io.github.chakyl.cobbleworkers.block;
 
-import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
-import io.github.chakyl.cobbleworkers.blockentity.MysteryMineBlockEntity;
+import io.github.chakyl.cobbleworkers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,10 +28,10 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public class MysteryMineBlock extends Block implements EntityBlock {
+public class GardeningStationBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public MysteryMineBlock(Properties props) {
+    public GardeningStationBlock(Properties props) {
         super(props);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
     }
@@ -50,22 +49,22 @@ public class MysteryMineBlock extends Block implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new MysteryMineBlockEntity(pPos, pState);
+        return new GardeningStationBlockEntity(pPos, pState);
     }
 
     @Override
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (placer instanceof Player player && level.getBlockEntity(pos) instanceof MysteryMineBlockEntity mysteryMineBlockEntity) {
-            mysteryMineBlockEntity.setOwner(player.getUUID());
+        if (placer instanceof Player player && level.getBlockEntity(pos) instanceof GardeningStationBlockEntity GardeningStationBlockEntity) {
+            GardeningStationBlockEntity.setOwner(player.getUUID());
         }
     }
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof MysteryMineBlockEntity mysteryMineBlockEntity) {
-               mysteryMineBlockEntity.drops();
+            if (blockEntity instanceof GardeningStationBlockEntity GardeningStationBlockEntity) {
+               GardeningStationBlockEntity.drops();
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -80,12 +79,12 @@ public class MysteryMineBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof MysteryMineBlockEntity mysteryMineBlockEntity) {
-                if (mysteryMineBlockEntity.validateOwner(pPlayer)) {
+            if (entity instanceof GardeningStationBlockEntity GardeningStationBlockEntity) {
+                if (GardeningStationBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {
-                throw new IllegalStateException("No Container Provider for MysteryMine");
+                throw new IllegalStateException("No Container Provider for GardeningStation");
             }
         }
         return InteractionResult.sidedSuccess(pLevel.isClientSide());
@@ -94,7 +93,7 @@ public class MysteryMineBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return createTickerHelper(pBlockEntityType, CobbleWorkersRegistery.BlockEntityRegistry.MYSTERY_MINE.get(),
+        return createTickerHelper(pBlockEntityType, CobbleWorkersRegistery.BlockEntityRegistry.GARDENING_STATION.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1, pPos, pState1));
     }
 

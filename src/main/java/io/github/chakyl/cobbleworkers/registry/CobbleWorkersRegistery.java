@@ -3,12 +3,15 @@ package io.github.chakyl.cobbleworkers.registry;
 import com.google.common.base.Suppliers;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.block.CraftStationBlock;
+import io.github.chakyl.cobbleworkers.block.GardeningStationBlock;
 import io.github.chakyl.cobbleworkers.block.MysteryMineBlock;
 import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
+import io.github.chakyl.cobbleworkers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobbleworkers.blockentity.MysteryMineBlockEntity;
 import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobbleworkers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobbleworkers.screen.CraftStationMenu;
+import io.github.chakyl.cobbleworkers.screen.GardeningStationMenu;
 import io.github.chakyl.cobbleworkers.screen.MysteryMineMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -68,6 +71,8 @@ public final class CobbleWorkersRegistery {
 
         public static final RegistryObject<Block> CRAFT_STATION = registerWithItem("craft_station", () ->
                 new CraftStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(SoundType.COPPER).noOcclusion().strength(1.5F, 6.0F)));
+        public static final RegistryObject<Block> GARDENING_STATION = registerWithItem("gardening_station", () ->
+                new GardeningStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).noOcclusion().strength(1.5F, 6.0F)));
         public static final RegistryObject<Block> MYSTERY_MINE = registerWithItem("mystery_mine", () ->
                 new MysteryMineBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).noOcclusion().strength(1.5F, 6.0F)));
 
@@ -93,6 +98,8 @@ public final class CobbleWorkersRegistery {
 
         public static final RegistryObject<BlockEntityType<CraftStationBlockEntity>> CRAFT_STATION = BLOCK_ENTITY_TYPES.register("craft_station",
                 () -> BlockEntityType.Builder.of(CraftStationBlockEntity::new, BlockRegistry.CRAFT_STATION.get()).build(null));
+        public static final RegistryObject<BlockEntityType<GardeningStationBlockEntity>> GARDENING_STATION = BLOCK_ENTITY_TYPES.register("gardening_station",
+                () -> BlockEntityType.Builder.of(GardeningStationBlockEntity::new, BlockRegistry.GARDENING_STATION.get()).build(null));
         public static final RegistryObject<BlockEntityType<MysteryMineBlockEntity>> MYSTERY_MINE = BLOCK_ENTITY_TYPES.register("mystery_mine",
                 () -> BlockEntityType.Builder.of(MysteryMineBlockEntity::new, BlockRegistry.MYSTERY_MINE.get()).build(null));
 
@@ -142,6 +149,9 @@ public final class CobbleWorkersRegistery {
 
         public static final RegistryObject<MenuType<CraftStationMenu>> CRAFT_STATION = MENU_TYPES.register("craft_station", () ->
                 IForgeMenuType.create(CraftStationMenu::new)
+        );
+        public static final RegistryObject<MenuType<GardeningStationMenu>> GARDENING_STATION = MENU_TYPES.register("gardening_station", () ->
+                IForgeMenuType.create(GardeningStationMenu::new)
         );
         public static final RegistryObject<MenuType<MysteryMineMenu>> MYSTERY_MINE = MENU_TYPES.register("mystery_mine", () ->
                 IForgeMenuType.create(MysteryMineMenu::new)

@@ -11,6 +11,7 @@ import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
+import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
 import io.github.chakyl.cobbleworkers.utils.PokeUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -35,6 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonItemForm;
+import static io.github.chakyl.cobbleworkers.utils.PokeUtils.handlePartySlot;
 
 public class CraftStationMenu extends AbstractWorkerMenu {
     public final CraftStationBlockEntity blockEntity;
@@ -114,7 +116,7 @@ public class CraftStationMenu extends AbstractWorkerMenu {
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {
         Slot sourceSlot = slots.get(pIndex);
-        if (sourceSlot == null || !sourceSlot.hasItem() || (pIndex >= TE_INVENTORY_FIRST_SLOT_INDEX - PARTY_SLOT_COUNT && pIndex < TE_INVENTORY_FIRST_SLOT_INDEX) || pIndex == slots.size()-1)
+        if (sourceSlot == null || !sourceSlot.hasItem() || (pIndex >= TE_INVENTORY_FIRST_SLOT_INDEX - PARTY_SLOT_COUNT && pIndex < TE_INVENTORY_FIRST_SLOT_INDEX) || pIndex == slots.size() - 1)
             return ItemStack.EMPTY;  //EMPTY_ITEM
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
@@ -158,19 +160,9 @@ public class CraftStationMenu extends AbstractWorkerMenu {
                 pPlayer, CobbleWorkersRegistery.BlockRegistry.CRAFT_STATION.get());
     }
 
-    private class PartySlot extends Slot {
+    private class PartySlot extends WorkstationPartySlot {
         public PartySlot(Container container, int slot, int x, int y) {
             super(container, slot, x, y);
-        }
-
-        @Override
-        public boolean mayPlace(ItemStack stack) {
-            return false;
-        }
-
-        @Override
-        public boolean allowModification(Player pPlayer) {
-            return false;
         }
 
         @Override
@@ -180,37 +172,7 @@ public class CraftStationMenu extends AbstractWorkerMenu {
         }
     }
 
-    // TODO Extract logic in a shareable way
     private void transferFromPartyToWorkerSlot(Player player, CraftStationMenu.PartySlot partySlot) {
-        if (this.level.isClientSide()) return;
-        int slotIndex = partySlot.index - 36;
-        WorkerSlot workerSlot = (WorkerSlot) this.slots.get(this.slots.size() - 1);
-        ItemStack newWorker = partySlot.getItem().copy();
-        Pokemon newWorkerPokemon = null;
-        ItemStack oldWorker = workerSlot.getItem().copy();
-
-        if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
-            newWorkerPokemon = this.party.get(slotIndex);
-        }
-        if (newWorkerPokemon == null && oldWorker.isEmpty()) return;
-        if (oldWorker.isEmpty()) {
-            partySlot.set(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get().getDefaultInstance());
-            this.party.remove(Objects.requireNonNull(newWorkerPokemon));
-        } else {
-            if (newWorkerPokemon != null) {
-                this.party.remove(Objects.requireNonNull(newWorkerPokemon));
-                this.party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, this.level));
-            }
-            partySlot.set(oldWorker);
-        }
-        partySlot.setChanged();
-        if (newWorker.is(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get())) {
-            workerSlot.set(ItemStack.EMPTY);
-            this.party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, this.level));
-        } else if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
-            workerSlot.set(newWorker);
-        }
-        level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
-        workerSlot.setChanged();
+        handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1));
     }
 }

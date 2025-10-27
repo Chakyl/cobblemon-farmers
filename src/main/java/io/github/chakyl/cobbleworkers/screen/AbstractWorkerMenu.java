@@ -2,16 +2,19 @@ package io.github.chakyl.cobbleworkers.screen;
 
 import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.CobblemonItems;
+import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.pokemon.Pokemon;
+import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.utils.PokeUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -134,34 +137,43 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
 
 
 
+    // TODO Extract logic in a shareable way
     private void transferFromPartyToWorkerSlot(Player player, PartySlot partySlot) {
         if (this.level.isClientSide()) return;
+        int slotIndex = partySlot.index - 36;
         WorkerSlot workerSlot = (WorkerSlot) this.slots.get(this.slots.size() - 1);
         ItemStack newWorker = partySlot.getItem().copy();
         Pokemon newWorkerPokemon = null;
         ItemStack oldWorker = workerSlot.getItem().copy();
-
-        if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
-            newWorkerPokemon = this.party.get(partySlot.index);
+        boolean noWorker = oldWorker.isEmpty();
+        Pokemon oldWorkerPokemon = null;
+        if (!oldWorker.isEmpty()) {
+            oldWorkerPokemon = PokeUtils.getItemFormPokemon(oldWorker, this.level);
+            CobbleWorkers.LOGGER.info("Owns: "+ oldWorkerPokemon.belongsTo(player));
+            if (oldWorkerPokemon.belongsTo(player)) return;
         }
-        if (newWorkerPokemon == null && oldWorker.isEmpty()) return;
-        if (oldWorker.isEmpty()) {
+        if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
+            newWorkerPokemon = this.party.get(slotIndex);
+        }
+        if (newWorkerPokemon == null && noWorker) return;
+        if (noWorker) {
             partySlot.set(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get().getDefaultInstance());
             this.party.remove(Objects.requireNonNull(newWorkerPokemon));
         } else {
-            if (newWorkerPokemon != null) {
+            if (newWorkerPokemon != null && oldWorkerPokemon != null) {
                 this.party.remove(Objects.requireNonNull(newWorkerPokemon));
-                this.party.set(partySlot.index, PokeUtils.getItemFormPokemon(oldWorker, this.level));
+                this.party.set(slotIndex, oldWorkerPokemon);
             }
             partySlot.set(oldWorker);
         }
         partySlot.setChanged();
         if (newWorker.is(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get())) {
             workerSlot.set(ItemStack.EMPTY);
-            this.party.set(partySlot.index, PokeUtils.getItemFormPokemon(oldWorker, this.level));
+            this.party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, this.level));
         } else if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
             workerSlot.set(newWorker);
         }
+        level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
         workerSlot.setChanged();
     }
 

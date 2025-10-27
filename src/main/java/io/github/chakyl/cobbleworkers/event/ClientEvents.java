@@ -2,9 +2,11 @@ package io.github.chakyl.cobbleworkers.event;
 
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.blockentity.renderer.CraftStationBlockEntityRenderer;
+import io.github.chakyl.cobbleworkers.blockentity.renderer.GardeningStationBlockEntityRenderer;
 import io.github.chakyl.cobbleworkers.blockentity.renderer.MysteryMineBlockEntityRenderer;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.CraftStationScreen;
+import io.github.chakyl.cobbleworkers.screen.GardeningStationScreen;
 import io.github.chakyl.cobbleworkers.screen.MysteryMineScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
@@ -23,12 +25,14 @@ public class ClientEvents {
             event.enqueueWork(() -> {
                 MenuScreens.register(CobbleWorkersRegistery.MenuRegistry.CRAFT_STATION.get(), CraftStationScreen::new);
                 MenuScreens.register(CobbleWorkersRegistery.MenuRegistry.MYSTERY_MINE.get(), MysteryMineScreen::new);
+                MenuScreens.register(CobbleWorkersRegistery.MenuRegistry.GARDENING_STATION.get(), GardeningStationScreen::new);
             });
         }
         @SubscribeEvent
         public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(CobbleWorkersRegistery.BlockEntityRegistry.CRAFT_STATION.get(), CraftStationBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(CobbleWorkersRegistery.BlockEntityRegistry.MYSTERY_MINE.get(), MysteryMineBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(CobbleWorkersRegistery.BlockEntityRegistry.GARDENING_STATION.get(), GardeningStationBlockEntityRenderer::new);
         }
 
     }

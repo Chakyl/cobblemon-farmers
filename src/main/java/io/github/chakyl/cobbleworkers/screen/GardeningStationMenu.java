@@ -1,22 +1,15 @@
 package io.github.chakyl.cobbleworkers.screen;
 
 import com.cobblemon.mod.common.Cobblemon;
-import com.cobblemon.mod.common.CobblemonItems;
-import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
-import com.cobblemon.mod.common.pokemon.Pokemon;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
-import io.github.chakyl.cobbleworkers.blockentity.MysteryMineBlockEntity;
+import io.github.chakyl.cobbleworkers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
-import io.github.chakyl.cobbleworkers.utils.PokeUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -33,14 +26,13 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonItemForm;
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.handlePartySlot;
 
-public class MysteryMineMenu extends AbstractWorkerMenu {
-    public final MysteryMineBlockEntity blockEntity;
+public class GardeningStationMenu extends AbstractWorkerMenu {
+    public final GardeningStationBlockEntity blockEntity;
     private final Level level;
     private final ContainerData data;
     private final Player player;
@@ -48,14 +40,14 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     private final SimpleContainer partyContainer = new SimpleContainer(6);
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
-    public MysteryMineMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
+    public GardeningStationMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
     }
 
-    public MysteryMineMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
-        super(CobbleWorkersRegistery.MenuRegistry.MYSTERY_MINE.get(), pContainerId, inv, entity, data);
+    public GardeningStationMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
+        super(CobbleWorkersRegistery.MenuRegistry.GARDENING_STATION.get(), pContainerId, inv, entity, data);
         checkContainerSize(inv, 2);
-        blockEntity = ((MysteryMineBlockEntity) entity);
+        blockEntity = ((GardeningStationBlockEntity) entity);
         this.level = inv.player.level();
         this.data = data;
         this.player = inv.player;
@@ -143,17 +135,17 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     }
 
     public double getSpeedModifier() {
-        return this.blockEntity.getSpeedModifier();
+        return 1;
     }
 
     public int getMultChance() {
-        return this.blockEntity.getMultChance();
+        return 0;
     }
 
     @Override
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-                pPlayer, CobbleWorkersRegistery.BlockRegistry.MYSTERY_MINE.get());
+                pPlayer, CobbleWorkersRegistery.BlockRegistry.GARDENING_STATION.get());
     }
 
     private class PartySlot extends WorkstationPartySlot {
@@ -163,12 +155,12 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
 
         @Override
         public Optional<ItemStack> tryRemove(int pCount, int pDecrement, Player pPlayer) {
-            MysteryMineMenu.this.transferFromPartyToWorkerSlot(player, this);
+            GardeningStationMenu.this.transferFromPartyToWorkerSlot(player, this);
             return Optional.empty();
         }
     }
 
-    private void transferFromPartyToWorkerSlot(Player player, MysteryMineMenu.PartySlot partySlot) {
+    private void transferFromPartyToWorkerSlot(Player player, GardeningStationMenu.PartySlot partySlot) {
         handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1));
     }
 }

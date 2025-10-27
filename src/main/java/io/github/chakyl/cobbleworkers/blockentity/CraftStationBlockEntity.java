@@ -219,7 +219,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     @Override
     public void setChanged() {
         super.setChanged();
-        if (this.level != null && this.level.isClientSide())
+        if (this.level != null)
             this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
@@ -251,11 +251,9 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     private Optional<CraftStationRecipe> getMatchingRecipe(RecipeWrapper inventoryWrapper) {
         if (level == null) return Optional.empty();
         if (lastRecipeID != null) {
-            Recipe<RecipeWrapper> recipe = ((RecipeManagerAccessor) level.getRecipeManager())
-                    .getRecipeMap(CraftStationRecipe.Type.INSTANCE)
-                    .get(lastRecipeID);
+            Recipe<RecipeWrapper> recipe = ((RecipeManagerAccessor) level.getRecipeManager()).getRecipeMap(CraftStationRecipe.Type.INSTANCE).get(lastRecipeID);
             if (recipe instanceof CraftStationRecipe) {
-                if ( recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((CraftStationRecipe) recipe).getElementalType())) {
+                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((CraftStationRecipe) recipe).getElementalType())) {
                     return Optional.of((CraftStationRecipe) recipe);
                 }
                 if (ItemStack.isSameItem(recipe.getResultItem(this.level.registryAccess()), this.outputInventory.getStackInSlot(0))) {
@@ -300,6 +298,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         CompoundTag data = new CompoundTag();
+        if (owner != null) data.putUUID("Owner", owner);
         data.put("InputInventory", this.inputInventory.serializeNBT());
         data.put("OutputInventory", this.outputInventory.serializeNBT());
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
@@ -312,6 +311,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     public void load(CompoundTag pTag) {
         super.load(pTag);
         CompoundTag data = pTag.getCompound(CobbleWorkers.MODID);
+        owner = data.hasUUID("Owner") ? data.getUUID("Owner") : null;
         if (data.contains("InputInventory", Tag.TAG_COMPOUND)) {
             this.inputInventory.deserializeNBT(data.getCompound("InputInventory"));
         }

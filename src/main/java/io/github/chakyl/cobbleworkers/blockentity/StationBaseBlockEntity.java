@@ -9,6 +9,7 @@ import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.CraftStationMenu;
 import io.github.chakyl.cobbleworkers.utils.PokeUtils;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -37,11 +38,13 @@ import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.UUID;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getItemFormPokemon;
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonRotation;
 
 public class StationBaseBlockEntity extends BlockEntity {
+    protected UUID owner;
     private PokemonEntity workerEntity;
 
     public StationBaseBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
@@ -99,5 +102,18 @@ public class StationBaseBlockEntity extends BlockEntity {
 
     public ItemStack getPokemonItem() {
         return null;
+    }
+
+    public void setOwner(UUID uuid) {
+        this.owner = uuid;
+    }
+
+    public boolean validateOwner(Player player) {
+//        return true;
+//        if (owner == null || !owner.equals(player.getUUID())) {
+//            player.sendSystemMessage(Component.translatable("message.cobble_workers.not_owned").withStyle(ChatFormatting.RED));
+//            return false;
+//        }
+        return true;
     }
 }

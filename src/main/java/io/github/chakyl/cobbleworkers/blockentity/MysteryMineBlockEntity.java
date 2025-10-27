@@ -108,12 +108,10 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
-        boolean hasWorker = this.hasWorker();
-        boolean hasInput = !this.hasInput();
         boolean didInventoryChange = false;
         super.tick(level, pos, state);
         if (!level.isClientSide()) {
-            if (hasWorker && hasInput) {
+            if (this.hasWorker() && this.hasInput()) {
                 Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
                 if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.get().getElementalType())) {
                     didInventoryChange = this.processRecipe(recipe.get());
@@ -162,7 +160,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     @Override
     public void setChanged() {
         super.setChanged();
-        if (this.level != null && this.level.isClientSide())
+        if (this.level != null)
             this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
@@ -253,8 +251,11 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 break;
             }
         }
-        if (level.getRandom().nextDouble() < recipe.getConsumeChance()) this.inputInventory.getStackInSlot(0).shrink(1);
-        return true;
+        if (level.getRandom().nextDouble() < recipe.getConsumeChance()) {
+            this.inputInventory.getStackInSlot(0).shrink(1);
+            return true;
+        }
+        return false;
     }
 
     public double getSpeedModifier() {

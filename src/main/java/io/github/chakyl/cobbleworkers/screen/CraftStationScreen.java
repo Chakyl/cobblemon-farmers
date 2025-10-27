@@ -18,6 +18,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+import static io.github.chakyl.cobbleworkers.utils.GuiUtils.renderPokemon;
+
 public class CraftStationScreen extends AbstractContainerScreen<CraftStationMenu> {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobbleWorkers.MODID, "textures/gui/craft_station.png");
     public static final ResourceLocation ELEMENT_TEXTURE = new ResourceLocation("cobblemon:textures/gui/types_small.png");
@@ -39,17 +41,17 @@ public class CraftStationScreen extends AbstractContainerScreen<CraftStationMenu
 
     @Override
     protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2);
-        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), this.inventoryLabelX + 2, 4, false, 0xFFFFFFFF,  false, 0, 0);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, this.playerInventoryTitle, this.inventoryLabelX, 74, 4210752, false);
+        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 34;
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF,  false, 0, 0);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752,  false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
         double speedMod = this.menu.getSpeedModifier();
         if (speedMod > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 70, 45, 0xFFFFFFFF, true);
+            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 36, 45, 0xFFFFFFFF, true);
         }
         int multChance = this.menu.getMultChance();
         if (multChance > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.mult_chance", multChance + "%"), centralX + 70, 56, 0xFFFFFFFF, true);
+            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.mult_chance", multChance + "%"), centralX + 36, 56, 0xFFFFFFFF, true);
         }
 
         int index = 0;
@@ -62,18 +64,11 @@ public class CraftStationScreen extends AbstractContainerScreen<CraftStationMenu
         Pokemon pokemon = this.menu.getWorkerPokemon();
         if (pokemon != null) {
             RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.literal("Lv." + pokemon.getLevel()), 8, 15, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.craft_station.type." + pokemon.getPrimaryType().getName().toLowerCase()), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
+            if (pokemon.getSecondaryType() != null) {
+                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.craft_station.type." + pokemon.getSecondaryType().getName().toLowerCase()), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
+            }
         }
-
-    }
-
-    protected void renderPokemon(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        Pokemon pokemon = this.menu.getWorkerPokemon();
-        if (pokemon == null) return;
-        ElementalType secondaryElement = pokemon.getSecondaryType();
-        if (secondaryElement != null) {
-            pGuiGraphics.blit(ELEMENT_TEXTURE, pMouseX + 56, pMouseY + 18, 0, secondaryElement.getTextureXMultiplier() * 18, 18, 18, 18, 324, 18);
-        }
-        pGuiGraphics.blit(ELEMENT_TEXTURE, pMouseX + 37, pMouseY + 18, 0, pokemon.getPrimaryType().getTextureXMultiplier() * 18, 18, 18, 18, 324, 18);
 
     }
 
@@ -87,7 +82,7 @@ public class CraftStationScreen extends AbstractContainerScreen<CraftStationMenu
 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
         renderProgressArrow(guiGraphics, x, y);
-        renderPokemon(guiGraphics, x, y);
+        renderPokemon(guiGraphics, x, y, this.menu.getWorkerPokemon());
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
