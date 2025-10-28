@@ -2,7 +2,6 @@ package io.github.chakyl.cobbleworkers.screen;
 
 
 import com.cobblemon.mod.common.api.gui.GuiUtilsKt;
-import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.client.CobblemonResources;
 import com.cobblemon.mod.common.client.render.RenderHelperKt;
 import com.cobblemon.mod.common.pokemon.Pokemon;
@@ -20,8 +19,8 @@ import net.minecraft.world.entity.player.Inventory;
 import static io.github.chakyl.cobbleworkers.utils.GuiUtils.renderPokemon;
 
 public class GardeningStationScreen extends AbstractContainerScreen<GardeningStationMenu> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(CobbleWorkers.MODID, "textures/gui/craft_station.png");
-    private static final Component CONTAINER_LABEL = Component.translatable("gui.cobble_workers.craft_station");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(CobbleWorkers.MODID, "textures/gui/gardening_station.png");
+    private static final Component CONTAINER_LABEL = Component.translatable("gui.cobble_workers.gardening_station");
     private static final ResourceLocation COBBLE_FONT = CobblemonResources.INSTANCE.getDEFAULT_LARGE();
 
     public GardeningStationScreen(GardeningStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
@@ -39,17 +38,18 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
 
     @Override
     protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 34;
+        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 46  ;
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF, false, 0, 0);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752, false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.workers_assigned", this.menu.getWorkersAssigned()), 212, 112, 0xFFFFFFFF, true);
         double speedMod = this.menu.getSpeedModifier();
         if (speedMod > 0) {
             GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 36, 45, 0xFFFFFFFF, true);
         }
-        int multChance = this.menu.getMultChance();
-        if (multChance > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.mult_chance", multChance + "%"), centralX + 36, 56, 0xFFFFFFFF, true);
+        int workingRadius = this.menu.getWorkingRadius();
+        if (workingRadius > 0) {
+            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.working_radius", workingRadius), centralX + 36, 56, 0xFFFFFFFF, true);
         }
 
         int index = 0;
@@ -62,9 +62,9 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
         Pokemon pokemon = this.menu.getWorkerPokemon();
         if (pokemon != null) {
             RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.literal("Lv." + pokemon.getLevel()), 8, 15, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
-            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.gardening_station.type." + pokemon.getPrimaryType().getName().toLowerCase()), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.gardening_station.type." + pokemon.getPrimaryType().getName().toLowerCase()), centralX + 90, 34, false, 0xFFFFFFFF, false, 0, 0);
             if (pokemon.getSecondaryType() != null) {
-                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.gardening_station.type." + pokemon.getSecondaryType().getName().toLowerCase()), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
+                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobble_workers.gardening_station.type." + pokemon.getSecondaryType().getName().toLowerCase()), centralX + 90, 48, false, 0xFFFFFFFF, false, 0, 0);
             }
         }
 
@@ -81,12 +81,12 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
         renderProgressArrow(guiGraphics, x, y);
-        renderPokemon(guiGraphics, x, y, this.menu.getWorkerPokemon());
+        renderPokemon(guiGraphics, x, y, this.menu.getWorkerPokemon(), -10);
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
         if (menu.isCrafting()) {
-            guiGraphics.blit(TEXTURE, x + 114, y + 23, 0, 166, menu.getScaledProgress(), 10);
+            guiGraphics.blit(TEXTURE, x + 91, y + 26, 0, 166, menu.getScaledProgress(), 10);
         }
     }
 

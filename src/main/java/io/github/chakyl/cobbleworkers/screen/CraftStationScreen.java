@@ -45,6 +45,7 @@ public class CraftStationScreen extends AbstractContainerScreen<CraftStationMenu
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF,  false, 0, 0);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752,  false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.workers_assigned", this.menu.getWorkersAssigned()), 212, 112, 0xFFFFFFFF, true);
         double speedMod = this.menu.getSpeedModifier();
         if (speedMod > 0) {
             GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 36, 45, 0xFFFFFFFF, true);

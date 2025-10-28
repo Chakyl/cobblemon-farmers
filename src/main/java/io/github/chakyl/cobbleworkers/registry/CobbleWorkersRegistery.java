@@ -16,8 +16,10 @@ import io.github.chakyl.cobbleworkers.screen.MysteryMineMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.BlockItem;
@@ -53,6 +55,7 @@ public final class CobbleWorkersRegistery {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MODID);
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, MODID);
     private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MODID);
+    private static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, MODID);
 
     public static void register() {
         BlockRegistry.register();
@@ -60,6 +63,7 @@ public final class CobbleWorkersRegistery {
         ItemRegistry.register();
         MenuRegistry.register();
         RecipeRegistry.register();
+        AttributeRegistry.register();
         CreativeTabReg.register();
     }
 
@@ -180,6 +184,16 @@ public final class CobbleWorkersRegistery {
                 return "mystery_mine";
             }
         });
+    }
+
+    public static final class AttributeRegistry {
+
+        private static void register() {
+            ATTRIBUTES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        }
+
+        public static final RegistryObject<Attribute> WORKERS_ASSIGNED = ATTRIBUTES.register("workers_assigned", () -> new RangedAttribute("attribute.cobble_workers.workers_assigned", 0, 0, 1024).setSyncable(true));
+        public static final RegistryObject<Attribute> WORKER_CAP = ATTRIBUTES.register("worker_cap", () -> new RangedAttribute("attribute.cobble_workers.worker_cap", 3, 0, 1024).setSyncable(true));
     }
 
     public static final class CreativeTabReg {

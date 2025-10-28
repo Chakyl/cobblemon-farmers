@@ -40,7 +40,6 @@ public class MysteryMineBlockEntityRenderer implements BlockEntityRenderer<Myste
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
-            BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
             pPoseStack.translate(0.5, 1, 0.5);
             pPoseStack.mulPose(Axis.YP.rotationDegrees(pokemonEntity.getYRot()));

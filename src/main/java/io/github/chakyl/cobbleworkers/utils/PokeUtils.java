@@ -5,7 +5,6 @@ import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
-import com.cobblemon.mod.common.client.gui.trade.PartySlot;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
@@ -17,6 +16,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -47,8 +48,8 @@ public class PokeUtils {
         return false;
     }
 
-    public static Pokemon getItemFormPokemon(ItemStack oldWorker, Level level) {
-        CompoundTag tag = oldWorker.getTag();
+    public static Pokemon getItemFormPokemon(ItemStack pokeItem, Level level) {
+        CompoundTag tag = pokeItem.getTag();
         if (tag == null) throw new RuntimeException("Horrible thing happened! The Pokemon doesn't exist!!!!");
         return Pokemon.Companion.loadFromNBT(tag.getCompound("pokeData"));
     }
@@ -77,13 +78,19 @@ public class PokeUtils {
         return offset;
     }
 
+    public static boolean hasWorkerSlot(Player player) {
+        return Mth.floor(player.getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) < Mth.floor(player.getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKER_CAP.get()).getValue());
+    }
+
     public static void handlePartySlot(Player player, Level level, PlayerPartyStore party, WorkstationPartySlot partySlot, WorkerSlot workerSlot) {
         if (level.isClientSide()) return;
+        int difference = 0;
         int slotIndex = partySlot.index - 36;
         ItemStack newWorker = partySlot.getItem().copy();
         Pokemon newWorkerPokemon = null;
         ItemStack oldWorker = workerSlot.getItem().copy();
         boolean noWorker = oldWorker.isEmpty();
+        if (noWorker && !hasWorkerSlot(player)) return;
         Pokemon oldWorkerPokemon = null;
         if (!oldWorker.isEmpty()) {
             oldWorkerPokemon = PokeUtils.getItemFormPokemon(oldWorker, level);
@@ -95,6 +102,7 @@ public class PokeUtils {
         if (noWorker) {
             partySlot.set(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get().getDefaultInstance());
             party.remove(Objects.requireNonNull(newWorkerPokemon));
+            difference--;
         } else {
             if (newWorkerPokemon != null && oldWorkerPokemon != null) {
                 party.remove(Objects.requireNonNull(newWorkerPokemon));
@@ -106,8 +114,13 @@ public class PokeUtils {
         if (newWorker.is(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get())) {
             workerSlot.set(ItemStack.EMPTY);
             party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, level));
+            difference++;
         } else if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
             workerSlot.set(newWorker);
+        }
+        if (difference != 0) {
+            AttributeInstance attr = player.getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get());
+            attr.setBaseValue(attr.getValue() -difference);
         }
         level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
         workerSlot.setChanged();

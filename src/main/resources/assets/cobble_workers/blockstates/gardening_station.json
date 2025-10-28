@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "cobble_workers:block/gardening_station",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cobble_workers:block/gardening_station"
+    },
+    "facing=south": {
+      "model": "cobble_workers:block/gardening_station",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cobble_workers:block/gardening_station",
+      "y": 270
+    }
+  }
+}

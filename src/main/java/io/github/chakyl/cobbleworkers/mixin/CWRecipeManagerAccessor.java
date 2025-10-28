@@ -14,7 +14,7 @@ import java.util.Map;
  * Credits to Farmer's Delight's dev team which credits Botania's dev team for the implementation!
  */
 @Mixin(RecipeManager.class)
-public interface RecipeManagerAccessor
+public interface CWRecipeManagerAccessor
 {
     @Invoker("byType")
     <C extends Container, T extends Recipe<C>> Map<ResourceLocation, Recipe<C>> getRecipeMap(RecipeType<T> type);

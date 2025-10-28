@@ -158,6 +158,9 @@ dependencies {
     // Cobblemon
     implementation fg.deobf("curse.maven:cobblemon-687131:5375390")
     implementation fg.deobf("curse.maven:kotlin-for-forge-351264:5402061")
+
+    implementation fg.deobf("curse.maven:bots-lib-1062753:5550032")
+    implementation fg.deobf("curse.maven:sturdy-farmland-growth-edition-1172429:7133472")
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html

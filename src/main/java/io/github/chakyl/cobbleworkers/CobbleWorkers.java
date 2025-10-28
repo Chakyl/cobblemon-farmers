@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 public class CobbleWorkers {
     public static final String MODID = "cobble_workers";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static boolean GROWTH_EDITION_INSTALLED = false;
 
     public CobbleWorkers() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         CobbleWorkersRegistery.register();
         MinecraftForge.EVENT_BUS.register(this);
-
     }
 }

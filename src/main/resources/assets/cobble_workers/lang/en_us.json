@@ -8,9 +8,11 @@
     "gui.cobble_workers.craft_station": "Craft Station",
     "gui.cobble_workers.gardening_station": "Gardening Station",
     "gui.cobble_workers.mystery_mine": "Mystery Mine",
+    "gui.cobble_workers.workers_assigned": "Assigned: %s",
     "gui.cobble_workers.party": "Party",
     "gui.cobble_workers.speed": "Speed: x%s",
     "gui.cobble_workers.mult_chance": "Mult Chance: %s",
+    "gui.cobble_workers.working_radius": "Working Radius: %s",
 
     "info.cobble_workers.craft_station.type.normal": "Can't work here",
     "info.cobble_workers.craft_station.type.fire": "Can't work here",
@@ -33,8 +35,8 @@
 
     "info.cobble_workers.gardening_station.type.normal": "Can't work here",
     "info.cobble_workers.gardening_station.type.fire": "Smelts items",
-    "info.cobble_workers.gardening_station.type.water": "Can't work here",
-    "info.cobble_workers.gardening_station.type.grass": "Can't work here",
+    "info.cobble_workers.gardening_station.type.water": "Waters soil",
+    "info.cobble_workers.gardening_station.type.grass": "Grows crops",
     "info.cobble_workers.gardening_station.type.flying": "Can't work here",
     "info.cobble_workers.gardening_station.type.fighting": "Can't work here",
     "info.cobble_workers.gardening_station.type.poison": "Can't work here",
@@ -47,8 +49,8 @@
     "info.cobble_workers.gardening_station.type.ghost": "Can't work here",
     "info.cobble_workers.gardening_station.type.steel": "Can't work here",
     "info.cobble_workers.gardening_station.type.dragon": "Can't work here",
-    "info.cobble_workers.gardening_station.type.dark": "Can't work here",
-    "info.cobble_workers.gardening_station.type.fairy": "Can't work here",
+    "info.cobble_workers.gardening_station.type.dark": "Defeats wild mons",
+    "info.cobble_workers.gardening_station.type.fairy": "Plants fertilizers",
 
     "info.cobble_workers.mystery_mine.type.normal": "Can't work here",
     "info.cobble_workers.mystery_mine.type.fire": "Can't work here",

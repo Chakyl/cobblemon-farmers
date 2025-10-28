@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
+import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
@@ -60,9 +61,6 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
         getPartySlots();
-        this.blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP).ifPresent(iItemHandler -> {
-            this.addSlot(new SlotItemHandler(iItemHandler, 0, 91, 20));
-        });
         this.blockEntity.getPokemonCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
             this.addSlot(new WorkerSlot(iItemHandler, 0, 11, 19));
         });
@@ -79,7 +77,8 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
     public int getScaledProgress() {
         int progress = Mth.floor(this.data.get(0) * this.getSpeedModifier());
         int maxProgress = this.data.get(1);
-        int progressArrowSize = 24;
+        int progressArrowSize = 68;
+
         return maxProgress != 0 && progress != 0 ? Mth.clamp(progress * progressArrowSize / maxProgress, 1, progressArrowSize) : 0;
     }
 
@@ -135,11 +134,11 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
     }
 
     public double getSpeedModifier() {
-        return 1;
+        return this.blockEntity.getSpeedModifier();
     }
 
-    public int getMultChance() {
-        return 0;
+    public int getWorkingRadius() {
+        return this.blockEntity.getAoeRadius();
     }
 
     @Override

@@ -1,8 +1,7 @@
 package io.github.chakyl.cobbleworkers.blockentity;
 
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.block.MysteryMineBlock;
-import io.github.chakyl.cobbleworkers.mixin.RecipeManagerAccessor;
+import io.github.chakyl.cobbleworkers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobbleworkers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
@@ -27,7 +26,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -39,7 +37,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -187,7 +184,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     private Optional<MysteryMineRecipe> getCurrentRecipe(RecipeWrapper inventoryWrapper) {
         if (level == null) return Optional.empty();
         if (lastRecipeID != null) {
-            Recipe<RecipeWrapper> recipe = ((RecipeManagerAccessor) level.getRecipeManager())
+            Recipe<RecipeWrapper> recipe = ((CWRecipeManagerAccessor) level.getRecipeManager())
                     .getRecipeMap(CraftStationRecipe.Type.INSTANCE)
                     .get(lastRecipeID);
             if (recipe instanceof MysteryMineRecipe) {

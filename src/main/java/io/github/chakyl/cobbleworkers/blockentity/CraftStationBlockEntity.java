@@ -1,8 +1,7 @@
 package io.github.chakyl.cobbleworkers.blockentity;
 
-import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.mixin.RecipeManagerAccessor;
+import io.github.chakyl.cobbleworkers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.CraftStationMenu;
@@ -168,9 +167,13 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         if (Mth.floor(progress * getSpeedModifier(recipe.getSpeedStat())) < craftingTime) {
             return false;
         }
-        progress = 0;
-        ItemStack resultStack = recipe.getResultItem(this.level.registryAccess());
         ItemStack outputStack = outputInventory.getStackInSlot(0);
+        ItemStack inputStack = inputInventory.getStackInSlot(0);
+        ItemStack resultStack = recipe.getResultItem(this.level.registryAccess());
+        ItemStack nbtResultStack = resultStack.copy();
+        nbtResultStack.setTag(inputStack.getTag());
+        if (!outputStack.isEmpty() && !ItemStack.isSameItemSameTags(outputStack, nbtResultStack)) return false;
+        progress = 0;
         int mult = 1;
         int multChance = getMultChance(recipe.getMultStat());
         if (multChance > 0) {
@@ -181,15 +184,14 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         }
         if (outputStack.isEmpty()) {
             ItemStack newResult = resultStack.copy();
+            if (inputStack.getTag() != null) newResult.setTag(inputStack.getTag());
             newResult.setCount(newResult.getCount() * mult);
             outputInventory.setStackInSlot(0, newResult);
-
         } else if (ItemStack.isSameItem(outputStack, resultStack)) {
             for (int i = 0; i < mult; i++) {
                 if (outputStack.getCount() < outputStack.getMaxStackSize()) outputStack.grow(resultStack.getCount());
             }
         }
-        ItemStack inputStack = inputInventory.getStackInSlot(0);
         if (!inputStack.isEmpty()) inputStack.shrink(1);
         return true;
     }
@@ -251,7 +253,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     private Optional<CraftStationRecipe> getMatchingRecipe(RecipeWrapper inventoryWrapper) {
         if (level == null) return Optional.empty();
         if (lastRecipeID != null) {
-            Recipe<RecipeWrapper> recipe = ((RecipeManagerAccessor) level.getRecipeManager()).getRecipeMap(CraftStationRecipe.Type.INSTANCE).get(lastRecipeID);
+            Recipe<RecipeWrapper> recipe = ((CWRecipeManagerAccessor) level.getRecipeManager()).getRecipeMap(CraftStationRecipe.Type.INSTANCE).get(lastRecipeID);
             if (recipe instanceof CraftStationRecipe) {
                 if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((CraftStationRecipe) recipe).getElementalType())) {
                     return Optional.of((CraftStationRecipe) recipe);

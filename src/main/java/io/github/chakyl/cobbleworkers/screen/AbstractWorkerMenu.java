@@ -87,12 +87,14 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
     }
+
     protected void getPartySlots() {
         for (int i = 0; i < 6; ++i) {
             this.partySlots.add(this.addSlot(new PartySlot(this.partyContainer, i, i % 2 == 0 ? 186 : 217, (((i / 2) * 31) + (i % 2 == 0 ? 20 : 28)))));
             this.partyContainer.addItem(getPokemonItemForm(this.party.get(i)));
         }
     }
+
     ArrayList<Integer> getPartyLevels() {
         ArrayList<Integer> partyLevels = new ArrayList<>(6);
         for (int i = 0; i < 6; ++i) {
@@ -101,6 +103,10 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
             else partyLevels.add(-1);
         }
         return partyLevels;
+    }
+
+    protected String getWorkersAssigned() {
+        return Mth.floor(this.player.getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) + "/" + Mth.floor(this.player.getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKER_CAP.get()).getValue());
     }
 
     @Override
@@ -135,46 +141,8 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
         }
     }
 
-
-
-    // TODO Extract logic in a shareable way
     private void transferFromPartyToWorkerSlot(Player player, PartySlot partySlot) {
-        if (this.level.isClientSide()) return;
-        int slotIndex = partySlot.index - 36;
-        WorkerSlot workerSlot = (WorkerSlot) this.slots.get(this.slots.size() - 1);
-        ItemStack newWorker = partySlot.getItem().copy();
-        Pokemon newWorkerPokemon = null;
-        ItemStack oldWorker = workerSlot.getItem().copy();
-        boolean noWorker = oldWorker.isEmpty();
-        Pokemon oldWorkerPokemon = null;
-        if (!oldWorker.isEmpty()) {
-            oldWorkerPokemon = PokeUtils.getItemFormPokemon(oldWorker, this.level);
-            CobbleWorkers.LOGGER.info("Owns: "+ oldWorkerPokemon.belongsTo(player));
-            if (oldWorkerPokemon.belongsTo(player)) return;
-        }
-        if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
-            newWorkerPokemon = this.party.get(slotIndex);
-        }
-        if (newWorkerPokemon == null && noWorker) return;
-        if (noWorker) {
-            partySlot.set(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get().getDefaultInstance());
-            this.party.remove(Objects.requireNonNull(newWorkerPokemon));
-        } else {
-            if (newWorkerPokemon != null && oldWorkerPokemon != null) {
-                this.party.remove(Objects.requireNonNull(newWorkerPokemon));
-                this.party.set(slotIndex, oldWorkerPokemon);
-            }
-            partySlot.set(oldWorker);
-        }
-        partySlot.setChanged();
-        if (newWorker.is(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get())) {
-            workerSlot.set(ItemStack.EMPTY);
-            this.party.set(slotIndex, PokeUtils.getItemFormPokemon(oldWorker, this.level));
-        } else if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
-            workerSlot.set(newWorker);
-        }
-        level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
-        workerSlot.setChanged();
+
     }
 
 }
