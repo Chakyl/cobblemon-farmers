@@ -24,7 +24,7 @@ public class BreakEvents {
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getState().is(CobbleWorkersRegistery.BlockRegistry.CRAFT_STATION.get()) || event.getState().is(CobbleWorkersRegistery.BlockRegistry.MYSTERY_MINE.get())) {
+        if (event.getState().is(CobbleWorkersRegistery.BlockRegistry.CRAFT_STATION.get()) || event.getState().is(CobbleWorkersRegistery.BlockRegistry.MYSTERY_MINE.get()) || event.getState().is(CobbleWorkersRegistery.BlockRegistry.GARDENING_STATION.get())) {
             BlockEntity blockEntity = event.getLevel().getBlockEntity(event.getPos());
             if (blockEntity instanceof StationBaseBlockEntity craftStationBlockEntity && craftStationBlockEntity.hasWorker()) {
                 event.setCanceled(true);
@@ -32,12 +32,11 @@ public class BreakEvents {
             }
         }
     }
+
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        CobbleWorkers.LOGGER.info("triggering!!");
         if (event.isWasDeath()) {
             double workerAssigned = event.getOriginal().getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue();
-            CobbleWorkers.LOGGER.info("assigned: " + workerAssigned);
             event.getEntity().getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).setBaseValue(workerAssigned);
             event.getOriginal().invalidateCaps();
         }

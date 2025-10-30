@@ -38,18 +38,18 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
 
     @Override
     protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 46  ;
+        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 46 ;
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF, false, 0, 0);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752, false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.workers_assigned", this.menu.getWorkersAssigned()), 212, 112, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.workers_assigned", this.menu.getWorkersAssigned()), 220, 112, 0xFFFFFFFF, true);
         double speedMod = this.menu.getSpeedModifier();
         if (speedMod > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 36, 45, 0xFFFFFFFF, true);
+            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 44, 45, 0xFFFFFFFF, true);
         }
         int workingRadius = this.menu.getWorkingRadius();
         if (workingRadius > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.working_radius", workingRadius), centralX + 36, 56, 0xFFFFFFFF, true);
+            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.working_radius", workingRadius), centralX + 44, 56, 0xFFFFFFFF, true);
         }
 
         int index = 0;
