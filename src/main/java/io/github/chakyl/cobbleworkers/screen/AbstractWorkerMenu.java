@@ -12,7 +12,11 @@ import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.utils.PokeUtils;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -43,6 +47,7 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
     private final PlayerPartyStore party;
     private final SimpleContainer partyContainer = new SimpleContainer(6);
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
+    private int quickcraftStatus;
 
     public AbstractWorkerMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pMenuType, pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
@@ -55,11 +60,15 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
         this.level = inv.player.level();
         this.data = data;
         this.player = inv.player;
-        PokemonStoreManager storage = Cobblemon.INSTANCE.getStorage();
-        try {
-            this.party = storage.getParty(inv.player.getUUID());
-        } catch (NoPokemonStoreException e) {
-            throw new RuntimeException(e);
+        if (!inv.player.level().isClientSide) {
+            PokemonStoreManager storage = Cobblemon.INSTANCE.getStorage();
+            try {
+                this.party = storage.getParty(inv.player.getUUID());
+            } catch (NoPokemonStoreException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            this.party = new PlayerPartyStore(inv.player.getUUID());
         }
     }
 
@@ -140,7 +149,10 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
             return Optional.empty();
         }
     }
-
+    @Override
+    public void clicked(int pSlotId, int pButton, ClickType pClickType, Player pPlayer) {
+        if (pClickType != ClickType.SWAP) super.clicked(pSlotId, pButton, pClickType, pPlayer);
+    }
     private void transferFromPartyToWorkerSlot(Player player, PartySlot partySlot) {
 
     }

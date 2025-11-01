@@ -14,7 +14,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -109,11 +113,26 @@ public class StationBaseBlockEntity extends BlockEntity {
     }
 
     public boolean validateOwner(Player player) {
-//        return true;
-//        if (owner == null || !owner.equals(player.getUUID())) {
-//            player.sendSystemMessage(Component.translatable("message.cobble_workers.not_owned").withStyle(ChatFormatting.RED));
-//            return false;
-//        }
+        if (owner == null || !owner.equals(player.getUUID())) {
+            player.sendSystemMessage(Component.translatable("message.cobble_workers.not_owned").withStyle(ChatFormatting.RED));
+            return false;
+        }
         return true;
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
+    }
+
+    @Override
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        load(pkt.getTag());
     }
 }

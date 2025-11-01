@@ -182,6 +182,8 @@ public class MysteryMineRecipe implements Recipe<RecipeWrapper> {
         @Override
         public void toNetwork(FriendlyByteBuf pBuffer, MysteryMineRecipe pRecipe) {
             pRecipe.ingredient.toNetwork(pBuffer);
+            pBuffer.writeVarInt(pRecipe.getResults(null).size());
+
             for (ItemStack result : pRecipe.getResults(null)) {
                 pBuffer.writeItemStack(result, false);
             }

@@ -277,6 +277,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         CompoundTag data = new CompoundTag();
+        if (owner != null) data.putUUID("Owner", owner);
         data.put("InputInventory", this.inputInventory.serializeNBT());
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putInt("CraftingTime", craftingTime);
@@ -288,6 +289,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     public void load(CompoundTag pTag) {
         super.load(pTag);
         CompoundTag data = pTag.getCompound(CobbleWorkers.MODID);
+        owner = data.hasUUID("Owner") ? data.getUUID("Owner") : null;
         if (data.contains("InputInventory", Tag.TAG_COMPOUND)) {
             this.inputInventory.deserializeNBT(data.getCompound("InputInventory"));
         }
@@ -299,17 +301,6 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
 
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
     }
 
     @Override

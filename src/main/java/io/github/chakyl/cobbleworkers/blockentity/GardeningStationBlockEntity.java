@@ -251,6 +251,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         CompoundTag data = new CompoundTag();
+        if (owner != null) data.putUUID("Owner", owner);
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putInt("ActionTime", actionTime);
         data.putInt("Progress", progress);
@@ -261,9 +262,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     public void load(CompoundTag pTag) {
         super.load(pTag);
         CompoundTag data = pTag.getCompound(CobbleWorkers.MODID);
-        if (data.contains("InputInventory", Tag.TAG_COMPOUND)) {
-        }
-
+        owner = data.hasUUID("Owner") ? data.getUUID("Owner") : null;
         if (data.contains("PokemonInventory", Tag.TAG_COMPOUND)) {
             this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
             this.initializeWorker();
@@ -271,17 +270,6 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
 
         actionTime = data.getInt("ActionTime");
         progress = data.getInt("Progress");
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
     }
 
     @Override

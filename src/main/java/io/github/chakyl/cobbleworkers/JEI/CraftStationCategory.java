@@ -72,7 +72,7 @@ public class CraftStationCategory implements IRecipeCategory<CraftStationRecipe>
         guiGraphics.blit(ELEMENT_TEXTURE, 0, 0, 0, elementalType.getTextureXMultiplier() * 18, 18, 18, 18, 324, 18);
 
         guiGraphics.drawString(Minecraft.getInstance().font, Language.getInstance().getVisualOrder(Component.translatable("jei.cobble_workers.craft_station.elemental_type", elementalType.getDisplayName())), 22, 5, elementalType.getHue(), true);
-        guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobble_workers.craft_station.speed_stat", recipe.getSpeedStat().getDisplayName()).getString()), 0, 22, 100, 0xFF4b3658);
+        guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobble_workers.craft_station.speed_stat", recipe.getSpeedStat().getDisplayName()).getString()), 0, 22, 84, 0xFF4b3658);
         if (recipe.getMultStat() != null) {
             guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobble_workers.craft_station.mult_stat", recipe.getMultStat().getDisplayName()).getString()), 0, 44, 84, 0xFF4b3658);
         }

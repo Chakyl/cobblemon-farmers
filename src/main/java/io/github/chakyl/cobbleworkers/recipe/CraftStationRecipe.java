@@ -142,7 +142,6 @@ public class CraftStationRecipe implements Recipe<RecipeWrapper> {
             if (pRecipe.getMultStat() != null) {
                 pBuffer.writeEnum(pRecipe.getMultStat());
             }
-            pBuffer.writeEnum(pRecipe.getSpeedStat());
             pBuffer.writeItemStack(pRecipe.getInputItem(null), false);
             pBuffer.writeItemStack(pRecipe.getResultItem(null), false);
         }

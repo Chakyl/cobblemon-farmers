@@ -1,5 +1,6 @@
 package io.github.chakyl.cobbleworkers.screen.helpers;
 
+import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.screen.MysteryMineMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;

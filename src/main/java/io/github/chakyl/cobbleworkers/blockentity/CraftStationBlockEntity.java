@@ -330,17 +330,6 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         progress = data.getInt("Progress");
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
-    }
-
     @Override
     public Component getDisplayName() {
         return Component.translatable("block.cobble_workers.craft_station");

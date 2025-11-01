@@ -9,6 +9,7 @@ import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.block.CraftStationBlock;
+import io.github.chakyl.cobbleworkers.entity.ClientSidePokemon;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
@@ -51,6 +52,9 @@ public class PokeUtils {
     public static Pokemon getItemFormPokemon(ItemStack pokeItem, Level level) {
         CompoundTag tag = pokeItem.getTag();
         if (tag == null) throw new RuntimeException("Horrible thing happened! The Pokemon doesn't exist!!!!");
+        if (level.isClientSide) {
+            return new ClientSidePokemon().loadFromNBTClient(tag.getCompound("pokeData"));
+        }
         return Pokemon.Companion.loadFromNBT(tag.getCompound("pokeData"));
     }
 

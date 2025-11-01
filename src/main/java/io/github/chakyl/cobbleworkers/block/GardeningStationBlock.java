@@ -79,8 +79,8 @@ public class GardeningStationBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof GardeningStationBlockEntity GardeningStationBlockEntity) {
-                if (GardeningStationBlockEntity.validateOwner(pPlayer)) {
+            if (entity instanceof GardeningStationBlockEntity gardeningStationBlockEntity) {
+                if (gardeningStationBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

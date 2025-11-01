@@ -52,11 +52,15 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
         this.level = inv.player.level();
         this.data = data;
         this.player = inv.player;
-        PokemonStoreManager storage = Cobblemon.INSTANCE.getStorage();
-        try {
-            this.party = storage.getParty(inv.player.getUUID());
-        } catch (NoPokemonStoreException e) {
-            throw new RuntimeException(e);
+        if (!inv.player.level().isClientSide) {
+            PokemonStoreManager storage = Cobblemon.INSTANCE.getStorage();
+            try {
+                this.party = storage.getParty(inv.player.getUUID());
+            } catch (NoPokemonStoreException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            this.party = new PlayerPartyStore(inv.player.getUUID());
         }
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
