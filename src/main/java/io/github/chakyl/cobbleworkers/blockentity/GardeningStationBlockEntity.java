@@ -17,9 +17,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -50,6 +47,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private int progress = 0;
     private int actionTime;
     private ResourceLocation lastRecipeID;
+    private boolean swapPriority = false;
 
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         @Override
@@ -70,6 +68,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                 return switch (pIndex) {
                     case 0 -> GardeningStationBlockEntity.this.progress;
                     case 1 -> GardeningStationBlockEntity.this.actionTime;
+                    case 2 -> GardeningStationBlockEntity.this.swapPriority ?  1 : 0;
                     default -> 0;
                 };
             }
@@ -79,15 +78,25 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                 switch (pIndex) {
                     case 0 -> GardeningStationBlockEntity.this.progress = pValue;
                     case 1 -> GardeningStationBlockEntity.this.actionTime = pValue;
+                    case 2 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
         };
+    }
+
+    public boolean getPrioritySwapped() {
+        return this.swapPriority;
+    }
+
+    public void setPrioritySwapped() {
+        this.swapPriority = !this.swapPriority;
+
     }
 
     @Override
@@ -130,7 +139,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         int spawnedXP = 0;
         for (PokemonEntity pokemon : nearbyMons) {
             if (!pokemon.isBattling() && !pokemon.isDeadOrDying() & pokemon.getPokemon().getOwnerPlayer() == null) {
-                pokemon.spawnAtLocation(CobblemonItems.EXPERIENCE_CANDY_XS.getDefaultInstance());
+                Block.popResourceFromFace(level, this.getBlockPos(), Direction.UP, CobblemonItems.EXPERIENCE_CANDY_S.getDefaultInstance());
                 pokemon.kill();
                 ++spawnedXP;
             }
@@ -152,15 +161,17 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
             waterFarmland(radius);
             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_WATER, SoundSource.BLOCKS, 1.0F, 0.9F);
         } else if (actionType.equals(types.getDARK())) {
-            generateExp(radius);
+            generateExp(radius * 4);
             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_DARK, SoundSource.BLOCKS, 1.0F, 0.9F);
         }
     }
 
     private ElementalType getActionType(Pokemon pokemon) {
-        if (getScalingStat(pokemon.getPrimaryType()) != null) return pokemon.getPrimaryType();
         ElementalType secondaryType = pokemon.getSecondaryType();
-        if (secondaryType != null && getScalingStat(secondaryType) != null) return secondaryType;
+        boolean hasSecondary = secondaryType != null && getScalingStat(secondaryType) != null;
+        if (this.swapPriority && hasSecondary) return secondaryType;
+        if (getScalingStat(pokemon.getPrimaryType()) != null) return pokemon.getPrimaryType();
+        if (hasSecondary) return secondaryType;
         return null;
     }
 
@@ -255,6 +266,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putInt("ActionTime", actionTime);
         data.putInt("Progress", progress);
+        data.putBoolean("SwapPriority", swapPriority);
         tag.put(CobbleWorkers.MODID, data);
     }
 
@@ -270,6 +282,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
 
         actionTime = data.getInt("ActionTime");
         progress = data.getInt("Progress");
+        swapPriority = data.getBoolean("SwapPriority");
     }
 
     @Override

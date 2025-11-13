@@ -6,10 +6,8 @@ import com.cobblemon.mod.common.api.pokemon.Natures;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.pokemon.FormData;
-import com.cobblemon.mod.common.pokemon.Nature;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.util.DataKeys;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
@@ -31,14 +29,8 @@ public class ClientSidePokemon extends Pokemon {
             this.setSpecies(Objects.requireNonNull(PokemonSpecies.INSTANCE.getByName(pokemonSpeciesIdentifier.substring(pokemonSpeciesIdentifier.indexOf(":") + 1))));
         }
 
-        if (nbt.contains(DataKeys.POKEMON_FORM_ID)) {
-            FormData resolvedForm = this.getSpecies().getStandardForm();
-            for (FormData form : this.getSpecies().getForms()) {
-                if (form.formOnlyShowdownId().equals(nbt.getString(DataKeys.POKEMON_FORM_ID))) {
-                    resolvedForm = form;
-                }
-            }
-            this.setForm(resolvedForm);
+        if (nbt.contains(DataKeys.POKEMON_SHINY)) {
+            this.setShiny(nbt.getBoolean(DataKeys.POKEMON_SHINY));
         }
 
         if (nbt.contains(DataKeys.POKEMON_LEVEL)) {
@@ -69,14 +61,24 @@ public class ClientSidePokemon extends Pokemon {
                 this.setNature(Objects.requireNonNull(Natures.INSTANCE.getNature(new ResourceLocation(pokemonNature))));
             }
         }
-        
+
         if (nbt.contains(DataKeys.POKEMON_MINTED_NATURE)) {
             String pokemonMintedNature = nbt.getString(DataKeys.POKEMON_MINTED_NATURE);
             if (!pokemonMintedNature.isEmpty()) {
                 this.setMintedNature(Objects.requireNonNull(Natures.INSTANCE.getNature(new ResourceLocation(pokemonMintedNature))));
             }
         }
+        if (nbt.contains(DataKeys.POKEMON_FORM_ID)) {
+            FormData resolvedForm = this.getSpecies().getStandardForm();
+            for (FormData form : this.getSpecies().getForms()) {
+                if (form.formOnlyShowdownId().equals(nbt.getString(DataKeys.POKEMON_FORM_ID))) {
+                    resolvedForm = form;
+                }
+            }
+            this.setForm(resolvedForm);
+        }
 
+        this.updateForm();
         this.updateAspects();
         return this;
     }

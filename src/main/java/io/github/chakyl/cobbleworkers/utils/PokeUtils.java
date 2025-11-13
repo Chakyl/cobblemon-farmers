@@ -2,12 +2,10 @@ package io.github.chakyl.cobbleworkers.utils;
 
 import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.CobblemonSounds;
-import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
+import com.cobblemon.mod.common.item.PokemonItem;
 import com.cobblemon.mod.common.pokemon.Pokemon;
-import com.cobblemon.mod.common.pokemon.Species;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.block.CraftStationBlock;
 import io.github.chakyl.cobbleworkers.entity.ClientSidePokemon;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
@@ -15,7 +13,6 @@ import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -29,24 +26,28 @@ import java.util.Objects;
 public class PokeUtils {
 
     public static ItemStack getPokemonItemForm(Pokemon pokemon) {
-        ItemStack itemStack = new ItemStack(CobblemonItems.POKEMON_MODEL.asItem());
         if (pokemon == null) return new ItemStack(CobbleWorkersRegistery.ItemRegistry.RETRIEVE_WORKER.get());
+        ItemStack itemStack = PokemonItem.from(pokemon);
         CompoundTag tag = itemStack.getOrCreateTag();
         CompoundTag pokeTag = pokemon.saveToNBT(new CompoundTag());
-        tag.put("species", pokeTag.get("Species"));
         tag.put("pokeData", pokeTag);
         return itemStack;
     }
 
-    public static boolean validWorkerType(ItemStack itemPokemon, ElementalType type) {
+    public static boolean validWorkerType(ItemStack itemPokemon, ElementalType type, Level level) {
         if (!itemPokemon.hasTag()) return false;
-        String speciesTag = itemPokemon.getTag().getString("species");
-        if (speciesTag.isEmpty()) return false;
-        Species pokeSpecies = PokemonSpecies.INSTANCE.getByIdentifier(new ResourceLocation(speciesTag));
-        for (ElementalType elementalType : pokeSpecies.getTypes()) {
+        Pokemon pokemon = getItemFormPokemon(itemPokemon, level);
+        for (ElementalType elementalType : pokemon.getTypes()) {
             if (elementalType.equals(type)) return true;
         }
         return false;
+    }
+
+    public static boolean priorityWorkerType(ItemStack itemPokemon, ElementalType type, Level level, boolean secondary) {
+        if (!itemPokemon.hasTag()) return false;
+        Pokemon pokemon = getItemFormPokemon(itemPokemon, level);
+        if (secondary && pokemon.getSecondaryType() != null) return pokemon.getSecondaryType().equals(type);
+        return pokemon.getPrimaryType().equals(type);
     }
 
     public static Pokemon getItemFormPokemon(ItemStack pokeItem, Level level) {
@@ -124,7 +125,7 @@ public class PokeUtils {
         }
         if (difference != 0) {
             AttributeInstance attr = player.getAttribute(CobbleWorkersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get());
-            attr.setBaseValue(attr.getValue() -difference);
+            attr.setBaseValue(attr.getValue() - difference);
         }
         level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
         workerSlot.setChanged();

@@ -1,8 +1,10 @@
 package io.github.chakyl.cobbleworkers.blockentity.renderer;
 
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
+import com.cobblemon.mod.common.util.DataKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.block.CraftStationBlock;
 import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -15,6 +17,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -22,9 +25,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonOffset;
 
@@ -68,6 +73,10 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
+            Set<String> workerAspects = pBlockEntity.getWorkerAspects();
+            if (workerAspects != null) {
+                pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), workerAspects);
+            }
             BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
             pPoseStack.translate(getPokemonOffset(blockState, true), 0.01, getPokemonOffset(blockState, false));

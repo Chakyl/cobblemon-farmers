@@ -13,9 +13,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
@@ -47,6 +44,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     private int craftingTime;
     private ResourceLocation lastRecipeID;
     private boolean checkNewRecipe;
+    private boolean swapPriority = false;
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(1) {
         @Override
@@ -79,6 +77,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 return switch (pIndex) {
                     case 0 -> MysteryMineBlockEntity.this.progress;
                     case 1 -> MysteryMineBlockEntity.this.craftingTime;
+                    case 2 -> MysteryMineBlockEntity.this.swapPriority ?  1 : 0;
                     default -> 0;
                 };
             }
@@ -88,13 +87,14 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 switch (pIndex) {
                     case 0 -> MysteryMineBlockEntity.this.progress = pValue;
                     case 1 -> MysteryMineBlockEntity.this.craftingTime = pValue;
+                    case 2 -> MysteryMineBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
         };
     }
@@ -110,7 +110,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         if (!level.isClientSide()) {
             if (this.hasWorker() && this.hasInput()) {
                 Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.get().getElementalType())) {
+                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.get().getElementalType(), level)) {
                     didInventoryChange = this.processRecipe(recipe.get());
                 } else {
                     this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
@@ -123,6 +123,12 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
             }
         }
 
+    }
+
+    public void setPrioritySwapped() {
+        this.swapPriority = !this.swapPriority;
+        checkNewRecipe = true;
+        setChanged();
     }
 
     @Override
@@ -188,22 +194,35 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                     .getRecipeMap(CraftStationRecipe.Type.INSTANCE)
                     .get(lastRecipeID);
             if (recipe instanceof MysteryMineRecipe) {
-                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((MysteryMineRecipe) recipe).getElementalType())) {
+                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((MysteryMineRecipe) recipe).getElementalType(), level)) {
                     return Optional.of((MysteryMineRecipe) recipe);
                 }
             }
         }
         if (checkNewRecipe) {
             List<MysteryMineRecipe> validRecipes = level.getRecipeManager().getRecipesFor(MysteryMineRecipe.Type.INSTANCE, inventoryWrapper, level);
+            MysteryMineRecipe foundRecipe = null;
             for (MysteryMineRecipe recipe : validRecipes) {
-                if (PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType())) {
-                    ResourceLocation newRecipeID = recipe.getId();
-                    if (lastRecipeID != null && !lastRecipeID.equals(newRecipeID)) {
-                        craftingTime = 0;
-                    }
-                    lastRecipeID = newRecipeID;
-                    return Optional.of(recipe);
+                if (PokeUtils.priorityWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType(), level, this.swapPriority)) {
+                    foundRecipe = recipe;
+                    break;
                 }
+            }
+            if (foundRecipe == null) {
+                for (MysteryMineRecipe recipe : validRecipes) {
+                    if (PokeUtils.priorityWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType(), level, !this.swapPriority)) {
+                        foundRecipe = recipe;
+                        break;
+                    }
+                }
+            }
+            if (foundRecipe != null) {
+                ResourceLocation newRecipeID = foundRecipe.getId();
+                if (lastRecipeID != null && !lastRecipeID.equals(newRecipeID)) {
+                    craftingTime = 0;
+                }
+                lastRecipeID = newRecipeID;
+                return Optional.of(foundRecipe);
             }
         }
         checkNewRecipe = false;
@@ -282,6 +301,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
+        data.putBoolean("SwapPriority", swapPriority);
         tag.put(CobbleWorkers.MODID, data);
     }
 
@@ -301,6 +321,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
 
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
+        swapPriority = data.getBoolean("SwapPriority");
     }
 
     @Override

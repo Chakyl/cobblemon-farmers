@@ -3,6 +3,7 @@ package io.github.chakyl.cobbleworkers.blockentity;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
+import io.github.chakyl.cobbleworkers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.CraftStationMenu;
 import io.github.chakyl.cobbleworkers.utils.PokeUtils;
@@ -11,9 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
@@ -46,6 +44,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     private int craftingTime;
     private ResourceLocation lastRecipeID;
     private boolean checkNewRecipe;
+    private boolean swapPriority = false;
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(1) {
         @Override
@@ -86,6 +85,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
                 return switch (pIndex) {
                     case 0 -> CraftStationBlockEntity.this.progress;
                     case 1 -> CraftStationBlockEntity.this.craftingTime;
+                    case 2 -> CraftStationBlockEntity.this.swapPriority ?  1 : 0;
                     default -> 0;
                 };
             }
@@ -95,13 +95,14 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
                 switch (pIndex) {
                     case 0 -> CraftStationBlockEntity.this.progress = pValue;
                     case 1 -> CraftStationBlockEntity.this.craftingTime = pValue;
+                    case 2 -> CraftStationBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
         };
     }
@@ -113,6 +114,12 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         if (!inputStack.isEmpty()) stacks.add(inputStack);
         if (!outputStack.isEmpty()) stacks.add(outputStack);
         return stacks;
+    }
+
+    public void setPrioritySwapped() {
+        this.swapPriority = !this.swapPriority;
+        checkNewRecipe = true;
+        setChanged();
     }
 
     @Override
@@ -128,7 +135,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         if (!level.isClientSide()) {
             if (hasWorker && hasInput) {
                 Optional<CraftStationRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
-                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.get().getElementalType())) {
+                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.get().getElementalType(), level)) {
                     didInventoryChange = this.processRecipe(recipe.get());
                 } else {
                     this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
@@ -255,7 +262,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         if (lastRecipeID != null) {
             Recipe<RecipeWrapper> recipe = ((CWRecipeManagerAccessor) level.getRecipeManager()).getRecipeMap(CraftStationRecipe.Type.INSTANCE).get(lastRecipeID);
             if (recipe instanceof CraftStationRecipe) {
-                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((CraftStationRecipe) recipe).getElementalType())) {
+                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((CraftStationRecipe) recipe).getElementalType(), level)) {
                     return Optional.of((CraftStationRecipe) recipe);
                 }
                 if (ItemStack.isSameItem(recipe.getResultItem(this.level.registryAccess()), this.outputInventory.getStackInSlot(0))) {
@@ -266,15 +273,28 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
 
         if (checkNewRecipe) {
             List<CraftStationRecipe> validRecipes = level.getRecipeManager().getRecipesFor(CraftStationRecipe.Type.INSTANCE, inventoryWrapper, level);
+            CraftStationRecipe foundRecipe = null;
             for (CraftStationRecipe recipe : validRecipes) {
-                if (PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType())) {
-                    ResourceLocation newRecipeID = recipe.getId();
-                    if (lastRecipeID != null && !lastRecipeID.equals(newRecipeID)) {
-                        craftingTime = 0;
-                    }
-                    lastRecipeID = newRecipeID;
-                    return Optional.of(recipe);
+                if (PokeUtils.priorityWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType(), level, this.swapPriority)) {
+                    foundRecipe = recipe;
+                    break;
                 }
+            }
+            if (foundRecipe == null) {
+                for (CraftStationRecipe recipe : validRecipes) {
+                    if (PokeUtils.priorityWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType(), level, !this.swapPriority)) {
+                        foundRecipe = recipe;
+                        break;
+                    }
+                }
+            }
+            if (foundRecipe != null) {
+                ResourceLocation newRecipeID = foundRecipe.getId();
+                if (lastRecipeID != null && !lastRecipeID.equals(newRecipeID)) {
+                    craftingTime = 0;
+                }
+                lastRecipeID = newRecipeID;
+                return Optional.of(foundRecipe);
             }
         }
 
@@ -306,6 +326,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
+        data.putBoolean("SwapPriority", swapPriority);
         tag.put(CobbleWorkers.MODID, data);
     }
 
@@ -328,6 +349,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
 
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
+        swapPriority = data.getBoolean("SwapPriority");
     }
 
     @Override

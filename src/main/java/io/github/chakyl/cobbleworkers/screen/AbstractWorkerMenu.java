@@ -1,24 +1,14 @@
 package io.github.chakyl.cobbleworkers.screen;
 
 import com.cobblemon.mod.common.Cobblemon;
-import com.cobblemon.mod.common.CobblemonItems;
-import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.pokemon.Pokemon;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.utils.PokeUtils;
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.ReportedException;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -28,13 +18,9 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonItemForm;
@@ -47,7 +33,7 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
     private final PlayerPartyStore party;
     private final SimpleContainer partyContainer = new SimpleContainer(6);
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
-    private int quickcraftStatus;
+    private boolean prioritySwapped;
 
     public AbstractWorkerMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pMenuType, pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
@@ -76,6 +62,14 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
         return data.get(0) > 0;
     }
 
+    public boolean getPrioritySwapped() {
+        // Implement
+        return false;
+    }
+
+    public void setPrioritySwapped() {
+        // Implement
+    }
 
     public Pokemon getWorkerPokemon() {
         WorkerSlot workerSlot = (WorkerSlot) this.slots.get(this.slots.size() - 1);
@@ -149,10 +143,12 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
             return Optional.empty();
         }
     }
+
     @Override
     public void clicked(int pSlotId, int pButton, ClickType pClickType, Player pPlayer) {
         if (pClickType != ClickType.SWAP) super.clicked(pSlotId, pButton, pClickType, pPlayer);
     }
+
     private void transferFromPartyToWorkerSlot(Player player, PartySlot partySlot) {
 
     }

@@ -2,46 +2,29 @@ package io.github.chakyl.cobbleworkers.blockentity;
 
 import com.cobblemon.mod.common.CobblemonEntities;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
+import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
-import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
-import io.github.chakyl.cobbleworkers.screen.CraftStationMenu;
-import io.github.chakyl.cobbleworkers.utils.PokeUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Containers;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getItemFormPokemon;
@@ -50,6 +33,7 @@ import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonRotation;
 public class StationBaseBlockEntity extends BlockEntity {
     protected UUID owner;
     private PokemonEntity workerEntity;
+    Set<String> workerAspects;
 
     public StationBaseBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
@@ -57,6 +41,10 @@ public class StationBaseBlockEntity extends BlockEntity {
 
     public PokemonEntity getWorkerEntity() {
         return this.workerEntity;
+    }
+
+    public Set<String> getWorkerAspects() {
+        return this.workerAspects;
     }
 
     public void initializeWorker() {
@@ -68,6 +56,7 @@ public class StationBaseBlockEntity extends BlockEntity {
             this.workerEntity.setNoAi(true);
             this.workerEntity.setYHeadRot(rotation);
             this.workerEntity.setYBodyRot(rotation);
+            this.workerAspects = pokemon.getAspects();
         } else {
             this.workerEntity = null;
         }
@@ -113,6 +102,10 @@ public class StationBaseBlockEntity extends BlockEntity {
     }
 
     public boolean validateOwner(Player player) {
+        if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer((ServerPlayer) player) != null) {
+            player.sendSystemMessage(Component.translatable("message.cobble_workers.in_battle").withStyle(ChatFormatting.RED));
+            return false;
+        }
         if (owner == null || !owner.equals(player.getUUID())) {
             player.sendSystemMessage(Component.translatable("message.cobble_workers.not_owned").withStyle(ChatFormatting.RED));
             return false;

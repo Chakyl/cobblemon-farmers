@@ -4,43 +4,53 @@
   "crafting_time": 200,
   "speed_stat": "ATTACK",
   "mult_stat": "SPECIAL_ATTACK",
-  "consume_chance": 0.7,
+  "consume_chance": 0.5,
   "ingredient": {
-    "tag": "cobble_workers:uncommon_berries"
+    "tag": "cobble_workers:legendary_berries"
   },
   "results": [
     {
       "item": "minecraft:cobblestone",
       "count": 1,
-      "weight": 32
+      "weight":48
     },
     {
       "item": "minecraft:coal",
-      "count": 2,
+      "count": 4,
       "weight": 8
     },
     {
       "item": "minecraft:raw_copper",
-      "count": 2,
+      "count": 4,
       "weight": 6
     },
     {
       "item": "minecraft:raw_iron",
-      "count": 1,
+      "count": 2,
       "weight": 4
     },
     {
       "item": "minecraft:lapis_lazuli",
-      "count": 1,
-      "weight": 3
+      "count": 4,
+      "weight": 2
+    },
+    {
+      "item": "minecraft:redstone",
+      "count": 4,
+      "weight": 2
     },
     {
       "item": "minecraft:raw_gold",
-      "count": 1,
-      "weight": 3
+      "count": 2,
+      "weight": 2
     },
     {
       "item": "cobblemon:thunder_stone",
+      "count": 1,
+      "weight": 1
+    },
+    {
+      "item": "cobblemon:dusk_stone",
       "count": 1,
       "weight": 1
     }

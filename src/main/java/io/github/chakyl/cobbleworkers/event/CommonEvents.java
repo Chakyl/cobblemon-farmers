@@ -1,10 +1,10 @@
 package io.github.chakyl.cobbleworkers.event;
 
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
+import io.github.chakyl.cobbleworkers.network.PacketHandler;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -16,6 +16,9 @@ public class CommonEvents {
         @SubscribeEvent
 
         public static void onCommonSetup(final FMLCommonSetupEvent event) {
+            event.enqueueWork(() -> {
+                PacketHandler.register();
+            });
             event.enqueueWork(() -> CobbleWorkers.GROWTH_EDITION_INSTALLED = ModList.get().isLoaded("dew_drop_farmland_growth"));
         }
 

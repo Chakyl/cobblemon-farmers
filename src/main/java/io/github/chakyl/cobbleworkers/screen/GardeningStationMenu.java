@@ -4,12 +4,10 @@ import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
-import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -24,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -76,6 +73,24 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
             this.partySlots.add(this.addSlot(new PartySlot(this.partyContainer, i, i % 2 == 0 ? 186 : 217, (((i / 2) * 31) + (i % 2 == 0 ? 20 : 28)))));
             this.partyContainer.addItem(getPokemonItemForm(this.party.get(i)));
         }
+    }
+
+    public int getCurrentProcessingTime() {
+        return this.data.get(0);
+    }
+
+    public int getTotalProcessingTime() {
+        return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
+    }
+
+    @Override
+    public boolean getPrioritySwapped() {
+        return this.data.get(2) == 1;
+    }
+
+    @Override
+    public void setPrioritySwapped() {
+        this.blockEntity.setPrioritySwapped();
     }
 
     public int getScaledProgress() {

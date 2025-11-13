@@ -1,5 +1,5 @@
 {
-    "itemGroup.cobble_workers": "Cobble Workers",
+    "itemGroup.cobble_workers": "Cobblemon Farmers",
     "item.cobble_workers.retrieve_worker": "Retrieve Worker",
     "block.cobble_workers.craft_station": "Craft Station",
     "block.cobble_workers.gardening_station": "Gardening Station",
@@ -13,6 +13,13 @@
     "gui.cobble_workers.speed": "Speed: x%s",
     "gui.cobble_workers.mult_chance": "Mult Chance: %s",
     "gui.cobble_workers.working_radius": "Working Radius: %s",
+    "gui.cobble_workers.swap_priority": "Swap Priority",
+    "gui.cobble_workers.prioritize_primary": "Prioritize Primary Type",
+    "gui.cobble_workers.prioritize_secondary": "Prioritize Secondary Type",
+
+    "tooltip.cobble_workers.mystery_mine.processing_time": "Mining time left: %s",
+    "tooltip.cobble_workers.gardening_station.processing_time": "Gardening Time left: %s",
+    "tooltip.cobble_workers.craft_station.processing_time": "Crafting Time left: %s",
 
     "info.cobble_workers.craft_station.type.normal": "Can't work here",
     "info.cobble_workers.craft_station.type.fire": "Can't work here",
@@ -71,6 +78,7 @@
     "info.cobble_workers.mystery_mine.type.dark": "Can't work here",
     "info.cobble_workers.mystery_mine.type.fairy": "Can't work here",
 
+    "message.cobble_workers.in_battle": "You can't access this while battling!",
     "message.cobble_workers.has_pokemon": "Remove worker before breaking!",
     "message.cobble_workers.not_owned": "You don't own this workstation!",
 

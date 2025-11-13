@@ -1,21 +1,15 @@
 package io.github.chakyl.cobbleworkers.screen;
 
 import com.cobblemon.mod.common.Cobblemon;
-import com.cobblemon.mod.common.CobblemonItems;
-import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
-import com.cobblemon.mod.common.pokemon.Pokemon;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
-import io.github.chakyl.cobbleworkers.utils.PokeUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -32,7 +26,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.github.chakyl.cobbleworkers.utils.PokeUtils.getPokemonItemForm;
@@ -88,6 +81,24 @@ public class CraftStationMenu extends AbstractWorkerMenu {
             this.partySlots.add(this.addSlot(new CraftStationMenu.PartySlot(this.partyContainer, i, i % 2 == 0 ? 186 : 217, (((i / 2) * 31) + (i % 2 == 0 ? 20 : 28)))));
             this.partyContainer.addItem(getPokemonItemForm(this.party.get(i)));
         }
+    }
+
+    public int getCurrentProcessingTime() {
+        return this.data.get(0);
+    }
+
+    @Override
+    public boolean getPrioritySwapped() {
+        return this.data.get(2) == 1;
+    }
+
+    @Override
+    public void setPrioritySwapped() {
+        this.blockEntity.setPrioritySwapped();
+    }
+
+    public int getTotalProcessingTime() {
+        return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
     }
 
     public int getScaledProgress() {

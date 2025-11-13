@@ -1,0 +1,15 @@
+{
+  "type": "cobble_workers:mystery_mine",
+  "elemental_type": "dragon",
+  "crafting_time": 12000,
+  "speed_stat": "SPEED",
+  "mult_stat": "HP",
+  "consume_chance": 1,
+  "ingredient": {
+    "tag": "cobble_workers:uncommon_berries"
+  },
+  "results": [
+    { "item": "minecraft:amethyst_shard", "count": 1, "weight": 12 },
+    { "item": "minecraft:emerald", "count": 1, "weight": 16 }
+  ]
+}
