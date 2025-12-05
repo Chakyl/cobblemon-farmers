@@ -66,7 +66,7 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
         if (speedMod > 0) {
             GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.speed", speedMod), centralX + 44, 45, 0xFFFFFFFF, true);
         }
-        int workingRadius = this.menu.getWorkingRadius();
+        int workingRadius = this.menu.getAoeRadius();
         if (workingRadius > 0) {
             GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobble_workers.working_radius", workingRadius), centralX + 44, 56, 0xFFFFFFFF, true);
         }
@@ -101,7 +101,7 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
         if (this.menu.getPrioritySwapped()) guiGraphics.blit(TEXTURE, x + 36, y + 34, 0, 176, 4, 4);
         renderProgressArrow(guiGraphics, x, y);
-        renderPokemon(guiGraphics, x, y, this.menu.getWorkerPokemon(), -10);
+        renderPokemon(guiGraphics, x, y, this.menu.getPrimaryType(), this.menu.getSecondaryType(), -10);
     }
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {

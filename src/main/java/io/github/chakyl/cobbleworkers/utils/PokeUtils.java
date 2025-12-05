@@ -6,7 +6,9 @@ import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.item.PokemonItem;
 import com.cobblemon.mod.common.pokemon.Pokemon;
+import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.block.CraftStationBlock;
+import io.github.chakyl.cobbleworkers.blockentity.StationBaseBlockEntity;
 import io.github.chakyl.cobbleworkers.entity.ClientSidePokemon;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
@@ -34,20 +36,16 @@ public class PokeUtils {
         return itemStack;
     }
 
-    public static boolean validWorkerType(ItemStack itemPokemon, ElementalType type, Level level) {
-        if (!itemPokemon.hasTag()) return false;
-        Pokemon pokemon = getItemFormPokemon(itemPokemon, level);
-        for (ElementalType elementalType : pokemon.getTypes()) {
-            if (elementalType.equals(type)) return true;
-        }
-        return false;
+    public static boolean validWorkerType(StationBaseBlockEntity stationBaseBlockEntity, ElementalType type, Level level) {
+        if (stationBaseBlockEntity.getPrimaryType() == null) return false;
+        if (stationBaseBlockEntity.getPrimaryType().equals(type)) return true;
+        return (stationBaseBlockEntity.getSecondaryType() != null && stationBaseBlockEntity.getSecondaryType().equals(type));
     }
 
-    public static boolean priorityWorkerType(ItemStack itemPokemon, ElementalType type, Level level, boolean secondary) {
-        if (!itemPokemon.hasTag()) return false;
-        Pokemon pokemon = getItemFormPokemon(itemPokemon, level);
-        if (secondary && pokemon.getSecondaryType() != null) return pokemon.getSecondaryType().equals(type);
-        return pokemon.getPrimaryType().equals(type);
+    public static boolean priorityWorkerType(StationBaseBlockEntity stationBaseBlockEntity, ElementalType type, Level level, boolean secondary) {
+        if (stationBaseBlockEntity.getPrimaryType() == null) return false;
+        if (secondary && stationBaseBlockEntity.getSecondaryType() != null) return stationBaseBlockEntity.getSecondaryType().equals(type);
+        return stationBaseBlockEntity.getPrimaryType().equals(type);
     }
 
     public static Pokemon getItemFormPokemon(ItemStack pokeItem, Level level) {

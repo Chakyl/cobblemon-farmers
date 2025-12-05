@@ -1,5 +1,6 @@
 package io.github.chakyl.cobbleworkers.blockentity;
 
+import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobbleworkers.CobbleWorkers;
 import io.github.chakyl.cobbleworkers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
@@ -77,7 +78,9 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 return switch (pIndex) {
                     case 0 -> MysteryMineBlockEntity.this.progress;
                     case 1 -> MysteryMineBlockEntity.this.craftingTime;
-                    case 2 -> MysteryMineBlockEntity.this.swapPriority ?  1 : 0;
+                    case 2 -> Mth.floor(MysteryMineBlockEntity.this.speedModifier * 100);
+                    case 3 -> MysteryMineBlockEntity.this.multChance;
+                    case 4 -> MysteryMineBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -87,14 +90,16 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 switch (pIndex) {
                     case 0 -> MysteryMineBlockEntity.this.progress = pValue;
                     case 1 -> MysteryMineBlockEntity.this.craftingTime = pValue;
-                    case 2 -> MysteryMineBlockEntity.this.swapPriority = pValue == 1;
+                    case 2 -> MysteryMineBlockEntity.this.speedModifier = (double) pValue / 100;
+                    case 3 -> MysteryMineBlockEntity.this.multChance = pValue;
+                    case 4 -> MysteryMineBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return 5;
             }
         };
     }
@@ -110,13 +115,21 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         if (!level.isClientSide()) {
             if (this.hasWorker() && this.hasInput()) {
                 Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), recipe.get().getElementalType(), level)) {
+                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
                     didInventoryChange = this.processRecipe(recipe.get());
+                    if (this.speedModifier <= 0) {
+                        this.fetchSpeedModifier(recipe.get().getSpeedStat());
+                        this.fetchMultChance(recipe.get().getMultStat());
+                    }
                 } else {
+                    this.speedModifier = 0;
+                    this.multChance = 0;
                     this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
                 }
             } else if (this.progress > 0) {
                 this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
+                this.speedModifier = 0;
+                this.multChance = 0;
             }
             if (didInventoryChange) {
                 setChanged();
@@ -133,7 +146,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
 
     @Override
     public boolean hasWorker() {
-        return !this.pokemonInventory.getStackInSlot(0).isEmpty();
+        return !this.pokemonInventory.getStackInSlot(0).isEmpty() && this.primaryType != null;
     }
 
     public boolean hasInput() {
@@ -194,7 +207,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                     .getRecipeMap(CraftStationRecipe.Type.INSTANCE)
                     .get(lastRecipeID);
             if (recipe instanceof MysteryMineRecipe) {
-                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(pokemonInventory.getStackInSlot(0), ((MysteryMineRecipe) recipe).getElementalType(), level)) {
+                if (recipe.matches(inventoryWrapper, level) && PokeUtils.validWorkerType(this, ((MysteryMineRecipe) recipe).getElementalType(), level)) {
                     return Optional.of((MysteryMineRecipe) recipe);
                 }
             }
@@ -203,14 +216,14 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
             List<MysteryMineRecipe> validRecipes = level.getRecipeManager().getRecipesFor(MysteryMineRecipe.Type.INSTANCE, inventoryWrapper, level);
             MysteryMineRecipe foundRecipe = null;
             for (MysteryMineRecipe recipe : validRecipes) {
-                if (PokeUtils.priorityWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType(), level, this.swapPriority)) {
+                if (PokeUtils.priorityWorkerType(this, recipe.getElementalType(), level, this.swapPriority)) {
                     foundRecipe = recipe;
                     break;
                 }
             }
             if (foundRecipe == null) {
                 for (MysteryMineRecipe recipe : validRecipes) {
-                    if (PokeUtils.priorityWorkerType(pokemonInventory.getStackInSlot(0), recipe.getElementalType(), level, !this.swapPriority)) {
+                    if (PokeUtils.priorityWorkerType(this, recipe.getElementalType(), level, !this.swapPriority)) {
                         foundRecipe = recipe;
                         break;
                     }
@@ -234,7 +247,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
 
         ++progress;
         craftingTime = recipe.getCraftingTime();
-        if (Mth.floor(progress * getSpeedModifier(recipe.getSpeedStat())) < craftingTime) {
+        if (Mth.floor(progress * getSpeedModifier()) < craftingTime) {
             return false;
         }
         progress = 0;
@@ -254,7 +267,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
             currentWeight += weights.get(i);
             if (currentWeight >= result) {
                 int mult = 1;
-                int multChance = getMultChance(recipe.getMultStat());
+                int multChance = getMultChance();
                 if (multChance > 0) {
                     Random r = new Random();
                     if (r.nextDouble() * 100 < multChance) mult = 2;
@@ -274,16 +287,6 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         return false;
     }
 
-    public double getSpeedModifier() {
-        Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-        return recipe.map(mysteryMineRecipe -> super.getSpeedModifier(mysteryMineRecipe.getSpeedStat())).orElse(0.0);
-    }
-
-    public int getMultChance() {
-        Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-        return recipe.map(mysteryMineRecipe -> super.getMultChance(mysteryMineRecipe.getMultStat())).orElse(0);
-    }
-
     protected boolean canProcess(MysteryMineRecipe recipe) {
         ItemStack resultStack = recipe.getResultItem(this.level.registryAccess());
         if (resultStack.isEmpty()) {
@@ -299,6 +302,8 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         if (owner != null) data.putUUID("Owner", owner);
         data.put("InputInventory", this.inputInventory.serializeNBT());
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
+        data.putString("PrimaryType", this.primaryType != null ? this.primaryType.getName() : "");
+        data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
         data.putBoolean("SwapPriority", swapPriority);
@@ -318,7 +323,8 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
             this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
             this.initializeWorker();
         }
-
+        primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
+        secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
         swapPriority = data.getBoolean("SwapPriority");

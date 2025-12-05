@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
+import com.cobblemon.mod.common.api.types.ElementalType;
 import io.github.chakyl.cobbleworkers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
 import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
@@ -41,7 +42,7 @@ public class CraftStationMenu extends AbstractWorkerMenu {
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
     public CraftStationMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(5));
     }
 
     public CraftStationMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -89,7 +90,7 @@ public class CraftStationMenu extends AbstractWorkerMenu {
 
     @Override
     public boolean getPrioritySwapped() {
-        return this.data.get(2) == 1;
+        return this.data.get(4) == 1;
     }
 
     @Override
@@ -161,12 +162,18 @@ public class CraftStationMenu extends AbstractWorkerMenu {
     }
 
 
-    public double getSpeedModifier() {
-        return this.blockEntity.getSpeedModifier();
-    }
+    public double getSpeedModifier() { return (double) this.data.get(2) / 100; }
 
     public int getMultChance() {
-        return this.blockEntity.getMultChance();
+        return this.data.get(3);
+    }
+
+    public ElementalType getPrimaryType() {
+        return this.blockEntity.getPrimaryType();
+    }
+
+    public ElementalType getSecondaryType() {
+        return this.blockEntity.getSecondaryType();
     }
 
     @Override
