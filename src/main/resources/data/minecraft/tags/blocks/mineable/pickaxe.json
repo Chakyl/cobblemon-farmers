@@ -1,7 +1,7 @@
 {
   "values": [
-    "cobble_workers:craft_station",
-    "cobble_workers:gardening_station",
-    "cobble_workers:mystery_mine"
+    "cobblemon_farmers:craft_station",
+    "cobblemon_farmers:gardening_station",
+    "cobblemon_farmers:mystery_mine"
   ]
 }

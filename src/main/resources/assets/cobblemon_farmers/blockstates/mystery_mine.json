@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "cobblemon_farmers:block/mystery_mine",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cobblemon_farmers:block/mystery_mine"
+    },
+    "facing=south": {
+      "model": "cobblemon_farmers:block/mystery_mine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cobblemon_farmers:block/mystery_mine",
+      "y": 270
+    }
+  }
+}

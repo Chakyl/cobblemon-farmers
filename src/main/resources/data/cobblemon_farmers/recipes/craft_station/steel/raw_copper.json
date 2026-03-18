@@ -1,0 +1,23 @@
+{
+  "type": "cobblemon_farmers:craft_station",
+  "conditions": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "forge:mod_loaded",
+        "modid": "create"
+      }
+    }
+  ],
+  "elemental_type": "steel",
+  "crafting_time": 2000,
+  "speed_stat": "SPECIAL_ATTACK",
+  "mult_stat": "ATTACK",
+  "ingredient": {
+    "item": "minecraft:raw_copper"
+  },
+  "result": {
+    "item": "minecraft:copper_ingot",
+    "count": 2
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "cobblemon_farmers:block/mystery_mine_bottom",
+    "east": "cobblemon_farmers:block/mystery_mine_side",
+    "north": "cobblemon_farmers:block/mystery_mine_side",
+    "particle": "cobblemon_farmers:block/mystery_mine_side",
+    "south": "cobblemon_farmers:block/mystery_mine_side",
+    "up": "cobblemon_farmers:block/mystery_mine_top",
+    "west": "cobblemon_farmers:block/mystery_mine_side"
+  }
+}

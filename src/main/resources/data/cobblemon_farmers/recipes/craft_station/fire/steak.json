@@ -1,0 +1,12 @@
+{
+  "type": "cobblemon_farmers:craft_station",
+  "elemental_type": "fire",
+  "crafting_time": 200,
+  "speed_stat": "SPECIAL_ATTACK",
+  "ingredient": {
+    "item": "minecraft:beef"
+  },
+  "result": {
+    "item": "minecraft:cooked_beef"
+  }
+}

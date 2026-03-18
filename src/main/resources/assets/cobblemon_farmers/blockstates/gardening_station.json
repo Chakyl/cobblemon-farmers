@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "cobblemon_farmers:block/gardening_station",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cobblemon_farmers:block/gardening_station"
+    },
+    "facing=south": {
+      "model": "cobblemon_farmers:block/gardening_station",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cobblemon_farmers:block/gardening_station",
+      "y": 270
+    }
+  }
+}

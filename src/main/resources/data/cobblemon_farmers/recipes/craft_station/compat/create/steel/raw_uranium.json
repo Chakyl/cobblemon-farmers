@@ -1,0 +1,27 @@
+{
+  "type": "create:crushing",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    },
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "forge:tag_empty",
+        "tag": "forge:raw_materials/uranium"
+      }
+    }
+  ],
+  "elemental_type": "steel",
+  "crafting_time": 2000,
+  "speed_stat": "SPECIAL_ATTACK",
+  "mult_stat": "ATTACK",
+  "ingredient": {
+    "tag": "forge:raw_materials/uranium"
+  },
+  "result": {
+    "item": "create:crushed_raw_uranium",
+    "count": 2
+  }
+}
