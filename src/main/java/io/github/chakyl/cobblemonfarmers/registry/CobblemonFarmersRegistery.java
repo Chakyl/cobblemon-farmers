@@ -1,6 +1,5 @@
 package io.github.chakyl.cobblemonfarmers.registry;
 
-import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.api.types.ElementalTypes;
 import com.google.common.base.Suppliers;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
@@ -15,6 +14,7 @@ import io.github.chakyl.cobblemonfarmers.blockentity.RanchingStationBlockEntity;
 import io.github.chakyl.cobblemonfarmers.items.WorkerTypeItem;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
 import io.github.chakyl.cobblemonfarmers.screen.CraftStationMenu;
 import io.github.chakyl.cobblemonfarmers.screen.GardeningStationMenu;
 import io.github.chakyl.cobblemonfarmers.screen.MysteryMineMenu;
@@ -203,7 +203,7 @@ public final class CobblemonFarmersRegistery {
 
         public static final RegistryObject<RecipeSerializer<CraftStationRecipe>> CRAFT_STATION_SERIALIZER = RECIPE_SERIALIZERS.register("craft_station", CraftStationRecipe.Serializer::new);
         public static final RegistryObject<RecipeSerializer<MysteryMineRecipe>> MYSTERY_MINE_SERIALIZER = RECIPE_SERIALIZERS.register("mystery_mine", MysteryMineRecipe.Serializer::new);
-//        public static final RegistryObject<RecipeSerializer<RanchingStationRecipe>> Ranching_Station_SERIALIZER = RECIPE_SERIALIZERS.register("ranching_station", RanchingStationRecipe.Serializer::new);
+        public static final RegistryObject<RecipeSerializer<RanchingStationForageRecipe>> RANCHING_STATION_FORAGE_SERIALIZER = RECIPE_SERIALIZERS.register("ranching_station/forage", RanchingStationForageRecipe.Serializer::new);
 
         public static final RegistryObject<RecipeType<CraftStationRecipe>> CRAFT_STATION = RECIPE_TYPES.register("craft_station", () -> new RecipeType<>() {
             @Override
@@ -217,12 +217,12 @@ public final class CobblemonFarmersRegistery {
                 return "mystery_mine";
             }
         });
-//        public static final RegistryObject<RecipeType<RanchingStationRecipe>> RANCHING_STATION = RECIPE_TYPES.register("ranching_station", () -> new RecipeType<>() {
-//            @Override
-//            public String toString() {
-//                return "ranching_station";
-//            }
-//        });
+        public static final RegistryObject<RecipeType<RanchingStationForageRecipe>> RANCHING_STATION_FORAGE = RECIPE_TYPES.register("ranching_station/forage", () -> new RecipeType<>() {
+            @Override
+            public String toString() {
+                return "ranching_station/forage";
+            }
+        });
     }
 
     public static final class AttributeRegistry {

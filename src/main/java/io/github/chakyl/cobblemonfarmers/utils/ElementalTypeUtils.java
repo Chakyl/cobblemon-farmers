@@ -24,6 +24,7 @@ public class ElementalTypeUtils {
             case "rock" -> CobblemonFarmersRegistery.ItemRegistry.ROCK_TYPE_WORKER.get();
             case "steel" -> CobblemonFarmersRegistery.ItemRegistry.STEEL_TYPE_WORKER.get();
             case "water" -> CobblemonFarmersRegistery.ItemRegistry.WATER_TYPE_WORKER.get();
+            case "bug" -> CobblemonFarmersRegistery.ItemRegistry.BUG_TYPE_WORKER.get();
             default -> CobblemonFarmersRegistery.ItemRegistry.NORMAL_TYPE_WORKER.get();
         };
     }

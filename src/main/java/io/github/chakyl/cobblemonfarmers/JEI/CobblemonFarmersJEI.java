@@ -1,16 +1,18 @@
 package io.github.chakyl.cobblemonfarmers.JEI;
 
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
-import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.registration.*;
-        import net.minecraft.client.Minecraft;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -28,6 +30,7 @@ public class CobblemonFarmersJEI implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration reg) {
         reg.addRecipeCategories(new CraftStationCategory(reg.getJeiHelpers().getGuiHelper()));
         reg.addRecipeCategories(new MysteryMineCategory(reg.getJeiHelpers().getGuiHelper()));
+        reg.addRecipeCategories(new RanchingStationForageCategory(reg.getJeiHelpers().getGuiHelper()));
         reg.addRecipeCategories(new GardeningStationCategory(reg.getJeiHelpers().getGuiHelper()));
     }
 
@@ -41,8 +44,10 @@ public class CobblemonFarmersJEI implements IModPlugin {
         List<MysteryMineRecipe> mysteryMineRecipes = recipeManager.getAllRecipesFor(MysteryMineRecipe.Type.INSTANCE);
         registration.addRecipes(MysteryMineCategory.TYPE, mysteryMineRecipes);
 
-        // Gardening Station hardcoded recipes
+        List<RanchingStationForageRecipe> ranchingStationForageRecipes = recipeManager.getAllRecipesFor(RanchingStationForageRecipe.Type.INSTANCE);
+        registration.addRecipes(RanchingStationForageCategory.TYPE, ranchingStationForageRecipes);
 
+        // Gardening Station hardcoded recipes
         List<GardeningStationRecipe> gardeningRecipes = new ArrayList<>();
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getGRASS(), Stats.SPEED, 24000));
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getWATER(), Stats.SPECIAL_ATTACK, 600));
@@ -55,14 +60,10 @@ public class CobblemonFarmersJEI implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration reg) {
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.CRAFT_STATION.get()), CraftStationCategory.TYPE);
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get()), MysteryMineCategory.TYPE);
+        reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get()), RanchingStationForageCategory.TYPE);
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.GARDENING_STATION.get()), GardeningStationCategory.TYPE);
     }
 
-//    @Override
-//    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-//        registration.addRecipeClickArea(PlortPressScreen.class, 80, 26, 20, 30,
-//                PlortPressingCategory.TYPE);
-//    }
 
     @Override
     public ResourceLocation getPluginUid() {

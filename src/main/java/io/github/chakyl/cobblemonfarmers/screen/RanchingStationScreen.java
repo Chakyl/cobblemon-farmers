@@ -24,8 +24,9 @@ import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemon;
 
 public class RanchingStationScreen extends AbstractContainerScreen<RanchingStationMenu> {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/gui/ranching_station.png");
+    public static final ResourceLocation ACTIONS_TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/gui/ranching_station_actions.png");
     public static final ResourceLocation ELEMENT_TEXTURE = new ResourceLocation("cobblemon:textures/gui/types_small.png");
-    public static final ResourceLocation SWAP_BUTTON = new ResourceLocation(CobblemonFarmers.MODID, "textures/gui/swap_button.png");
+    public static final ResourceLocation SWAP_BUTTON =  new ResourceLocation(CobblemonFarmers.MODID, "textures/gui/swap_button.png");
     private static final Component CONTAINER_LABEL = Component.translatable("gui.cobblemon_farmers.ranching_station");
     private static final ResourceLocation COBBLE_FONT = CobblemonResources.INSTANCE.getDEFAULT_LARGE();
 
@@ -48,7 +49,6 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
     @Override
     protected void init() {
         super.init();
-        this.togglePriorityButton.initTextureValues(0, 0, 28, 18, SWAP_BUTTON);
         this.inventoryLabelY = 10000;
         this.titleLabelY = 10000;
     }
@@ -59,6 +59,7 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF, false, 0, 0);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752, false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.actions").withStyle(ChatFormatting.BOLD), -16, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 220, 112, 0xFFFFFFFF, true);
 
         double speedMod = this.menu.getSpeedModifier();
@@ -96,7 +97,13 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         int y = (height - imageHeight) / 2;
 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
-        if (this.menu.getPrioritySwapped()) guiGraphics.blit(TEXTURE, x + 36, y + 34, 0, 176, 4, 4);
+        guiGraphics.blit(ACTIONS_TEXTURE, x - 36, y, 0, 0, 36, 98);
+        int iconSize = 16;
+        int iconOffsetX = x - 25;
+        if (this.menu.getCanMilk()) guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 18, 0, 112, iconSize, iconSize);
+        if (this.menu.getCanShear()) guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 46, iconSize, 112, iconSize, iconSize);
+        if (this.menu.getCanForage()) guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 74, iconSize * 2, 112, iconSize, iconSize);
+
         renderPokemon(guiGraphics, x, y, this.menu.getWorkerPokemon());
     }
     @Override

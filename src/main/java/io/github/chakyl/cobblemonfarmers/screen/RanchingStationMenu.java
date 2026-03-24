@@ -146,6 +146,18 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
                 pPlayer, CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get());
     }
 
+    public boolean getCanMilk() {
+        return true;
+    }
+
+    public boolean getCanShear() {
+        return true;
+    }
+
+    public boolean getCanForage() {
+        return true;
+    }
+
     private class PartySlot extends WorkstationPartySlot {
         public PartySlot(Container container, int slot, int x, int y) {
             super(container, slot, x, y);

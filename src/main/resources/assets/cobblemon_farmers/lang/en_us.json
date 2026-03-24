@@ -117,11 +117,16 @@
     "jei.cobblemon_farmers.mystery_mine.chance": "Chance: %s",
     "jei.cobblemon_farmers.mystery_mine.consume_chance": "Chance to consume: %s",
 
+    "jei.cobblemon_farmers.ranching_station.more_info": "Hover over items for more info.",
+    "jei.cobblemon_farmers.ranching_station.forage.affection.over": "%s+ ❤ affection required",
+    "jei.cobblemon_farmers.ranching_station.forage.chance": "%s chance",
+    "jei.cobblemon_farmers.ranching_station.forage.affection.quality":  "Ranching Power raises quality",
 
     "jei.cobblemon_farmers.gardening_station.action_time": "Time: %ss",
     "jei.cobblemon_farmers.gardening_station.speed_stat": "%s impacts time",
     "jei.cobblemon_farmers.gardening_station.level_scaling.grass": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.water": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working radius increases by 1 every 10 levels",
-    "jei.cobblemon_farmers.gardening_station.elemental_type": "%s"
+    "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
+    "gui.cobblemon_farmers.actions": "Actions"
 }

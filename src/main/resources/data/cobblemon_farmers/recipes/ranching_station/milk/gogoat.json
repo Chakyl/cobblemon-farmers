@@ -1,0 +1,9 @@
+{
+	"type": "cobblemon_farmers:ranching_station/milk",
+	"pokemon": "gogoat",
+	"consume_bucket": true,
+	"milk": {
+		"sm": "minecraft:milk_bucket",
+		"lg": "minecraft:milk_bucket"
+	}
+}
