@@ -92,7 +92,7 @@ public class RanchingStationBlock extends Block implements EntityBlock {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
                 if (ranchingStationBlockEntity.validateOwner(pPlayer)) {
-                    NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
+                    ranchingStationBlockEntity.handleInteraction(pLevel, (ServerPlayer) pPlayer, pPos, pPlayer.getMainHandItem().getItem());
                 }
             } else {
                 throw new IllegalStateException("No Container Provider for RanchingStation");

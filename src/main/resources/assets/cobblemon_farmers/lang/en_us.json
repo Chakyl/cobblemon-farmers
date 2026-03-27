@@ -128,5 +128,11 @@
     "jei.cobblemon_farmers.gardening_station.level_scaling.water": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
-    "gui.cobblemon_farmers.actions": "Actions"
+    "gui.cobblemon_farmers.actions": "Actions",
+    "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Ranching Power",
+    "tooltip.cobblemon_farmers.ranching_station.ranching_power_desc": "Scales off of friendship and HP",
+    "message.cobblemon_farmers.ranching_station.no_drops": "You didn't get anything this time...",
+    "message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared": "This Pokémon has no drops!",
+    "message.cobblemon_farmers.ranching_station.too_soon": "This Pokémon needs some time to rest",
+    "message.cobblemon_farmers.ranching_station.needs_hearts": "This Pokémon doesn't trust you enough..."
 }

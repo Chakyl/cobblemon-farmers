@@ -27,4 +27,5 @@ public class RanchingForage {
     public boolean hasQuality() { return hasQuality; }
 
     public int getMinHearts() { return minHearts; }
+
 }

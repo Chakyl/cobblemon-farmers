@@ -50,6 +50,13 @@ public class PokeUtils {
         return pokemon.getPrimaryType().equals(type);
     }
 
+    public static String getSpeciesFromItemFormPokemon(ItemStack pokeItem, Level level) {
+        CompoundTag tag = pokeItem.getTag();
+        if (tag == null) throw new RuntimeException("Horrible thing happened! The Pokemon doesn't exist!!!!");
+        String species = tag.getCompound("pokeData").getString("Species");
+        return species.substring(species.indexOf(":") + 1);
+    }
+
     public static Pokemon getItemFormPokemon(ItemStack pokeItem, Level level) {
         CompoundTag tag = pokeItem.getTag();
         if (tag == null) throw new RuntimeException("Horrible thing happened! The Pokemon doesn't exist!!!!");

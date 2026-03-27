@@ -1,6 +1,7 @@
 package io.github.chakyl.cobblemonfarmers.recipe;
 
 
+import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.api.types.ElementalTypes;
@@ -11,6 +12,7 @@ import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.RanchingForage;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -23,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.applyQuality;
 
 public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
     private final String pokemon;
@@ -37,12 +41,22 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
 
     @Override
     public boolean matches(RecipeWrapper pContainer, Level pLevel) {
-        return false;
+        if (pContainer.getItem(0).is(CobblemonItems.POKEMON_MODEL)) {
+
+            CompoundTag tag = pContainer.getItem(0).getTag();
+            if (tag != null && !tag.isEmpty()) {
+                String species = tag.getString("species");
+                if (!pokemon.contains(":")) return species.equals("cobblemon:" + pokemon);
+                return pokemon.equals(species);
+
+            }
+        }
+        return true;
     }
 
     @Override
     public ItemStack assemble(RecipeWrapper pContainer, RegistryAccess pRegistryAccess) {
-        return null;
+        return forages.get(0).getItem().copy();
     }
 
     @Override
@@ -52,7 +66,7 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
 
     @Override
     public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
-        return null;
+        return forages.get(0).getItem().copy();
     }
 
     @Override
@@ -63,6 +77,22 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
     @Override
     public RecipeSerializer<?> getSerializer() {
         return CobblemonFarmersRegistery.RecipeRegistry.RANCHING_STATION_FORAGE_SERIALIZER.get();
+    }
+
+    public List<ItemStack> getScaledDrops(int hearts) {
+        List<ItemStack> drops = new ArrayList<>(this.forages.size());
+        for (RanchingForage forage : forages) {
+            if (forage.getMinHearts() <= hearts) {
+                if (Math.random() < forage.getChance()) {
+                    ItemStack result = forage.getItem();
+                    if (forage.hasQuality()) {
+                        result = applyQuality(result, hearts);
+                    }
+                    drops.add(result);
+                }
+            }
+        }
+        return drops;
     }
 
     public String getPokemon() {

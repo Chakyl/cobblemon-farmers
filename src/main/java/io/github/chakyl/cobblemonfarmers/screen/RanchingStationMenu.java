@@ -132,6 +132,10 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
         return copyOfSourceStack;
     }
 
+    public int getRanchingPower() {
+        return this.blockEntity.getRanchingPower();
+    }
+
     public double getSpeedModifier() {
         return this.blockEntity.getSpeedModifier();
     }
@@ -151,11 +155,11 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
     }
 
     public boolean getCanShear() {
-        return true;
+        return this.blockEntity.hasMagicShearDrops();
     }
 
     public boolean getCanForage() {
-        return true;
+        return this.blockEntity.hasForageRecipe();
     }
 
     private class PartySlot extends WorkstationPartySlot {
