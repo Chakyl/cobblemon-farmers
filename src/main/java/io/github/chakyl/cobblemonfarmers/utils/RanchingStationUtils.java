@@ -18,7 +18,25 @@ public class RanchingStationUtils {
             tag.put("quality_food", qualityFoodTag);
             return qualityItem;
         }
+        return itemStack;
+    }
 
+    public static ItemStack applyMilkQuality(ItemStack itemStack, int hearts) {
+        int heartQuality = 0;
+        if (hearts >= 10 || (hearts > 0 && (hearts % 5) == 0)) {
+            heartQuality = 3;
+        } else {
+            heartQuality = (int) (double) ((hearts % 11) / 2 - 2);
+        }
+        if (heartQuality > 0) {
+            ItemStack qualityItem = itemStack.copy();
+            CompoundTag tag = qualityItem.getOrCreateTag();
+            CompoundTag qualityFoodTag = new CompoundTag();
+            qualityFoodTag.putString("quality", String.valueOf(heartQuality));
+            qualityFoodTag.put("effects", new ListTag());
+            tag.put("quality_food", qualityFoodTag);
+            return qualityItem;
+        }
         return itemStack;
     }
 

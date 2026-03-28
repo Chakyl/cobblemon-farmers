@@ -8,6 +8,7 @@ import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationMilkingRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -40,6 +41,7 @@ public class CobblemonFarmersJEI implements IModPlugin {
         reg.addRecipeCategories(new CraftStationCategory(reg.getJeiHelpers().getGuiHelper()));
         reg.addRecipeCategories(new MysteryMineCategory(reg.getJeiHelpers().getGuiHelper()));
         reg.addRecipeCategories(new RanchingStationForageCategory(reg.getJeiHelpers().getGuiHelper()));
+        reg.addRecipeCategories(new RanchingStationMilkingCategory(reg.getJeiHelpers().getGuiHelper()));
         reg.addRecipeCategories(new GardeningStationCategory(reg.getJeiHelpers().getGuiHelper()));
     }
 
@@ -56,11 +58,16 @@ public class CobblemonFarmersJEI implements IModPlugin {
         List<RanchingStationForageRecipe> ranchingStationForageRecipes = recipeManager.getAllRecipesFor(RanchingStationForageRecipe.Type.INSTANCE);
         registration.addRecipes(RanchingStationForageCategory.TYPE, ranchingStationForageRecipes);
 
+        List<RanchingStationMilkingRecipe> ranchingStationMilkingRecipes = recipeManager.getAllRecipesFor(RanchingStationMilkingRecipe.Type.INSTANCE);
+        registration.addRecipes(RanchingStationMilkingCategory.TYPE, ranchingStationMilkingRecipes);
+
         // Gardening Station hardcoded recipes
         List<GardeningStationRecipe> gardeningRecipes = new ArrayList<>();
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getGRASS(), Stats.SPEED, 24000));
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getWATER(), Stats.SPECIAL_ATTACK, 600));
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getDARK(), Stats.HP, 20000));
+        gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getNORMAL(), Stats.SPEED, 300));
+        gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getFAIRY(), Stats.SPECIAL_ATTACK, 800));
         registration.addRecipes(GardeningStationCategory.TYPE, gardeningRecipes);
     }
 
@@ -70,6 +77,7 @@ public class CobblemonFarmersJEI implements IModPlugin {
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.CRAFT_STATION.get()), CraftStationCategory.TYPE);
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get()), MysteryMineCategory.TYPE);
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get()), RanchingStationForageCategory.TYPE);
+        reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get()), RanchingStationMilkingCategory.TYPE);
         reg.addRecipeCatalyst(new ItemStack(CobblemonFarmersRegistery.BlockRegistry.GARDENING_STATION.get()), GardeningStationCategory.TYPE);
     }
 

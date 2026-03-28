@@ -3,7 +3,9 @@
 	"pokemon": "gogoat",
 	"consume_bucket": true,
 	"milk": {
-		"sm": "minecraft:milk_bucket",
-		"lg": "minecraft:milk_bucket"
+		"sm": {
+			"item": "minecraft:milk_bucket",
+			"count": 1
+		}
 	}
 }

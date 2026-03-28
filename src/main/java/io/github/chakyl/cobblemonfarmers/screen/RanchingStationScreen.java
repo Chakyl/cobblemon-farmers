@@ -64,15 +64,6 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.actions").withStyle(ChatFormatting.BOLD), -16, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 220, 112, 0xFFFFFFFF, true);
 
-        double speedMod = this.menu.getSpeedModifier();
-        if (speedMod > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.speed", speedMod), centralX + 44, 45, 0xFFFFFFFF, true);
-        }
-        int multChance = this.menu.getMultChance();
-        if (multChance > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.mult_chance", multChance + "%"), centralX + 44, 56, 0xFFFFFFFF, true);
-        }
-
         int index = 0;
         for (int level : this.menu.getPartyLevels()) {
             if (level > 0) {
@@ -98,10 +89,10 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         guiGraphics.blit(ACTIONS_TEXTURE, x - 36, y, 0, 0, 36, 98);
         int iconSize = 16;
         int iconOffsetX = x - 25;
-        if (this.menu.getCanMilk()) guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 18, 0, 112, iconSize, iconSize);
-        if (this.menu.getCanShear())
-            guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 46, iconSize, 112, iconSize, iconSize);
+        if (this.menu.getCanShear()) guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 18, 0, 112, iconSize, iconSize);
         if (this.menu.getCanForage())
+            guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 46, iconSize, 112, iconSize, iconSize);
+        if (this.menu.getCanMilk())
             guiGraphics.blit(ACTIONS_TEXTURE, iconOffsetX, y + 74, iconSize * 2, 112, iconSize, iconSize);
         int hearts = this.menu.getRanchingPower();
         int heartSize = 8;

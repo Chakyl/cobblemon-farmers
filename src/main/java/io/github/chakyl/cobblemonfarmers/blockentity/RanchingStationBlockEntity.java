@@ -11,6 +11,7 @@ import com.cobblemon.mod.common.pokemon.Species;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.RanchingStationBlock;
 import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationMilkingRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.RanchingStationMenu;
 import io.github.chakyl.cobblemonfarmers.tag.CobblemonFarmersTags;
@@ -36,6 +37,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -58,20 +60,15 @@ import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.getDa
 
 public class RanchingStationBlockEntity extends StationBaseBlockEntity implements MenuProvider {
     protected final ContainerData data;
-    private int progress = 0;
-    private int craftingTime;
     private int dayLastForaged;
     private int dayLastMilked;
     private int dayLastMagicSheared;
     private int dayLastFed;
-    private boolean checkNewRecipe;
-    private boolean swapPriority = false;
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
             super.onContentsChanged(slot);
-            checkNewRecipe = true;
             setChanged();
         }
     };
@@ -80,7 +77,6 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         @Override
         protected void onContentsChanged(int slot) {
             super.onContentsChanged(slot);
-            checkNewRecipe = true;
             setChanged();
             initializeWorker();
         }
@@ -91,14 +87,14 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
 
     public RanchingStationBlockEntity(BlockPos pos, BlockState state) {
         super(CobblemonFarmersRegistery.BlockEntityRegistry.RANCHING_STATION.get(), pos, state);
-        this.checkNewRecipe = true;
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> RanchingStationBlockEntity.this.progress;
-                    case 1 -> RanchingStationBlockEntity.this.craftingTime;
-                    case 2 -> RanchingStationBlockEntity.this.swapPriority ? 1 : 0;
+                    case 0 -> RanchingStationBlockEntity.this.dayLastMagicSheared;
+                    case 1 -> RanchingStationBlockEntity.this.dayLastForaged;
+                    case 2 -> RanchingStationBlockEntity.this.dayLastMilked;
+                    case 3 -> RanchingStationBlockEntity.this.dayLastFed;
                     default -> 0;
                 };
             }
@@ -106,16 +102,17 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             @Override
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
-                    case 0 -> RanchingStationBlockEntity.this.progress = pValue;
-                    case 1 -> RanchingStationBlockEntity.this.craftingTime = pValue;
-                    case 2 -> RanchingStationBlockEntity.this.swapPriority = pValue == 1;
+                    case 0 -> RanchingStationBlockEntity.this.dayLastMagicSheared = pValue;
+                    case 1 -> RanchingStationBlockEntity.this.dayLastForaged = pValue;
+                    case 2 -> RanchingStationBlockEntity.this.dayLastMilked = pValue;
+                    case 3 -> RanchingStationBlockEntity.this.dayLastFed = pValue;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
         };
     }
@@ -151,11 +148,6 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         }
     }
 
-    public void setPrioritySwapped() {
-        this.swapPriority = !this.swapPriority;
-        checkNewRecipe = true;
-        setChanged();
-    }
 
     @Override
     public boolean hasWorker() {
@@ -187,8 +179,23 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                             true
                     );
                 } else if (magicShear(level, pPlayer)) return;
-
-
+            } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MILKS_RANCHING_STATION)) {
+                if (this.getRanchingPower() < 1) {
+                    pPlayer.displayClientMessage(
+                            Component.translatable("message.cobblemon_farmers.ranching_station.needs_hearts").withStyle(ChatFormatting.RED),
+                            true
+                    );
+                } else if (!canMilkToday(level)) {
+                    pPlayer.displayClientMessage(
+                            Component.translatable("message.cobblemon_farmers.ranching_station.too_soon").withStyle(ChatFormatting.RED),
+                            true
+                    );
+                } else if (!hasMilkingRecipe()) {
+                    pPlayer.displayClientMessage(
+                            Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_milked").withStyle(ChatFormatting.RED),
+                            true
+                    );
+                } else if (milkPokemon(level, pPlayer)) return;
             }
         }
         NetworkHooks.openScreen(pPlayer, this, pPos);
@@ -260,11 +267,52 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                 return true;
             }
         }
-        player.displayClientMessage(
-                Component.translatable("message.cobblemon_farmers.ranching_station.no_drops"),
-                true
-        );
+        if (player != null) {
+            player.displayClientMessage(
+                    Component.translatable("message.cobblemon_farmers.ranching_station.no_drops"),
+                    true
+            );
+        }
         return true;
+    }
+
+    private RanchingStationMilkingRecipe getMilkingRecipe() {
+        List<RanchingStationMilkingRecipe> validRecipes = level.getRecipeManager().getRecipesFor(RanchingStationMilkingRecipe.Type.INSTANCE, new RecipeWrapper(this.pokemonInventory), level);
+        for (RanchingStationMilkingRecipe recipe : validRecipes) {
+            return recipe;
+        }
+        return null;
+    }
+
+    public boolean hasMilkingRecipe() {
+        return hasWorker() && getMilkingRecipe() != null;
+    }
+
+    public boolean canMilkToday(Level level) {
+        return compareDay(getDay(level), this.dayLastMilked, 1);
+    }
+
+    public boolean milkPokemon(Level level, Player player) {
+        RanchingStationMilkingRecipe currentRecipe = getMilkingRecipe();
+        if (currentRecipe != null) {
+            this.dayLastMilked = getDay(level);
+            ItemStack milk = currentRecipe.getMilk(this.getRanchingPower());
+            if (!milk.isEmpty()) {
+                BlockPos pos = this.getBlockPos();
+                if (player != null && currentRecipe.getIsBucketConsumed()) {
+                    ItemUtils.createFilledResult(player.getMainHandItem(), player, milk.copy(), true);
+                }
+                else {
+                    Block.popResourceFromFace(level, pos, this.getBlockState().getValue(RanchingStationBlock.FACING), milk.copy());
+                }
+                this.level.playSound(null, this.getBlockPos(), SoundEvents.COW_MILK, SoundSource.BLOCKS, 1.0F, 1.0F);
+                generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_ON);
+                return true;
+            }
+        } else {
+            return false;
+        }
+        return false;
     }
 
     @Override
@@ -314,19 +362,6 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         return new RanchingStationMenu(pContainerId, pPlayerInventory, this, this.data);
     }
 
-
-    public double getSpeedModifier() {
-//        Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-//        return recipe.map(mysteryMineRecipe -> super.getSpeedModifier(mysteryMineRecipe.getSpeedStat())).orElse(0.0);
-        return 0;
-    }
-
-    public int getMultChance() {
-        return 0;
-//        Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-//        return recipe.map(mysteryMineRecipe -> super.getMultChance(mysteryMineRecipe.getMultStat())).orElse(0);
-    }
-
     public int getRanchingPower() {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty()) {
@@ -346,9 +381,10 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         if (owner != null) data.putUUID("Owner", owner);
         data.put("InputInventory", this.inputInventory.serializeNBT());
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
-        data.putInt("CraftingTime", craftingTime);
-        data.putInt("Progress", progress);
-        data.putBoolean("SwapPriority", swapPriority);
+        data.putInt("DayLastMagicSheared", dayLastMagicSheared);
+        data.putInt("DayLastForaged", dayLastForaged);
+        data.putInt("DayLastMilked", dayLastMilked);
+        data.putInt("DayLastFed", dayLastFed);
         tag.put(CobblemonFarmers.MODID, data);
     }
 
@@ -360,15 +396,14 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         if (data.contains("InputInventory", Tag.TAG_COMPOUND)) {
             this.inputInventory.deserializeNBT(data.getCompound("InputInventory"));
         }
-
         if (data.contains("PokemonInventory", Tag.TAG_COMPOUND)) {
             this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
             this.initializeWorker();
         }
-
-        craftingTime = data.getInt("CraftingTime");
-        progress = data.getInt("Progress");
-        swapPriority = data.getBoolean("SwapPriority");
+        dayLastMagicSheared = data.getInt("DayLastMagicSheared");
+        dayLastForaged = data.getInt("DayLastForaged");
+        dayLastMilked = data.getInt("DayLastMilked");
+        dayLastFed = data.getInt("DayLastFed");
     }
 
     @Override

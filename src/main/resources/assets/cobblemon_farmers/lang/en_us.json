@@ -43,6 +43,14 @@
     "tooltip.cobblemon_farmers.mystery_mine.processing_time": "Mining time left: %s",
     "tooltip.cobblemon_farmers.gardening_station.processing_time": "Gardening Time left: %s",
     "tooltip.cobblemon_farmers.craft_station.processing_time": "Crafting Time left: %s",
+    "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Ranching Power",
+    "tooltip.cobblemon_farmers.ranching_station.ranching_power_desc": "Scales off of friendship and HP",
+
+    "message.cobblemon_farmers.ranching_station.no_drops": "You didn't get anything this time...",
+    "message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared": "This Pokémon has no drops!",
+    "message.cobblemon_farmers.ranching_station.cannot_be_milked": "This Pokémon cannot be milked!",
+    "message.cobblemon_farmers.ranching_station.too_soon": "This Pokémon needs some time to rest",
+    "message.cobblemon_farmers.ranching_station.needs_hearts": "This Pokémon doesn't trust you enough...",
 
     "info.cobblemon_farmers.craft_station.type.normal": "Can't work here",
     "info.cobblemon_farmers.craft_station.type.fire": "Smelts items",
@@ -63,7 +71,7 @@
     "info.cobblemon_farmers.craft_station.type.dark": "Can't work here",
     "info.cobblemon_farmers.craft_station.type.fairy": "Can't work here",
 
-    "info.cobblemon_farmers.gardening_station.type.normal": "Can't work here",
+    "info.cobblemon_farmers.gardening_station.type.normal": "Ranches mons",
     "info.cobblemon_farmers.gardening_station.type.fire": "Smelts items",
     "info.cobblemon_farmers.gardening_station.type.water": "Waters soil",
     "info.cobblemon_farmers.gardening_station.type.grass": "Grows crops",
@@ -80,7 +88,7 @@
     "info.cobblemon_farmers.gardening_station.type.steel": "Can't work here",
     "info.cobblemon_farmers.gardening_station.type.dragon": "Can't work here",
     "info.cobblemon_farmers.gardening_station.type.dark": "Defeats wild mons",
-    "info.cobblemon_farmers.gardening_station.type.fairy": "Can't work here",
+    "info.cobblemon_farmers.gardening_station.type.fairy": "Shears mons",
 
     "info.cobblemon_farmers.mystery_mine.type.normal": "Can't work here",
     "info.cobblemon_farmers.mystery_mine.type.fire": "Can't work here",
@@ -117,22 +125,22 @@
     "jei.cobblemon_farmers.mystery_mine.chance": "Chance: %s",
     "jei.cobblemon_farmers.mystery_mine.consume_chance": "Chance to consume: %s",
 
+    "jei.cobblemon_farmers.ranching_station.category.milking": "Ranching: Milking",
+    "jei.cobblemon_farmers.ranching_station.category.foraging": "Ranching: Foraging",
     "jei.cobblemon_farmers.ranching_station.more_info": "Hover over items for more info.",
     "jei.cobblemon_farmers.ranching_station.forage.affection.over": "%s+ ❤ affection required",
     "jei.cobblemon_farmers.ranching_station.forage.chance": "%s chance",
     "jei.cobblemon_farmers.ranching_station.forage.affection.quality":  "Ranching Power raises quality",
+    "jei.cobblemon_farmers.ranching_station.milk.affection.range": "%s ❤ affection required",
+    "jei.cobblemon_farmers.ranching_station.milk.affection.over": "%s+ ❤ affection required",
 
     "jei.cobblemon_farmers.gardening_station.action_time": "Time: %ss",
     "jei.cobblemon_farmers.gardening_station.speed_stat": "%s impacts time",
     "jei.cobblemon_farmers.gardening_station.level_scaling.grass": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.water": "Working radius increases by 1 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.normal": "Working radius increases by 1 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.fairy": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
-    "gui.cobblemon_farmers.actions": "Actions",
-    "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Ranching Power",
-    "tooltip.cobblemon_farmers.ranching_station.ranching_power_desc": "Scales off of friendship and HP",
-    "message.cobblemon_farmers.ranching_station.no_drops": "You didn't get anything this time...",
-    "message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared": "This Pokémon has no drops!",
-    "message.cobblemon_farmers.ranching_station.too_soon": "This Pokémon needs some time to rest",
-    "message.cobblemon_farmers.ranching_station.needs_hearts": "This Pokémon doesn't trust you enough..."
+    "gui.cobblemon_farmers.actions": "Actions"
 }

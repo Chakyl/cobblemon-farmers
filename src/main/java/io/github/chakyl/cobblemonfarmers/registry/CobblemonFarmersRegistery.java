@@ -15,6 +15,7 @@ import io.github.chakyl.cobblemonfarmers.items.WorkerTypeItem;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationMilkingRecipe;
 import io.github.chakyl.cobblemonfarmers.screen.CraftStationMenu;
 import io.github.chakyl.cobblemonfarmers.screen.GardeningStationMenu;
 import io.github.chakyl.cobblemonfarmers.screen.MysteryMineMenu;
@@ -204,6 +205,7 @@ public final class CobblemonFarmersRegistery {
         public static final RegistryObject<RecipeSerializer<CraftStationRecipe>> CRAFT_STATION_SERIALIZER = RECIPE_SERIALIZERS.register("craft_station", CraftStationRecipe.Serializer::new);
         public static final RegistryObject<RecipeSerializer<MysteryMineRecipe>> MYSTERY_MINE_SERIALIZER = RECIPE_SERIALIZERS.register("mystery_mine", MysteryMineRecipe.Serializer::new);
         public static final RegistryObject<RecipeSerializer<RanchingStationForageRecipe>> RANCHING_STATION_FORAGE_SERIALIZER = RECIPE_SERIALIZERS.register("ranching_station/forage", RanchingStationForageRecipe.Serializer::new);
+        public static final RegistryObject<RecipeSerializer<RanchingStationMilkingRecipe>> RANCHING_STATION_MILK_SERIALIZER = RECIPE_SERIALIZERS.register("ranching_station/milk", RanchingStationMilkingRecipe.Serializer::new);
 
         public static final RegistryObject<RecipeType<CraftStationRecipe>> CRAFT_STATION = RECIPE_TYPES.register("craft_station", () -> new RecipeType<>() {
             @Override
@@ -221,6 +223,12 @@ public final class CobblemonFarmersRegistery {
             @Override
             public String toString() {
                 return "ranching_station/forage";
+            }
+        });
+        public static final RegistryObject<RecipeType<RanchingStationMilkingRecipe>> RANCHING_STATION_MILK = RECIPE_TYPES.register("ranching_station/milk", () -> new RecipeType<>() {
+            @Override
+            public String toString() {
+                return "ranching_station/milk";
             }
         });
     }

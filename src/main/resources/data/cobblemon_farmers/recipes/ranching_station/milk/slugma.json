@@ -1,9 +1,11 @@
 {
 	"type": "cobblemon_farmers:ranching_station/milk",
-	"pokemon": "milktank",
+	"pokemon": "slugma",
 	"consume_bucket": true,
 	"milk": {
-		"sm": "minecraft:milk_bucket",
-		"lg": "minecraft:milk_bucket"
+		"sm": {
+			"item": "minecraft:lava_bucket",
+			"count": 1
+		}
 	}
 }

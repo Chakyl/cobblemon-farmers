@@ -136,23 +136,13 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
         return this.blockEntity.getRanchingPower();
     }
 
-    public double getSpeedModifier() {
-        return this.blockEntity.getSpeedModifier();
-    }
-
-    public int getMultChance() {
-        return this.blockEntity.getMultChance();
-    }
-
     @Override
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
                 pPlayer, CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get());
     }
 
-    public boolean getCanMilk() {
-        return true;
-    }
+    public boolean getCanMilk() { return this.blockEntity.hasMilkingRecipe();  }
 
     public boolean getCanShear() {
         return this.blockEntity.hasMagicShearDrops();
