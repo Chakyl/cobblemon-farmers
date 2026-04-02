@@ -56,12 +56,16 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     };
 
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
+        private ItemStack previousWorker;
         @Override
         protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            checkNewRecipe = true;
-            setChanged();
-            initializeWorker();
+            ItemStack current = getStackInSlot(slot);
+            if (previousWorker == null || !ItemStack.matches(current, previousWorker)) {
+                this.previousWorker = current.copy();
+                super.onContentsChanged(slot);
+                checkNewRecipe = true;
+                setChanged();
+            }
         }
     };
 

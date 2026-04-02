@@ -17,6 +17,7 @@ import net.minecraft.world.level.LightLayer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class RanchingStationBlockEntityRenderer implements BlockEntityRenderer<RanchingStationBlockEntity> {
     private final Map<ItemStack, Float> itemRotations = new HashMap<>();
@@ -29,6 +30,10 @@ public class RanchingStationBlockEntityRenderer implements BlockEntityRenderer<R
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
+            Set<String> workerAspects = pBlockEntity.getWorkerAspects();
+            if (workerAspects != null) {
+                pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), workerAspects);
+            }
             pPoseStack.pushPose();
             pPoseStack.translate(0.5, 0.2, 0.5);
             pPoseStack.mulPose(Axis.YP.rotationDegrees(pokemonEntity.getYRot()));

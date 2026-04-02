@@ -26,6 +26,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonItemForm;
@@ -136,6 +137,12 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
         return this.blockEntity.getRanchingPower();
     }
 
+    public int getFriendshipHearts() { return this.blockEntity.getFriendshipHearts(); }
+
+    public int getHPHearts() {
+        return this.blockEntity.getHPHearts();
+    }
+
     @Override
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
@@ -166,5 +173,6 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
 
     private void transferFromPartyToWorkerSlot(Player player, RanchingStationMenu.PartySlot partySlot) {
         handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1));
+        if (!Objects.requireNonNull(this.blockEntity.getLevel()).isClientSide) this.blockEntity.initializeDayData(this.blockEntity.getLevel());
     }
 }

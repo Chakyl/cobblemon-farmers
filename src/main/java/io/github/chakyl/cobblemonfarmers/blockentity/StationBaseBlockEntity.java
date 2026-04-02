@@ -78,7 +78,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            return (double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100;
+            return ((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) * (pokemon.getShiny() ? 2.0 : 1.0);
         }
         return 0.0;
     }
@@ -87,7 +87,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            return Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100);
+            return (Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100)) * (pokemon.getShiny() ? 2 : 1);
         }
         return 0;
     }

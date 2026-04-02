@@ -8,7 +8,6 @@ import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -17,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +61,13 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.actions").withStyle(ChatFormatting.BOLD), -16, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 220, 112, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 140, 45, 0xFFFFFFFF, true);
+
+        int friendshipHearts = this.menu.getFriendshipHearts();
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.friendship_hearts", friendshipHearts), centralX + 48, 45, 0xFFFFFFFF, true);
+
+        int hpHearts = this.menu.getHPHearts();
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.hp_hearts", hpHearts), centralX + 44, 56, 0xFFFFFFFF, true);
 
         int index = 0;
         for (int level : this.menu.getPartyLevels()) {

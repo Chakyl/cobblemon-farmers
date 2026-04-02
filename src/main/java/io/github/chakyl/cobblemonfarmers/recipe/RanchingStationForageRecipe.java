@@ -142,8 +142,8 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
 
         @Override
         public @Nullable RanchingStationForageRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-            NonNullList<RanchingForage> forages = NonNullList.withSize(pBuffer.readVarInt(), RanchingForage.getDefaultInstance());
             String pokemon = pBuffer.readUtf();
+            NonNullList<RanchingForage> forages = NonNullList.withSize(pBuffer.readVarInt(), RanchingForage.getDefaultInstance());
             for (int i = 0; i < forages.size(); i++) {
                 double chance = pBuffer.readDouble();
                 int minHearts = pBuffer.readInt();

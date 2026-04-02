@@ -1,11 +1,13 @@
 package io.github.chakyl.cobblemonfarmers.blockentity;
 
 import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.drop.DropEntry;
 import com.cobblemon.mod.common.api.drop.DropTable;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
+import com.cobblemon.mod.common.api.tags.CobblemonItemTags;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
@@ -74,11 +76,17 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
     };
 
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
+        private ItemStack previousWorker;
+
         @Override
         protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            setChanged();
-            initializeWorker();
+            ItemStack current = getStackInSlot(slot);
+            if (previousWorker == null || !ItemStack.matches(current, previousWorker)) {
+                this.previousWorker = current.copy();
+                super.onContentsChanged(slot);
+                setChanged();
+                initializeWorker();
+            }
         }
     };
 
@@ -137,17 +145,49 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
-        boolean didInventoryChange = false;
         super.tick(level, pos, state);
         if (!level.isClientSide() && level.getGameTime() % 20 == 0) {
-            if (this.hasWorker()) {
-            }
-            if (didInventoryChange) {
-                setChanged();
+            if (this.hasWorker() && hasInput()) {
+                if (this.isHungry(level) && this.inputInventory.getStackInSlot(0).is(CobblemonItemTags.BERRIES)) {
+                    this.level.playSound(null, this.getBlockPos(), CobblemonSounds.BERRY_EAT, SoundSource.BLOCKS, 1.0F, 0.9F);
+                    this.dayLastFed = getDay(level);
+                    this.consumeBerry(this.inputInventory.getStackInSlot(0));
+                    this.inputInventory.getStackInSlot(0).shrink(1);
+                    setChanged();
+                }
             }
         }
     }
+    public void increaseFriendship(int amount) {
+        CompoundTag pokeData = this.pokemonInventory.getStackInSlot(0).getTag().getCompound("pokeData");
+        pokeData.putInt("Friendship", pokeData.getInt("Friendship") + amount);
+        ((ServerLevel)this.level).sendParticles(
+                ParticleTypes.HEART,
+                this.getBlockPos().getX(),
+                this.getBlockPos().getY() + 1,
+                this.getBlockPos().getZ(),
+                amount,
+                0.2 * Mth.randomBetween(level.random, -2, 2),
+                0.2 * Mth.randomBetween(level.random, -2, 2),
+                0.2 * Mth.randomBetween(level.random, -2, 2),
+                0.1
+        );
+    }
 
+    public void consumeBerry(ItemStack berry) {
+        if (berry.is(CobblemonFarmersTags.UNCOMMON_BERRIES)) {
+            if (this.level.getRandom().nextDouble() < 0.5) this.increaseFriendship(1);
+        }
+        if (berry.is(CobblemonFarmersTags.RARE_BERRIES)) {
+            this.increaseFriendship(1);
+        }
+        if (berry.is(CobblemonFarmersTags.LEGENDARY_BERRIES)) {
+            this.increaseFriendship(2);
+        }
+    }
+    public boolean isHungry(Level level) {
+        return compareDay(getDay(level), this.dayLastFed, 1);
+    }
 
     @Override
     public boolean hasWorker() {
@@ -160,42 +200,44 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
 
     public void handleInteraction(Level level, ServerPlayer pPlayer, BlockPos pPos, Item item) {
         if (this.hasWorker()) {
-            if (item == Items.AIR && canForageToday(level) && hasForageRecipe()) {
-                if (harvestForage(level)) return;
-            } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MAGIC_SHEARS_RANCHING_STATION)) {
-                if (this.getRanchingPower() < 5) {
-                    pPlayer.displayClientMessage(
-                            Component.translatable("message.cobblemon_farmers.ranching_station.needs_hearts").withStyle(ChatFormatting.RED),
-                            true
-                    );
-                } else if (!canMagicShearToday(level)) {
-                    pPlayer.displayClientMessage(
-                            Component.translatable("message.cobblemon_farmers.ranching_station.too_soon").withStyle(ChatFormatting.RED),
-                            true
-                    );
-                } else if (!hasMagicShearDrops()) {
-                    pPlayer.displayClientMessage(
-                            Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared").withStyle(ChatFormatting.RED),
-                            true
-                    );
-                } else if (magicShear(level, pPlayer)) return;
-            } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MILKS_RANCHING_STATION)) {
-                if (this.getRanchingPower() < 1) {
-                    pPlayer.displayClientMessage(
-                            Component.translatable("message.cobblemon_farmers.ranching_station.needs_hearts").withStyle(ChatFormatting.RED),
-                            true
-                    );
-                } else if (!canMilkToday(level)) {
-                    pPlayer.displayClientMessage(
-                            Component.translatable("message.cobblemon_farmers.ranching_station.too_soon").withStyle(ChatFormatting.RED),
-                            true
-                    );
-                } else if (!hasMilkingRecipe()) {
-                    pPlayer.displayClientMessage(
-                            Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_milked").withStyle(ChatFormatting.RED),
-                            true
-                    );
-                } else if (milkPokemon(level, pPlayer)) return;
+            if (!isHungry(level)) {
+                if (item == Items.AIR && canForageToday(level) && hasForageRecipe()) {
+                    if (harvestForage(level)) return;
+                } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MAGIC_SHEARS_RANCHING_STATION)) {
+                    if (this.getRanchingPower() < 5) {
+                        pPlayer.displayClientMessage(
+                                Component.translatable("message.cobblemon_farmers.ranching_station.needs_hearts").withStyle(ChatFormatting.RED),
+                                true
+                        );
+                    } else if (!canMagicShearToday(level)) {
+                        pPlayer.displayClientMessage(
+                                Component.translatable("message.cobblemon_farmers.ranching_station.too_soon").withStyle(ChatFormatting.RED),
+                                true
+                        );
+                    } else if (!hasMagicShearDrops()) {
+                        pPlayer.displayClientMessage(
+                                Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared").withStyle(ChatFormatting.RED),
+                                true
+                        );
+                    } else if (magicShear(level, pPlayer)) return;
+                } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MILKS_RANCHING_STATION)) {
+                    if (this.getRanchingPower() < 1) {
+                        pPlayer.displayClientMessage(
+                                Component.translatable("message.cobblemon_farmers.ranching_station.needs_hearts").withStyle(ChatFormatting.RED),
+                                true
+                        );
+                    } else if (!canMilkToday(level)) {
+                        pPlayer.displayClientMessage(
+                                Component.translatable("message.cobblemon_farmers.ranching_station.too_soon").withStyle(ChatFormatting.RED),
+                                true
+                        );
+                    } else if (!hasMilkingRecipe()) {
+                        pPlayer.displayClientMessage(
+                                Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_milked").withStyle(ChatFormatting.RED),
+                                true
+                        );
+                    } else if (milkPokemon(level, pPlayer)) return;
+                }
             }
         }
         NetworkHooks.openScreen(pPlayer, this, pPos);
@@ -292,6 +334,15 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         return compareDay(getDay(level), this.dayLastMilked, 1);
     }
 
+    public void initializeDayData(Level level) {
+        int day = getDay(level);
+        this.dayLastFed = day;
+        this.dayLastMilked = day;
+        this.dayLastForaged = day;
+        this.dayLastMagicSheared = day;
+    }
+
+
     public boolean milkPokemon(Level level, Player player) {
         RanchingStationMilkingRecipe currentRecipe = getMilkingRecipe();
         if (currentRecipe != null) {
@@ -301,8 +352,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                 BlockPos pos = this.getBlockPos();
                 if (player != null && currentRecipe.getIsBucketConsumed()) {
                     ItemUtils.createFilledResult(player.getMainHandItem(), player, milk.copy(), true);
-                }
-                else {
+                } else {
                     Block.popResourceFromFace(level, pos, this.getBlockState().getValue(RanchingStationBlock.FACING), milk.copy());
                 }
                 this.level.playSound(null, this.getBlockPos(), SoundEvents.COW_MILK, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -363,15 +413,23 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
     }
 
     public int getRanchingPower() {
+        int friendshipHearts = getFriendshipHearts();
+        int hpHearts = getHPHearts();
+        return Math.min(friendshipHearts + hpHearts, 10);
+    }
+
+    public int getFriendshipHearts() {
         ItemStack pokemonItem = getPokemonItem();
-        if (!pokemonItem.isEmpty()) {
-            Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            int friendshipHearts = (int) (5 * ((double) pokemon.getFriendship() / Cobblemon.config.getMaxPokemonFriendship()));
-            int hpHearts = (int) (5 * ((double) pokemon.getStat(Stats.HP) / ((double) (255 + 31 + 252) / 2)));  // Base Stat Max + IV + EV
-//            CobblemonFarmers.LOGGER.info("Friendship Hearts: " + friendshipHearts + " HP Hearts: " + hpHearts);
-            return Math.min(friendshipHearts + hpHearts, 10);
-        }
-        return 0;
+        if (pokemonItem.isEmpty()) return 0;
+        Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
+        return ((int) (5 * ((double) pokemon.getFriendship() / Cobblemon.config.getMaxPokemonFriendship()))) * (pokemon.getShiny() ? 2 : 1);
+    }
+
+    public int getHPHearts() {
+        ItemStack pokemonItem = getPokemonItem();
+        if (pokemonItem.isEmpty()) return 0;
+        Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
+        return ((int) (5 * ((double) pokemon.getStat(Stats.HP) / 250))) * (pokemon.getShiny() ? 2 : 1);  // Base Stat Max + IV + EV: 255 + 31 + 252) / 2 = 53.8
     }
 
     @Override

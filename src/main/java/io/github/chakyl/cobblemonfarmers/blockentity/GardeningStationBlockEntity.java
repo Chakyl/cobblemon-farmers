@@ -51,13 +51,17 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private int actionTime;
     private ResourceLocation lastRecipeID;
     private boolean swapPriority = false;
-
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
+        private ItemStack previousWorker;
         @Override
         protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            setChanged();
-            initializeWorker();
+            ItemStack current = getStackInSlot(slot);
+            if (previousWorker == null || !ItemStack.matches(current, previousWorker)) {
+                this.previousWorker = current.copy();
+                super.onContentsChanged(slot);
+                setChanged();
+                initializeWorker();
+            }
         }
     };
 
@@ -142,6 +146,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - radius, centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + radius, centerPos.getZ() + radius))) {
             BlockEntity entity = this.level.getBlockEntity(pos);
             if (entity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
+                if (ranchingStationBlockEntity.isHungry(this.level)) return;
                 if (fairy) {
                     if (ranchingStationBlockEntity.getRanchingPower() > 1 && ranchingStationBlockEntity.canMagicShearToday(this.level) && ranchingStationBlockEntity.hasMagicShearDrops()) {
                         if (ranchingStationBlockEntity.magicShear(this.level, null)) {
@@ -245,7 +250,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         if (pokemonItem == null || pokemonItem.isEmpty()) return 0;
         Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
         if (getActionType(pokemon) == null) return 0;
-        return getAoeRadius(pokemon.getLevel());
+        return getAoeRadius(pokemon.getLevel()) + (pokemon.getShiny() ? 2 : 0);
     }
 
     public int getAoeRadius(int level) {

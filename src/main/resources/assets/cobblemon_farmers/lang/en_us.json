@@ -142,5 +142,8 @@
     "jei.cobblemon_farmers.gardening_station.level_scaling.fairy": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
-    "gui.cobblemon_farmers.actions": "Actions"
+    "gui.cobblemon_farmers.actions": "Actions",
+    "gui.cobblemon_farmers.friendship_hearts": "Friendship: %s/5",
+    "gui.cobblemon_farmers.hp_hearts": "HP: %s/5",
+    "gui.cobblemon_farmers.eats_berries": "Eats berries daily"
 }

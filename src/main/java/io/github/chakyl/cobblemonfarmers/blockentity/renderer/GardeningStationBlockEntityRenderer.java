@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
 
@@ -32,6 +33,10 @@ public class GardeningStationBlockEntityRenderer implements BlockEntityRenderer<
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
+            Set<String> workerAspects = pBlockEntity.getWorkerAspects();
+            if (workerAspects != null) {
+                pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), workerAspects);
+            }
             BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
             pPoseStack.translate(getPokemonOffset(blockState, true), 0.01, getPokemonOffset(blockState, false));

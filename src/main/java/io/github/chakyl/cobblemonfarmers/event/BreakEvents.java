@@ -21,9 +21,9 @@ public class BreakEvents {
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getState().is(CobblemonFarmersRegistery.BlockRegistry.CRAFT_STATION.get()) || event.getState().is(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get()) || event.getState().is(CobblemonFarmersRegistery.BlockRegistry.GARDENING_STATION.get())) {
+        if (event.getState().is(CobblemonFarmersRegistery.BlockRegistry.CRAFT_STATION.get()) || event.getState().is(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get()) || event.getState().is(CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get()) ||event.getState().is(CobblemonFarmersRegistery.BlockRegistry.GARDENING_STATION.get())) {
             BlockEntity blockEntity = event.getLevel().getBlockEntity(event.getPos());
-            if (blockEntity instanceof StationBaseBlockEntity craftStationBlockEntity && craftStationBlockEntity.hasWorker()) {
+            if (blockEntity instanceof StationBaseBlockEntity stationBaseBlockEntity && stationBaseBlockEntity.hasWorker()) {
                 event.setCanceled(true);
                 player.displayClientMessage(Component.translatable("message.cobblemon_farmers.has_pokemon").setStyle(Style.EMPTY.withColor(TextColor.fromLegacyFormat(ChatFormatting.RED))), false);
             }

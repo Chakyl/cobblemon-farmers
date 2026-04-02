@@ -13,7 +13,7 @@ public class RanchingStationUtils {
             ItemStack qualityItem = itemStack.copy();
             CompoundTag tag = qualityItem.getOrCreateTag();
             CompoundTag qualityFoodTag = new CompoundTag();
-            qualityFoodTag.putString("quality", String.valueOf(heartQuality));
+            qualityFoodTag.putInt("quality", heartQuality);
             qualityFoodTag.put("effects", new ListTag());
             tag.put("quality_food", qualityFoodTag);
             return qualityItem;
@@ -32,7 +32,7 @@ public class RanchingStationUtils {
             ItemStack qualityItem = itemStack.copy();
             CompoundTag tag = qualityItem.getOrCreateTag();
             CompoundTag qualityFoodTag = new CompoundTag();
-            qualityFoodTag.putString("quality", String.valueOf(heartQuality));
+            qualityFoodTag.putInt("quality", heartQuality);
             qualityFoodTag.put("effects", new ListTag());
             tag.put("quality_food", qualityFoodTag);
             return qualityItem;
