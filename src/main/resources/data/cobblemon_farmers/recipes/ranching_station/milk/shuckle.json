@@ -1,10 +1,10 @@
 {
 	"type": "cobblemon_farmers:ranching_station/milk",
-	"pokemon": "gogoat",
-	"consume_bucket": true,
+	"pokemon": "shuckle",
+	"consume_bucket": false,
 	"milk": {
 		"sm": {
-			"item": "minecraft:milk_bucket",
+			"item": "cobblemon:berry_juice",
 			"count": 1
 		}
 	}

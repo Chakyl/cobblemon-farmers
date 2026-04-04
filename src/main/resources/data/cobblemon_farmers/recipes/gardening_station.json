@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "ppp",
+    "pBp",
+    "p p"
+  ],
+  "key": {
+    "p": {
+      "tag": "minecraft:planks"
+    },
+    "B": {
+      "item": "cobblemon:poke_ball"
+    }
+  },
+  "result": {
+    "item": "cobblemon_farmers:gardening_station"
+  },
+  "show_notification": true
+}

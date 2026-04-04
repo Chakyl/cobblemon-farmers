@@ -1,8 +1,10 @@
 package io.github.chakyl.cobblemonfarmers.blockentity.renderer;
 
+import com.cobblemon.mod.common.client.render.pokemon.PokemonRenderer;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.CraftStationBlock;
 import io.github.chakyl.cobblemonfarmers.blockentity.CraftStationBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -11,6 +13,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -21,11 +24,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
 
@@ -66,18 +67,21 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
             this.renderItem(stack, pBlockEntity, pPoseStack, pBuffer, index);
             index++;
         }
-        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
-            Set<String> workerAspects = pBlockEntity.getWorkerAspects();
-            if (workerAspects != null) {
-                pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), workerAspects);
-            }
+            Set<String> newAspects = new HashSet<>(pokemonEntity.getAspects());
+            newAspects.addAll(pokemonEntity.getForm().getAspects());
+            pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), newAspects);
             BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
             pPoseStack.translate(getPokemonOffset(blockState, true), 0.01, getPokemonOffset(blockState, false));
             pPoseStack.mulPose(Axis.YP.rotationDegrees(pokemonEntity.getYRot()));
-            entityRenderDispatcher.render(pokemonEntity, 0, 0, 0, 0, pPartialTick, pPoseStack, pBuffer, pPackedLight);
+            EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+            EntityRenderer<?> renderer = dispatcher.getRenderer(pokemonEntity);
+            if (renderer instanceof PokemonRenderer pRenderer) {
+                pRenderer.render(pokemonEntity, 0, pPartialTick, pPoseStack, pBuffer, pPackedLight);
+            }
             pPoseStack.popPose();
         }
     }

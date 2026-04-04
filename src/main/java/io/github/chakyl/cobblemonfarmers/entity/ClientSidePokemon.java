@@ -81,8 +81,6 @@ public class ClientSidePokemon extends Pokemon {
             this.setFriendship(nbt.getInt(DataKeys.POKEMON_FRIENDSHIP), true);
         }
 
-        this.updateForm();
-        this.updateAspects();
         return this;
     }
 

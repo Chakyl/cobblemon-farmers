@@ -7,6 +7,12 @@
 			"count": 8,
 			"chance": 1,
 			"min_hearts": 2
+		},
+		{
+			"item": "minecraft:blue_ice",
+			"count": 1,
+			"chance": 0.8,
+			"min_hearts": 8
 		}
 	]
 }

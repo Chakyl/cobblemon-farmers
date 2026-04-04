@@ -22,6 +22,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PokeUtils {
 
@@ -136,5 +138,13 @@ public class PokeUtils {
         }
         level.playSound(null, player.getOnPos(), CobblemonSounds.GUI_CLICK, SoundSource.BLOCKS, 0.5F, 1.0F);
         workerSlot.setChanged();
+    }
+
+    public static String getStringifiedAspects(Set<String> aspects) {
+        String aspectsString = "";
+        if (!aspects.isEmpty()) {
+            aspectsString = "-"+aspects.stream().sorted().collect(Collectors.joining("-")).toLowerCase().replace("?","question").replace("!","exclamation").replaceAll("[^a-z0-9/._-]", "");
+        }
+        return aspectsString;
     }
 }

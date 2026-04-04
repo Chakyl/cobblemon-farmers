@@ -43,7 +43,7 @@
     "tooltip.cobblemon_farmers.mystery_mine.processing_time": "Mining time left: %s",
     "tooltip.cobblemon_farmers.gardening_station.processing_time": "Gardening Time left: %s",
     "tooltip.cobblemon_farmers.craft_station.processing_time": "Crafting Time left: %s",
-    "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Ranching Power",
+    "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Affection",
     "tooltip.cobblemon_farmers.ranching_station.ranching_power_desc": "Scales off of friendship and HP",
 
     "message.cobblemon_farmers.ranching_station.no_drops": "You didn't get anything this time...",
@@ -125,12 +125,17 @@
     "jei.cobblemon_farmers.mystery_mine.chance": "Chance: %s",
     "jei.cobblemon_farmers.mystery_mine.consume_chance": "Chance to consume: %s",
 
+    "emi.category.cobblemon_farmers.emi.craft_station": "Elemental Crafting",
+    "emi.category.cobblemon_farmers.emi.gardening_station": "Gardening Station",
+    "emi.category.cobblemon_farmers.emi.mystery_mine": "Mystery Mining",
+    "emi.category.cobblemon_farmers.emi.ranching_station_milking": "Ranching: Milking",
+    "emi.category.cobblemon_farmers.emi.ranching_station_forages": "Ranching: Foraging",
     "jei.cobblemon_farmers.ranching_station.category.milking": "Ranching: Milking",
     "jei.cobblemon_farmers.ranching_station.category.foraging": "Ranching: Foraging",
     "jei.cobblemon_farmers.ranching_station.more_info": "Hover over items for more info.",
     "jei.cobblemon_farmers.ranching_station.forage.affection.over": "%s+ ❤ affection required",
     "jei.cobblemon_farmers.ranching_station.forage.chance": "%s chance",
-    "jei.cobblemon_farmers.ranching_station.forage.affection.quality":  "Ranching Power raises quality",
+    "jei.cobblemon_farmers.ranching_station.forage.affection.quality":  "Affection raises quality",
     "jei.cobblemon_farmers.ranching_station.milk.affection.range": "%s ❤ affection required",
     "jei.cobblemon_farmers.ranching_station.milk.affection.over": "%s+ ❤ affection required",
 

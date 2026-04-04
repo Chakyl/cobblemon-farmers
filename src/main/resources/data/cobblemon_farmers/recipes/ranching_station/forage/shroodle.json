@@ -1,12 +1,11 @@
 {
 	"type": "cobblemon_farmers:ranching_station/forage",
-	"pokemon": "gogoat",
+	"pokemon": "shroodle",
 	"forages": [
 		{
-			"item": "minecraft:goat_horn",
+			"item": "cobblemon:poison_gem",
 			"count": 1,
-			"chance": 0.1,
-			"has_quality": true,
+			"chance": 0.05,
 			"min_hearts": 5
 		}
 	]
