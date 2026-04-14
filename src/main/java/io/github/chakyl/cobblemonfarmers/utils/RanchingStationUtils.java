@@ -39,9 +39,8 @@ public class RanchingStationUtils {
         }
         return itemStack;
     }
-
     public static boolean compareDay(int day, int checkedDay, int amount) {
-        return day > checkedDay || checkedDay - day > amount;
+        return day < checkedDay || day - checkedDay >= amount;
     }
 
     public static int getDay(Level level) {

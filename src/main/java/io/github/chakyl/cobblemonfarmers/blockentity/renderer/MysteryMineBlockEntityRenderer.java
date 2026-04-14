@@ -16,14 +16,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
 
 public class MysteryMineBlockEntityRenderer implements BlockEntityRenderer<MysteryMineBlockEntity> {
     private final Map<ItemStack, Float> itemRotations = new HashMap<>();

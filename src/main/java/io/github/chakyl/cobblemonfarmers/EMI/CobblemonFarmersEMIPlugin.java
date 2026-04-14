@@ -7,8 +7,6 @@ import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
-import io.github.chakyl.cobblemonfarmers.JEI.GardeningStationCategory;
-import io.github.chakyl.cobblemonfarmers.JEI.GardeningStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
@@ -18,7 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @EmiEntrypoint
@@ -50,6 +47,7 @@ public class CobblemonFarmersEMIPlugin implements EmiPlugin {
         registry.addRecipe(new EMIGardeningStationRecipe(ElementalTypes.INSTANCE.getDARK(), Stats.HP, 20000));
         registry.addRecipe(new EMIGardeningStationRecipe(ElementalTypes.INSTANCE.getNORMAL(), Stats.SPEED, 300));
         registry.addRecipe(new EMIGardeningStationRecipe(ElementalTypes.INSTANCE.getFAIRY(), Stats.SPECIAL_ATTACK, 800));
+        registry.addRecipe(new EMIGardeningStationRecipe(ElementalTypes.INSTANCE.getFLYING(), Stats.SPECIAL_DEFENCE, 200));
 
         List<RanchingStationForageRecipe> ranchingStationForageRecipes = recipeManager.getAllRecipesFor(RanchingStationForageRecipe.Type.INSTANCE);
         for (RanchingStationForageRecipe recipe : ranchingStationForageRecipes) {

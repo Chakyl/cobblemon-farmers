@@ -4,7 +4,6 @@ import com.cobblemon.mod.common.client.render.pokemon.PokemonRenderer;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.CraftStationBlock;
 import io.github.chakyl.cobblemonfarmers.blockentity.CraftStationBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -24,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 
@@ -70,12 +68,17 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
 
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
+            Set<String> workerAspects = pBlockEntity.getWorkerAspects();
+            if (workerAspects != null) {
+                pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), workerAspects);
+            }
             Set<String> newAspects = new HashSet<>(pokemonEntity.getAspects());
             newAspects.addAll(pokemonEntity.getForm().getAspects());
             pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), newAspects);
             BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
-            pPoseStack.translate(getPokemonOffset(blockState, true), 0.01, getPokemonOffset(blockState, false));
+            float hitbox = pokemonEntity.getPokemon().getSpecies().getHitbox().width;
+            pPoseStack.translate(getPokemonOffset(blockState, hitbox, true), 0.01, getPokemonOffset(blockState, hitbox, false));
             pPoseStack.mulPose(Axis.YP.rotationDegrees(pokemonEntity.getYRot()));
             EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
             EntityRenderer<?> renderer = dispatcher.getRenderer(pokemonEntity);

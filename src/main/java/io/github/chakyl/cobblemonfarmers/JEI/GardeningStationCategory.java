@@ -73,7 +73,7 @@ public class GardeningStationCategory implements IRecipeCategory<GardeningStatio
         guiGraphics.drawString(Minecraft.getInstance().font, Language.getInstance().getVisualOrder(Component.translatable("jei.cobblemon_farmers.gardening_station.elemental_type", elementalType.getDisplayName())), 22, 4, elementalType.getHue(), true);
         guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobblemon_farmers.gardening_station.speed_stat", recipe.speedStat.getDisplayName()).getString()), 0, 22, 84, 0xFF4b3658);
         guiGraphics.drawString(Minecraft.getInstance().font, Language.getInstance().getVisualOrder(Component.translatable("jei.cobblemon_farmers.gardening_station.action_time", recipe.actionTime / 20)), 86, 32, 0xFFFFFFFF, false);
-        guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + elementalType.getName()).getString()), 0, 54, 156, 0xFF4b3658);
+        guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + elementalType.getName()).getString()), 0, 54, 160, 0xFF4b3658);
     }
 
 }

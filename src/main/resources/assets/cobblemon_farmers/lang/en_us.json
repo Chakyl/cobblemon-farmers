@@ -75,7 +75,7 @@
     "info.cobblemon_farmers.gardening_station.type.fire": "Smelts items",
     "info.cobblemon_farmers.gardening_station.type.water": "Waters soil",
     "info.cobblemon_farmers.gardening_station.type.grass": "Grows crops",
-    "info.cobblemon_farmers.gardening_station.type.flying": "Can't work here",
+    "info.cobblemon_farmers.gardening_station.type.flying": "Harvests berries",
     "info.cobblemon_farmers.gardening_station.type.fighting": "Can't work here",
     "info.cobblemon_farmers.gardening_station.type.poison": "Can't work here",
     "info.cobblemon_farmers.gardening_station.type.electric": "Can't work here",
@@ -146,9 +146,15 @@
     "jei.cobblemon_farmers.gardening_station.level_scaling.normal": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.fairy": "Working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working radius increases by 1 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.flying": "Berry eating chance decreases and working radius increases by 1 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
     "gui.cobblemon_farmers.actions": "Actions",
     "gui.cobblemon_farmers.friendship_hearts": "Friendship: %s/5",
     "gui.cobblemon_farmers.hp_hearts": "HP: %s/5",
-    "gui.cobblemon_farmers.eats_berries": "Eats berries daily"
+    "gui.cobblemon_farmers.eats_berries": "Eats berries daily",
+    "gui.cobblemon_farmers.view_recipes": "View drops",
+
+    "config.jade.plugin_cobblemon_farmers.cobblemon_farmers": "Cobblemon Farmers",
+    "jade.cobblemon_farmers.workstation.pokemon.name": "%s Lv. %s",
+    "jade.cobblemon_farmers.workstation.no_worker": "No worker assigned"
 }

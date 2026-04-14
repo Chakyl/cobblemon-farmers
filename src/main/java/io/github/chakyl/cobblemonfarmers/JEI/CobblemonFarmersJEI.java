@@ -67,6 +67,7 @@ public class CobblemonFarmersJEI implements IModPlugin {
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getWATER(), Stats.SPECIAL_ATTACK, 600));
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getDARK(), Stats.HP, 20000));
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getNORMAL(), Stats.SPEED, 300));
+        gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getFLYING(), Stats.SPECIAL_DEFENCE, 200));
         gardeningRecipes.add(new GardeningStationRecipe(ElementalTypes.INSTANCE.getFAIRY(), Stats.SPECIAL_ATTACK, 800));
         registration.addRecipes(GardeningStationCategory.TYPE, gardeningRecipes);
     }

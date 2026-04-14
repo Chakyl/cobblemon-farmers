@@ -1,6 +1,7 @@
 package io.github.chakyl.cobblemonfarmers.blockentity;
 
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
+import io.github.chakyl.cobblemonfarmers.block.MysteryMineBlock;
 import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
@@ -38,6 +39,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.insertIntoFacingOrPopOut;
+
 public class MysteryMineBlockEntity extends StationBaseBlockEntity implements MenuProvider {
     protected final ContainerData data;
     private int progress = 0;
@@ -57,6 +60,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
 
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         private ItemStack previousWorker;
+
         @Override
         protected void onContentsChanged(int slot) {
             ItemStack current = getStackInSlot(slot);
@@ -81,7 +85,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 return switch (pIndex) {
                     case 0 -> MysteryMineBlockEntity.this.progress;
                     case 1 -> MysteryMineBlockEntity.this.craftingTime;
-                    case 2 -> MysteryMineBlockEntity.this.swapPriority ?  1 : 0;
+                    case 2 -> MysteryMineBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -267,7 +271,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 }
                 outputItem = results.get(i).copy();
                 outputItem.setCount(Mth.clamp(outputItem.getCount() * mult, 0, outputItem.getMaxStackSize()));
-                Block.popResourceFromFace(level, this.getBlockPos(), Direction.UP, outputItem.copy());
+                insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(MysteryMineBlock.FACING), outputItem.copy());
                 break;
             }
         }

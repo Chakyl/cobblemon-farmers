@@ -91,7 +91,7 @@ public class EMIGardeningStationRecipe implements EmiRecipe {
         widgets.addText(Component.translatable("jei.cobblemon_farmers.gardening_station.elemental_type", elementalType.getDisplayName()), 22, 4, elementalType.getHue(), true);
         emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.gardening_station.speed_stat", this.stat.getDisplayName()), 0, 22, 0xFF4b3658, 84, false);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.gardening_station.action_time", this.recipeTime / 20), 86, 32, 0xFFFFFFFF, false);
-        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + elementalType.getName()), 0, 54, 0xFF4b3658, 156, false);
+        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + elementalType.getName()), 0, 54, 0xFF4b3658, 164, false);
     }
 
 }

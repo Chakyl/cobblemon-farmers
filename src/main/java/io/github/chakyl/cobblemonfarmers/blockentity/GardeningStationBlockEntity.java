@@ -5,14 +5,17 @@ import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.api.types.ElementalTypes;
+import com.cobblemon.mod.common.block.BerryBlock;
+import com.cobblemon.mod.common.block.entity.BerryBlockEntity;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import cool.bot.botslib.util.Util;
 import cool.bot.dewdropfarmland.utils.CropHandlerUtils;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
+import io.github.chakyl.cobblemonfarmers.block.GardeningStationBlock;
+import io.github.chakyl.cobblemonfarmers.block.MysteryMineBlock;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.GardeningStationMenu;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +23,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
@@ -35,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -42,8 +45,10 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getItemFormPokemon;
+import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.insertIntoFacingOrPopOut;
 
 public class GardeningStationBlockEntity extends StationBaseBlockEntity implements MenuProvider {
     protected final ContainerData data;
@@ -53,6 +58,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private boolean swapPriority = false;
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         private ItemStack previousWorker;
+
         @Override
         protected void onContentsChanged(int slot) {
             ItemStack current = getStackInSlot(slot);
@@ -149,14 +155,14 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                 if (ranchingStationBlockEntity.isHungry(this.level)) return;
                 if (fairy) {
                     if (ranchingStationBlockEntity.getRanchingPower() > 1 && ranchingStationBlockEntity.canMagicShearToday(this.level) && ranchingStationBlockEntity.hasMagicShearDrops()) {
-                        if (ranchingStationBlockEntity.magicShear(this.level, null)) {
+                        if (ranchingStationBlockEntity.magicShear(this.level, null, centerPos, this.getBlockState().getValue(GardeningStationBlock.FACING))) {
                             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_FAIRY, SoundSource.BLOCKS, 1.0F, 0.9F);
                             return;
                         }
                     }
                 } else {
                     if (ranchingStationBlockEntity.canForageToday(this.level) && ranchingStationBlockEntity.hasForageRecipe()) {
-                        if (ranchingStationBlockEntity.harvestForage(this.level)) {
+                        if (ranchingStationBlockEntity.harvestForage(this.level, centerPos, this.getBlockState().getValue(GardeningStationBlock.FACING))) {
                             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_NORMAL, SoundSource.BLOCKS, 1.0F, 0.9F);
                             return;
                         }
@@ -172,19 +178,51 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         }
     }
 
+    private void harvestNearbyBerries(int radius) {
+        BlockPos centerPos = this.getBlockPos();
+        boolean ateBerry = this.level.getRandom().nextDouble() < 1 - (radius * 0.1);
+        for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - radius, centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + radius, centerPos.getZ() + radius))) {
+            if (this.level.getBlockEntity(pos) instanceof BerryBlockEntity berryBlockEntity) {
+                if (this.level.getBlockState(pos).getBlock() instanceof BerryBlock berryBlock && level.getBlockState(pos).hasProperty(BlockStateProperties.AGE_5)) {
+                    if (level.getBlockState(pos).getValue(BlockStateProperties.AGE_5) == BerryBlock.FRUIT_AGE) {
+                        if (!ateBerry) {
+                            List<ItemStack> mergedStacks = berryBlockEntity.berryAndGrowthPoint$common().stream()
+                                    .collect(Collectors.groupingBy(
+                                            pair -> pair.getFirst().item(),
+                                            Collectors.summingInt(pair -> 1)
+                                    ))
+                                    .entrySet().stream()
+                                    .map(entry -> new ItemStack(entry.getKey(), entry.getValue()))
+                                    .collect(Collectors.toList());
+                            for (ItemStack itemStack : mergedStacks) {
+                                insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(MysteryMineBlock.FACING), itemStack);
+                            }
+                            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_FLYING, SoundSource.BLOCKS, 0.4F, 0.9F);
+                        } else {
+                            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.BERRY_EAT, SoundSource.BLOCKS, 0.4F, 1.0F);
+                        }
+                        level.setBlock(pos, berryBlockEntity.getBlockState().setValue(BlockStateProperties.AGE_5, BerryBlock.MATURE_AGE), 2);
+                        return;
+                    }
+                }
+
+            }
+        }
+    }
+
     private void generateExp(int radius) {
         List<PokemonEntity> nearbyMons = level.getEntitiesOfClass(PokemonEntity.class, new AABB(this.getBlockPos()).inflate(radius));
         int spawnedXP = 0;
         for (PokemonEntity pokemon : nearbyMons) {
             if (!pokemon.isBattling() && !pokemon.isDeadOrDying() & pokemon.getPokemon().getOwnerPlayer() == null) {
-                Block.popResourceFromFace(level, this.getBlockPos(), Direction.UP, CobblemonItems.EXPERIENCE_CANDY_S.getDefaultInstance());
+                insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(MysteryMineBlock.FACING), CobblemonItems.EXPERIENCE_CANDY_S.getDefaultInstance());
                 pokemon.kill();
                 ++spawnedXP;
             }
         }
         if (spawnedXP < radius / 2) {
             for (int i = 0; i < (radius / 2) - spawnedXP; i++) {
-                Block.popResourceFromFace(level, this.getBlockPos(), Direction.UP, CobblemonItems.EXPERIENCE_CANDY_XS.getDefaultInstance());
+                insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(MysteryMineBlock.FACING), CobblemonItems.EXPERIENCE_CANDY_XS.getDefaultInstance());
             }
         }
     }
@@ -194,19 +232,22 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         int radius = getAoeRadius(pokemon.getLevel());
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getGRASS())) {
             CropHandlerUtils.growCropsInRadius((ServerLevel) this.level, this.getBlockPos(), this.getLevel().getRandom(), radius);
-            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_GRASS, SoundSource.BLOCKS, 1.0F, 0.9F);
+            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_GRASS, SoundSource.BLOCKS, 0.5F, 0.9F);
         } else if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getWATER())) {
             waterFarmland(radius);
-            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_WATER, SoundSource.BLOCKS, 1.0F, 0.9F);
+            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_WATER, SoundSource.BLOCKS, 0.5F, 0.9F);
+        } else if (actionType.equals(types.getFLYING())) {
+            harvestNearbyBerries(radius);
         } else if (actionType.equals(types.getNORMAL())) {
             harvestFromRanchingStation(radius, false);
         } else if (actionType.equals(types.getFAIRY())) {
             harvestFromRanchingStation(radius, true);
-        }else if (actionType.equals(types.getDARK())) {
+        } else if (actionType.equals(types.getDARK())) {
             generateExp(radius * 4);
-            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_DARK, SoundSource.BLOCKS, 1.0F, 0.9F);
+            this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_DARK, SoundSource.BLOCKS, 0.5F, 0.9F);
         }
     }
+
 
     private ElementalType getActionType(Pokemon pokemon) {
         ElementalType secondaryType = pokemon.getSecondaryType();
@@ -217,12 +258,14 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         return null;
     }
 
+
     private int getActionTime(ElementalType type) {
         ElementalTypes types = ElementalTypes.INSTANCE;
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && type.equals(types.getGRASS())) return 24000;
         if (type.equals(types.getWATER())) return 600;
         if (type.equals(types.getNORMAL())) return 300;
         if (type.equals(types.getFAIRY())) return 800;
+        if (type.equals(types.getFLYING())) return 200;
         if (type.equals(types.getDARK())) return 20000;
         return -1;
     }
@@ -233,6 +276,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         if (type.equals(types.getWATER())) return Stats.SPECIAL_ATTACK;
         if (type.equals(types.getNORMAL())) return Stats.SPEED;
         if (type.equals(types.getFAIRY())) return Stats.SPECIAL_ATTACK;
+        if (type.equals(types.getFLYING())) return Stats.SPECIAL_DEFENCE;
         if (type.equals(types.getDARK())) return Stats.HP;
         return null;
     }

@@ -6,9 +6,12 @@ import com.cobblemon.mod.common.client.CobblemonResources;
 import com.cobblemon.mod.common.client.render.RenderHelperKt;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.emi.emi.api.EmiApi;
+import io.github.chakyl.cobbleemibackported.CobblemonStack;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -20,6 +23,7 @@ import net.minecraft.world.entity.player.Inventory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.chakyl.cobblemonfarmers.utils.CobblemonEMIUtils.getEmiPokemon;
 import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemonTypesOnly;
 
 public class RanchingStationScreen extends AbstractContainerScreen<RanchingStationMenu> {
@@ -51,6 +55,12 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         super.init();
         this.inventoryLabelY = 10000;
         this.titleLabelY = 10000;
+        this.addRenderableWidget(new RanchingStationScreen.ViewRecipesButton(this.leftPos + 122, this.topPos + 19, 42, 16, Component.translatable("gui.cobblemon_farmers.view_recipes"), (button) -> {
+            if (this.menu.getWorkerPokemon() != null) {
+                CobblemonStack stack = getEmiPokemon(this.menu.getWorkerPokemon().showdownId());
+                EmiApi.displayUses(stack);
+            }
+        }));
     }
 
     @Override
@@ -89,7 +99,6 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
-
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
         guiGraphics.blit(ACTIONS_TEXTURE, x - 36, y, 0, 0, 36, 98);
         int iconSize = 16;
@@ -114,10 +123,10 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         int ranchingPowerAreaTop = this.topPos + RP_GUI_Y - (8 / 2);
         int ranchingPowerAreaRight = this.leftPos + RP_GUI_X + heartWidth;
         int ranchingPowerAreaBottom = this.topPos + RP_GUI_Y + (8 / 2);
-
         return mouseX >= ranchingPowerAreaLeft && mouseX <= ranchingPowerAreaRight &&
                 mouseY >= ranchingPowerAreaTop && mouseY <= ranchingPowerAreaBottom;
     }
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         renderBackground(guiGraphics);
@@ -127,7 +136,21 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
             List<Component> tooltipList = new ArrayList<>();
             tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.ranching_power", this.menu.getRanchingPower()));
             tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.ranching_power_desc", this.menu.getRanchingPower()).withStyle(ChatFormatting.GRAY));
-            guiGraphics.renderComponentTooltip(this.font, tooltipList,  mouseX,  mouseY);
+            guiGraphics.renderComponentTooltip(this.font, tooltipList, mouseX, mouseY);
+        }
+    }
+
+    private class ViewRecipesButton extends Button {
+        public ViewRecipesButton(int x, int y, int width, int height, Component message, OnPress onPress) {
+            super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+
+
+            RenderHelperKt.drawScaledText(guiGraphics, COBBLE_FONT, this.getMessage().plainCopy(), this.getX(), this.getY() + (this.height - 8) / 2, 1f, 1, 200, this.isHoveredOrFocused() ? 0xFF00FF00 : 0xFFFFFFFF, false, true, 0, 0);
+
         }
     }
 

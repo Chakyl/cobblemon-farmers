@@ -44,7 +44,8 @@ public class GardeningStationBlockEntityRenderer implements BlockEntityRenderer<
             pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), newAspects);
             BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
-            pPoseStack.translate(getPokemonOffset(blockState, true), 0.01, getPokemonOffset(blockState, false));
+            float hitbox = pokemonEntity.getPokemon().getSpecies().getHitbox().width;
+            pPoseStack.translate(getPokemonOffset(blockState, hitbox, true), 0.01, getPokemonOffset(blockState, hitbox, false));
             pPoseStack.mulPose(Axis.YP.rotationDegrees(pokemonEntity.getYRot()));
             EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
             EntityRenderer<?> renderer = dispatcher.getRenderer(pokemonEntity);

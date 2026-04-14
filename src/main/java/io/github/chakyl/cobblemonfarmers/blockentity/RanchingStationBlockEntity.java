@@ -1,10 +1,10 @@
 package io.github.chakyl.cobblemonfarmers.blockentity;
 
 import com.cobblemon.mod.common.Cobblemon;
-import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.CobblemonSounds;
 import com.cobblemon.mod.common.api.drop.DropEntry;
 import com.cobblemon.mod.common.api.drop.DropTable;
+import com.cobblemon.mod.common.api.drop.ItemDropEntry;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.api.tags.CobblemonItemTags;
@@ -50,13 +50,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getItemFormPokemon;
-import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getSpeciesFromItemFormPokemon;
+import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.*;
 import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.compareDay;
 import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.getDay;
 
@@ -158,10 +158,11 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             }
         }
     }
+
     public void increaseFriendship(int amount) {
         CompoundTag pokeData = this.pokemonInventory.getStackInSlot(0).getTag().getCompound("pokeData");
         pokeData.putInt("Friendship", pokeData.getInt("Friendship") + amount);
-        ((ServerLevel)this.level).sendParticles(
+        ((ServerLevel) this.level).sendParticles(
                 ParticleTypes.HEART,
                 this.getBlockPos().getX(),
                 this.getBlockPos().getY() + 1,
@@ -185,6 +186,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             this.increaseFriendship(2);
         }
     }
+
     public boolean isHungry(Level level) {
         return compareDay(getDay(level), this.dayLastFed, 1);
     }
@@ -202,7 +204,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         if (this.hasWorker()) {
             if (!isHungry(level)) {
                 if (item == Items.AIR && canForageToday(level) && hasForageRecipe()) {
-                    if (harvestForage(level)) return;
+                    if (harvestForage(level, null, null)) return;
                 } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MAGIC_SHEARS_RANCHING_STATION)) {
                     if (this.getRanchingPower() < 5) {
                         pPlayer.displayClientMessage(
@@ -219,7 +221,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                                 Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared").withStyle(ChatFormatting.RED),
                                 true
                         );
-                    } else if (magicShear(level, pPlayer)) return;
+                    } else if (magicShear(level, pPlayer, null, null)) return;
                 } else if (item.getDefaultInstance().is(CobblemonFarmersTags.MILKS_RANCHING_STATION)) {
                     if (this.getRanchingPower() < 1) {
                         pPlayer.displayClientMessage(
@@ -259,7 +261,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         return compareDay(getDay(level), this.dayLastForaged, 1);
     }
 
-    public boolean harvestForage(Level level) {
+    public boolean harvestForage(Level level, BlockPos overridePos, Direction overrideDirection) {
         RanchingStationForageRecipe currentRecipe = getForageRecipe();
         if (currentRecipe != null) {
             this.dayLastForaged = getDay(level);
@@ -267,7 +269,11 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             if (!drops.isEmpty()) {
                 BlockPos pos = this.getBlockPos();
                 for (ItemStack drop : drops) {
-                    Block.popResourceFromFace(level, pos, this.getBlockState().getValue(RanchingStationBlock.FACING), drop.copy());
+                    if (overridePos != null && overrideDirection != null) {
+                        insertIntoFacingOrPopOut(level, overridePos, overrideDirection, drop.copy());
+                    } else {
+                        Block.popResourceFromFace(level, pos, Direction.UP, drop.copy());
+                    }
                 }
                 this.level.playSound(null, this.getBlockPos(), CobblemonSounds.BERRY_HARVEST, SoundSource.BLOCKS, 1.0F, 0.9F);
                 generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_ON);
@@ -281,7 +287,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
 
     private DropTable getMagicShearDrops() {
         if (!this.hasWorker()) return null;
-        Species species = Objects.requireNonNull(PokemonSpecies.INSTANCE.getByName(getSpeciesFromItemFormPokemon(this.pokemonInventory.getStackInSlot(0), level)));
+        Species species = Objects.requireNonNull(PokemonSpecies.INSTANCE.getByName(getSpeciesFromCompoundTag(this.pokemonInventory.getStackInSlot(0).getTag())));
         return species.getDrops();
     }
 
@@ -293,7 +299,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         return compareDay(getDay(level), this.dayLastMagicSheared, 1);
     }
 
-    public boolean magicShear(Level level, Player player) {
+    public boolean magicShear(Level level, Player player, BlockPos overridePos, Direction overrideDirection) {
         DropTable dropTable = getMagicShearDrops();
         if (dropTable != null) {
             this.dayLastMagicSheared = getDay(level);
@@ -302,7 +308,18 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             if (!drops.isEmpty()) {
                 BlockPos pos = this.getBlockPos();
                 for (DropEntry drop : drops) {
-                    drop.drop(null, (ServerLevel) level, this.getBlockPos().getCenter(), null);
+                    if (overridePos != null && overrideDirection != null && drop instanceof ItemDropEntry) {
+                        ItemDropEntry itemDropEntry = ((ItemDropEntry) drop);
+                        ItemStack item = new ItemStack(ForgeRegistries.ITEMS.getValue(itemDropEntry.getItem()), itemDropEntry.getQuantityRange() == null ? itemDropEntry.getQuantity() :
+                                itemDropEntry.getQuantityRange().getFirst());
+                        if (itemDropEntry.getNbt() != null) {
+                            item.setTag(itemDropEntry.getNbt());
+                        }
+                        if (!item.isEmpty()) insertIntoFacingOrPopOut(level, overridePos, overrideDirection, item);
+                    } else {
+                        drop.drop(null, (ServerLevel) level, this.getBlockPos().getCenter(), null);
+
+                    }
                 }
                 generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_ON);
                 generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_OFF);

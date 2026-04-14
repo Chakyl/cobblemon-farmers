@@ -2,24 +2,33 @@ package io.github.chakyl.cobblemonfarmers.utils;
 
 import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.CobblemonSounds;
+import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.item.PokemonItem;
 import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.cobblemon.mod.common.pokemon.Species;
+import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.CraftStationBlock;
 import io.github.chakyl.cobblemonfarmers.entity.ClientSidePokemon;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkstationPartySlot;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import java.util.Objects;
 import java.util.Set;
@@ -52,8 +61,7 @@ public class PokeUtils {
         return pokemon.getPrimaryType().equals(type);
     }
 
-    public static String getSpeciesFromItemFormPokemon(ItemStack pokeItem, Level level) {
-        CompoundTag tag = pokeItem.getTag();
+    public static String getSpeciesFromCompoundTag(CompoundTag tag) {
         if (tag == null) throw new RuntimeException("Horrible thing happened! The Pokemon doesn't exist!!!!");
         String species = tag.getCompound("pokeData").getString("Species");
         return species.substring(species.indexOf(":") + 1);
@@ -80,14 +88,15 @@ public class PokeUtils {
         return rotation;
     }
 
-    public static float getPokemonOffset(BlockState blockState, boolean xOffset) {
+    public static float getPokemonOffset(BlockState blockState, float hitbox, boolean xOffset) {
+        float resolvedHitbox = hitbox - 0.25f;
         Direction facingDirection = blockState.getValue(CraftStationBlock.FACING);
         float offset;
         switch (facingDirection) {
-            case SOUTH -> offset = xOffset ? 0.5f : -0.5f;
-            case EAST -> offset = xOffset ? -0.5f : 0.5f;
-            case WEST -> offset = xOffset ? 1.5f : 0.5f;
-            default -> offset = xOffset ? 0.5f : 1.5f;
+            case SOUTH -> offset = xOffset ? 0.5f : -1 * resolvedHitbox;
+            case EAST -> offset = xOffset ? -1 * resolvedHitbox : 0.5f;
+            case WEST -> offset = xOffset ?  1f + resolvedHitbox : 0.5f;
+            default -> offset = xOffset ? 0.5f : 1f + resolvedHitbox;
         }
         return offset;
     }
@@ -146,5 +155,21 @@ public class PokeUtils {
             aspectsString = "-"+aspects.stream().sorted().collect(Collectors.joining("-")).toLowerCase().replace("?","question").replace("!","exclamation").replaceAll("[^a-z0-9/._-]", "");
         }
         return aspectsString;
+    }
+    public static void insertIntoFacingOrPopOut(Level level, BlockPos pos, Direction facing, ItemStack item) {
+        BlockPos facingBlockPos = pos.relative(facing);
+        BlockEntity facingBlockEntity = level.getBlockEntity(facingBlockPos);
+
+        if (!(facingBlockEntity instanceof BlockEntity)) {
+            Block.popResourceFromFace(level, facingBlockPos, Direction.UP, item);
+            return;
+        }
+        facingBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).ifPresent(handler -> {
+            ItemStack remainder = net.minecraftforge.items.ItemHandlerHelper.insertItem(handler, item, false);
+
+            if (!remainder.isEmpty()) {
+                Block.popResourceFromFace(level, pos, Direction.UP, remainder);
+            }
+        });
     }
 }
