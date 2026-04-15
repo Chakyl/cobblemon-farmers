@@ -81,7 +81,6 @@ public class MysteryMineBlock extends Block implements EntityBlock {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof MysteryMineBlockEntity mysteryMineBlockEntity) {
                 if (mysteryMineBlockEntity.validateOwner(pPlayer)) {
-                    mysteryMineBlockEntity.setChanged();
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

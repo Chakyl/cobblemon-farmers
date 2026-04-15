@@ -81,7 +81,6 @@ public class GardeningStationBlock extends Block implements EntityBlock {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof GardeningStationBlockEntity gardeningStationBlockEntity) {
                 if (gardeningStationBlockEntity.validateOwner(pPlayer)) {
-                    gardeningStationBlockEntity.setChanged();
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

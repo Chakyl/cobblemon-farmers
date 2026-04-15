@@ -82,7 +82,6 @@ public class CraftStationBlock extends Block implements EntityBlock {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof CraftStationBlockEntity craftStationBlockEntity) {
                 if (craftStationBlockEntity.validateOwner(pPlayer)) {
-                    craftStationBlockEntity.setChanged();
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {
