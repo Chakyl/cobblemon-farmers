@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "wBw",
+    "iwi",
+    "ppp"
+  ],
+  "key": {
+    "p": {
+      "tag": "minecraft:planks"
+    },
+    "B": {
+      "item": "cobblemon:great_ball"
+    },
+    "w": {
+      "item": "minecraft:wheat"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "cobblemon_farmers:ranching_station"
+  },
+  "show_notification": true
+}

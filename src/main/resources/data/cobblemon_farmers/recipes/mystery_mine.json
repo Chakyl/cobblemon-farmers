@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "pcp",
+    "dBd",
+    "pcp"
+  ],
+  "key": {
+    "p": {
+      "tag": "minecraft:planks"
+    },
+    "B": {
+      "item": "cobblemon:great_ball"
+    },
+    "c": {
+      "item": "minecraft:cobblestone"
+    },
+    "d": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "item": "cobblemon_farmers:mystery_mine"
+  },
+  "show_notification": true
+}

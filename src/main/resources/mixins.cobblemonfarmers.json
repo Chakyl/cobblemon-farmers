@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.chakyl.cobblemonfarmers.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mixins.cobblemonfarmers.refmap.json",
+  "mixins": [
+    "CWRecipeManagerAccessor"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,15 @@
+{
+	"type": "cobblemon_farmers:ranching_station/milk",
+	"pokemon": "miltank",
+	"consume_bucket": true,
+	"milk": {
+		"sm": {
+			"item": "minecraft:milk_bucket",
+			"count": 1
+		},
+		"lg": {
+			"item": "minecraft:milk_bucket",
+			"count": 1
+		}
+	}
+}

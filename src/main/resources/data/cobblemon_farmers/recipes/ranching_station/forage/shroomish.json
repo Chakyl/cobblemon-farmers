@@ -1,0 +1,12 @@
+{
+	"type": "cobblemon_farmers:ranching_station/forage",
+	"pokemon": "shroomish",
+	"forages": [
+		{
+			"item": "cobblemon:grass_gem",
+			"count": 1,
+			"chance": 0.1,
+			"min_hearts": 3
+		}
+	]
+}

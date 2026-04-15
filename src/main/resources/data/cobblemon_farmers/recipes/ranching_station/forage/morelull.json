@@ -1,0 +1,13 @@
+{
+	"type": "cobblemon_farmers:ranching_station/forage",
+	"pokemon": "morelull",
+	"forages": [
+		{
+			"item": "cobblemon:grass_gem",
+			"count": 3,
+			"chance": 0.4,
+			"has_quality": true,
+			"min_hearts": 0
+		}
+	]
+}

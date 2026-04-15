@@ -1,0 +1,13 @@
+{
+	"type": "cobblemon_farmers:ranching_station/forage",
+	"pokemon": "lapras",
+	"forages": [
+		{
+			"item": "minecraft:blue_ice",
+			"count": 1,
+			"chance": 0.5,
+			"use_quality": true,
+			"min_hearts": 5
+		}
+	]
+}

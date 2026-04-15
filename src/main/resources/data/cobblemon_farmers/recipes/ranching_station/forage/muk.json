@@ -1,0 +1,13 @@
+{
+	"type": "cobblemon_farmers:ranching_station/forage",
+	"pokemon": "muk",
+	"forages": [
+		{
+			"item": "cobblemon:poison_gem",
+			"count": 4,
+			"chance": 0.45,
+			"has_quality": true,
+			"min_hearts": 6
+		}
+	]
+}

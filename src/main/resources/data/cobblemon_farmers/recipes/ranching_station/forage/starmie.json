@@ -1,0 +1,12 @@
+{
+	"type": "cobblemon_farmers:ranching_station/forage",
+	"pokemon": "starmie",
+	"forages": [
+		{
+			"item": "cobblemon:psychic_gem",
+			"count": 1,
+			"chance": 1,
+			"min_hearts": 8
+		}
+	]
+}
