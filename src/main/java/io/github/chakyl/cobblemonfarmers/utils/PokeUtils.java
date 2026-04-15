@@ -2,21 +2,12 @@ package io.github.chakyl.cobblemonfarmers.utils;
 
 import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.CobblemonSounds;
-import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.item.PokemonItem;
 import com.cobblemon.mod.common.pokemon.Pokemon;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.block.CraftStationBlock;
-import io.github.chakyl.cobbleworkers.blockentity.StationBaseBlockEntity;
-import io.github.chakyl.cobbleworkers.entity.ClientSidePokemon;
-import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
-import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
-import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
-import com.cobblemon.mod.common.pokemon.Species;
-import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.CraftStationBlock;
+import io.github.chakyl.cobblemonfarmers.blockentity.StationBaseBlockEntity;
 import io.github.chakyl.cobblemonfarmers.entity.ClientSidePokemon;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
@@ -24,7 +15,6 @@ import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkstationPartySlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -34,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import java.util.Objects;
@@ -60,7 +49,8 @@ public class PokeUtils {
 
     public static boolean priorityWorkerType(StationBaseBlockEntity stationBaseBlockEntity, ElementalType type, Level level, boolean secondary) {
         if (stationBaseBlockEntity.getPrimaryType() == null) return false;
-        if (secondary && stationBaseBlockEntity.getSecondaryType() != null) return stationBaseBlockEntity.getSecondaryType().equals(type);
+        if (secondary && stationBaseBlockEntity.getSecondaryType() != null)
+            return stationBaseBlockEntity.getSecondaryType().equals(type);
         return stationBaseBlockEntity.getPrimaryType().equals(type);
     }
 
@@ -98,7 +88,7 @@ public class PokeUtils {
         switch (facingDirection) {
             case SOUTH -> offset = xOffset ? 0.5f : -1 * resolvedHitbox;
             case EAST -> offset = xOffset ? -1 * resolvedHitbox : 0.5f;
-            case WEST -> offset = xOffset ?  1f + resolvedHitbox : 0.5f;
+            case WEST -> offset = xOffset ? 1f + resolvedHitbox : 0.5f;
             default -> offset = xOffset ? 0.5f : 1f + resolvedHitbox;
         }
         return offset;
@@ -155,10 +145,11 @@ public class PokeUtils {
     public static String getStringifiedAspects(Set<String> aspects) {
         String aspectsString = "";
         if (!aspects.isEmpty()) {
-            aspectsString = "-"+aspects.stream().sorted().collect(Collectors.joining("-")).toLowerCase().replace("?","question").replace("!","exclamation").replaceAll("[^a-z0-9/._-]", "");
+            aspectsString = "-" + aspects.stream().sorted().collect(Collectors.joining("-")).toLowerCase().replace("?", "question").replace("!", "exclamation").replaceAll("[^a-z0-9/._-]", "");
         }
         return aspectsString;
     }
+
     public static void insertIntoFacingOrPopOut(Level level, BlockPos pos, Direction facing, ItemStack item) {
         BlockPos facingBlockPos = pos.relative(facing);
         BlockEntity facingBlockEntity = level.getBlockEntity(facingBlockPos);

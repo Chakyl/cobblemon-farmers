@@ -241,7 +241,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private void runAction(ElementalType actionType, Pokemon pokemon) {
         ElementalTypes types = ElementalTypes.INSTANCE;
         int radius = this.getAoeRadius();
-        if (CobbleWorkers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getGRASS())) {
+        if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getGRASS())) {
             CropHandlerUtils.growCropsInRadius((ServerLevel) this.level, this.getBlockPos(), this.getLevel().getRandom(), radius);
             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_GRASS, SoundSource.BLOCKS, 0.5F, 0.9F);
         } else if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getWATER())) {

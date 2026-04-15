@@ -5,10 +5,6 @@ import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
-import io.github.chakyl.cobbleworkers.blockentity.MysteryMineBlockEntity;
-import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
-import io.github.chakyl.cobbleworkers.screen.helpers.WorkerSlot;
-import io.github.chakyl.cobbleworkers.screen.helpers.WorkstationPartySlot;
 import io.github.chakyl.cobblemonfarmers.blockentity.MysteryMineBlockEntity;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
@@ -162,7 +158,9 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
         return copyOfSourceStack;
     }
 
-    public double getSpeedModifier() { return (double) this.data.get(2) / 100; }
+    public double getSpeedModifier() {
+        return (double) this.data.get(2) / 100;
+    }
 
     public int getMultChance() {
         return this.data.get(3);

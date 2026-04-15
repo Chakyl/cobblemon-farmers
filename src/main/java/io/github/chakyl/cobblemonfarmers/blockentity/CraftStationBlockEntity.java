@@ -1,12 +1,6 @@
 package io.github.chakyl.cobblemonfarmers.blockentity;
 
 import com.cobblemon.mod.common.api.types.ElementalTypes;
-import io.github.chakyl.cobbleworkers.CobbleWorkers;
-import io.github.chakyl.cobbleworkers.mixin.CWRecipeManagerAccessor;
-import io.github.chakyl.cobbleworkers.recipe.CraftStationRecipe;
-import io.github.chakyl.cobbleworkers.registry.CobbleWorkersRegistery;
-import io.github.chakyl.cobbleworkers.screen.CraftStationMenu;
-import io.github.chakyl.cobbleworkers.utils.PokeUtils;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
