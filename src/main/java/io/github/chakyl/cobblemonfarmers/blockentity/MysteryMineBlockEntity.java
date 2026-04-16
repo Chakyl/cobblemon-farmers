@@ -69,6 +69,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 this.previousWorker = current.copy();
                 super.onContentsChanged(slot);
                 checkNewRecipe = true;
+                initializeWorker();
                 setChanged();
             }
         }
