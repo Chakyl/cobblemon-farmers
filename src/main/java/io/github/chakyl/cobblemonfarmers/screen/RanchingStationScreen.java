@@ -57,7 +57,7 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         this.titleLabelY = 10000;
         this.addRenderableWidget(new RanchingStationScreen.ViewRecipesButton(this.leftPos + 122, this.topPos + 19, 42, 16, Component.translatable("gui.cobblemon_farmers.view_recipes"), (button) -> {
             if (this.menu.getWorkerPokemon() != null) {
-                CobblemonStack stack = getEmiPokemon(this.menu.getWorkerPokemon().showdownId());
+                CobblemonStack stack = getEmiPokemon(this.menu.getWorkerPokemon());
                 EmiApi.displayUses(stack);
             }
         }));
