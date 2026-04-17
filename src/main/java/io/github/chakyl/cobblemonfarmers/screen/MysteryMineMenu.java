@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
+import com.cobblemon.mod.common.api.types.ElementalType;
 import io.github.chakyl.cobblemonfarmers.blockentity.MysteryMineBlockEntity;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
@@ -41,7 +42,7 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
     public MysteryMineMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(5));
     }
 
     public MysteryMineMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -88,9 +89,10 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
         return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
     }
 
+
     @Override
     public boolean getPrioritySwapped() {
-        return this.data.get(2) == 1;
+        return this.data.get(4) == 1;
     }
 
     @Override
@@ -157,11 +159,19 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     }
 
     public double getSpeedModifier() {
-        return this.blockEntity.getSpeedModifier();
+        return (double) this.data.get(2) / 100;
     }
 
     public int getMultChance() {
-        return this.blockEntity.getMultChance();
+        return this.data.get(3);
+    }
+
+    public ElementalType getPrimaryType() {
+        return this.blockEntity.getPrimaryType();
+    }
+
+    public ElementalType getSecondaryType() {
+        return this.blockEntity.getSecondaryType();
     }
 
     @Override

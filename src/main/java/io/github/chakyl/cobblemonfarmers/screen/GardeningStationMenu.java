@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
+import com.cobblemon.mod.common.api.types.ElementalType;
 import io.github.chakyl.cobblemonfarmers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
@@ -39,7 +40,7 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
     public GardeningStationMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(5));
     }
 
     public GardeningStationMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -81,6 +82,20 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
 
     public int getTotalProcessingTime() {
         return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
+    }
+
+    public double getSpeedModifier() { return (double) this.data.get(2) / 100; }
+
+    public int getAoeRadius() {
+        return this.data.get(3);
+    }
+
+    public ElementalType getPrimaryType() {
+        return this.blockEntity.getPrimaryType();
+    }
+
+    public ElementalType getSecondaryType() {
+        return this.blockEntity.getSecondaryType();
     }
 
     @Override
@@ -150,14 +165,6 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
         }
         sourceSlot.onTake(playerIn, sourceStack);
         return copyOfSourceStack;
-    }
-
-    public double getSpeedModifier() {
-        return this.blockEntity.getSpeedModifier();
-    }
-
-    public int getWorkingRadius() {
-        return this.blockEntity.getAoeRadius();
     }
 
     @Override

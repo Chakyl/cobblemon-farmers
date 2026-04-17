@@ -2,6 +2,7 @@ package io.github.chakyl.cobblemonfarmers.blockentity;
 
 import com.cobblemon.mod.common.CobblemonEntities;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
+import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
@@ -33,9 +34,21 @@ public class StationBaseBlockEntity extends BlockEntity {
     protected UUID owner;
     private PokemonEntity workerEntity;
     Set<String> workerAspects;
+    ElementalType primaryType;
+    ElementalType secondaryType;
+    double speedModifier;
+    int multChance;
 
     public StationBaseBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
+    }
+
+    public ElementalType getPrimaryType() {
+        return this.primaryType;
+    }
+
+    public ElementalType getSecondaryType() {
+        return this.secondaryType;
     }
 
     public PokemonEntity getWorkerEntity() {
@@ -56,9 +69,15 @@ public class StationBaseBlockEntity extends BlockEntity {
             this.workerEntity.setYHeadRot(rotation);
             this.workerEntity.setYBodyRot(rotation);
             this.workerAspects = pokemon.getAspects();
+            this.primaryType = pokemon.getPrimaryType();
+            this.secondaryType = pokemon.getSecondaryType();
         } else {
             this.workerEntity = null;
+            this.primaryType = null;
+            this.secondaryType = null;
         }
+        this.speedModifier = 0;
+        this.multChance = 0;
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
@@ -74,22 +93,32 @@ public class StationBaseBlockEntity extends BlockEntity {
         return false;
     }
 
-    public double getSpeedModifier(Stats scalingStat) {
+    public void fetchSpeedModifier(Stats scalingStat) {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            return ((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) * (pokemon.getShiny() ? 2.0 : 1.0);
+            this.speedModifier =  ((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) * (pokemon.getShiny() ? 2.0 : 1.0);
+        } else {
+            this.speedModifier = 0.0;
         }
-        return 0.0;
     }
 
-    public int getMultChance(Stats scalingStat) {
+    public void fetchMultChance(Stats scalingStat) {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            return (Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100)) * (pokemon.getShiny() ? 2 : 1);
+            this.multChance = (Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100)) * (pokemon.getShiny() ? 2 : 1);
+        } else {
+            this.multChance = 0;
         }
-        return 0;
+    }
+
+    public double getSpeedModifier() {
+        return this.speedModifier;
+    }
+
+    public int getMultChance() {
+        return this.multChance;
     }
 
     public ItemStack getPokemonItem() {

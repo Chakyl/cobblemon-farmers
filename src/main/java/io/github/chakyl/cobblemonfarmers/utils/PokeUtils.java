@@ -2,14 +2,12 @@ package io.github.chakyl.cobblemonfarmers.utils;
 
 import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.CobblemonSounds;
-import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.item.PokemonItem;
 import com.cobblemon.mod.common.pokemon.Pokemon;
-import com.cobblemon.mod.common.pokemon.Species;
-import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.CraftStationBlock;
+import io.github.chakyl.cobblemonfarmers.blockentity.StationBaseBlockEntity;
 import io.github.chakyl.cobblemonfarmers.entity.ClientSidePokemon;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
@@ -17,7 +15,6 @@ import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkstationPartySlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -27,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import java.util.Objects;
@@ -45,20 +41,17 @@ public class PokeUtils {
         return itemStack;
     }
 
-    public static boolean validWorkerType(ItemStack itemPokemon, ElementalType type, Level level) {
-        if (!itemPokemon.hasTag()) return false;
-        Pokemon pokemon = getItemFormPokemon(itemPokemon, level);
-        for (ElementalType elementalType : pokemon.getTypes()) {
-            if (elementalType.equals(type)) return true;
-        }
-        return false;
+    public static boolean validWorkerType(StationBaseBlockEntity stationBaseBlockEntity, ElementalType type, Level level) {
+        if (stationBaseBlockEntity.getPrimaryType() == null) return false;
+        if (stationBaseBlockEntity.getPrimaryType().equals(type)) return true;
+        return (stationBaseBlockEntity.getSecondaryType() != null && stationBaseBlockEntity.getSecondaryType().equals(type));
     }
 
-    public static boolean priorityWorkerType(ItemStack itemPokemon, ElementalType type, Level level, boolean secondary) {
-        if (!itemPokemon.hasTag()) return false;
-        Pokemon pokemon = getItemFormPokemon(itemPokemon, level);
-        if (secondary && pokemon.getSecondaryType() != null) return pokemon.getSecondaryType().equals(type);
-        return pokemon.getPrimaryType().equals(type);
+    public static boolean priorityWorkerType(StationBaseBlockEntity stationBaseBlockEntity, ElementalType type, Level level, boolean secondary) {
+        if (stationBaseBlockEntity.getPrimaryType() == null) return false;
+        if (secondary && stationBaseBlockEntity.getSecondaryType() != null)
+            return stationBaseBlockEntity.getSecondaryType().equals(type);
+        return stationBaseBlockEntity.getPrimaryType().equals(type);
     }
 
     public static String getSpeciesFromCompoundTag(CompoundTag tag) {
@@ -95,7 +88,7 @@ public class PokeUtils {
         switch (facingDirection) {
             case SOUTH -> offset = xOffset ? 0.5f : -1 * resolvedHitbox;
             case EAST -> offset = xOffset ? -1 * resolvedHitbox : 0.5f;
-            case WEST -> offset = xOffset ?  1f + resolvedHitbox : 0.5f;
+            case WEST -> offset = xOffset ? 1f + resolvedHitbox : 0.5f;
             default -> offset = xOffset ? 0.5f : 1f + resolvedHitbox;
         }
         return offset;
@@ -152,10 +145,11 @@ public class PokeUtils {
     public static String getStringifiedAspects(Set<String> aspects) {
         String aspectsString = "";
         if (!aspects.isEmpty()) {
-            aspectsString = "-"+aspects.stream().sorted().collect(Collectors.joining("-")).toLowerCase().replace("?","question").replace("!","exclamation").replaceAll("[^a-z0-9/._-]", "");
+            aspectsString = "-" + aspects.stream().sorted().collect(Collectors.joining("-")).toLowerCase().replace("?", "question").replace("!", "exclamation").replaceAll("[^a-z0-9/._-]", "");
         }
         return aspectsString;
     }
+
     public static void insertIntoFacingOrPopOut(Level level, BlockPos pos, Direction facing, ItemStack item) {
         BlockPos facingBlockPos = pos.relative(facing);
         BlockEntity facingBlockEntity = level.getBlockEntity(facingBlockPos);

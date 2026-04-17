@@ -56,6 +56,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private int actionTime;
     private ResourceLocation lastRecipeID;
     private boolean swapPriority = false;
+    private int aoeRadius;
+
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         private ItemStack previousWorker;
 
@@ -81,7 +83,9 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                 return switch (pIndex) {
                     case 0 -> GardeningStationBlockEntity.this.progress;
                     case 1 -> GardeningStationBlockEntity.this.actionTime;
-                    case 2 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
+                    case 2 -> Mth.floor(GardeningStationBlockEntity.this.speedModifier * 100);
+                    case 3 -> GardeningStationBlockEntity.this.aoeRadius;
+                    case 4 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -91,14 +95,16 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                 switch (pIndex) {
                     case 0 -> GardeningStationBlockEntity.this.progress = pValue;
                     case 1 -> GardeningStationBlockEntity.this.actionTime = pValue;
-                    case 2 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
+                    case 2 -> GardeningStationBlockEntity.this.speedModifier = (double) pValue / 100;
+                    case 3 -> GardeningStationBlockEntity.this.aoeRadius = pValue;
+                    case 4 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return 5;
             }
         };
     }
@@ -120,15 +126,20 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     public void tick(Level level, BlockPos pos, BlockState state) {
         super.tick(level, pos, state);
         if (!level.isClientSide() && hasWorker()) {
+            if (this.getSpeedModifier() == 0.0 && getActionType() != null) {
+                ElementalType type = getActionType();
+                this.fetchSpeedModifier(getScalingStat(type));
+                this.fetchAoeRadius();
+            }
             ItemStack pokemonItem = getPokemonItem();
             if (pokemonItem == null || pokemonItem.isEmpty()) return;
-            Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            ElementalType actionType = getActionType(pokemon);
+            ElementalType actionType = getActionType();
             if (actionType != null) {
                 ++progress;
                 actionTime = getActionTime(actionType);
                 int resolvedProgress = getActionProgress(actionType);
                 if (resolvedProgress >= actionTime) {
+                    Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
                     runAction(actionType, pokemon);
                     progress = 0;
                 }
@@ -229,7 +240,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
 
     private void runAction(ElementalType actionType, Pokemon pokemon) {
         ElementalTypes types = ElementalTypes.INSTANCE;
-        int radius = getAoeRadius(pokemon.getLevel());
+        int radius = this.getAoeRadius();
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getGRASS())) {
             CropHandlerUtils.growCropsInRadius((ServerLevel) this.level, this.getBlockPos(), this.getLevel().getRandom(), radius);
             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_GRASS, SoundSource.BLOCKS, 0.5F, 0.9F);
@@ -249,12 +260,11 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
 
-    private ElementalType getActionType(Pokemon pokemon) {
-        ElementalType secondaryType = pokemon.getSecondaryType();
-        boolean hasSecondary = secondaryType != null && getScalingStat(secondaryType) != null;
+    private ElementalType getActionType() {
+        boolean hasSecondary = this.secondaryType != null && getScalingStat(this.secondaryType) != null;
         if (this.swapPriority && hasSecondary) return secondaryType;
-        if (getScalingStat(pokemon.getPrimaryType()) != null) return pokemon.getPrimaryType();
-        if (hasSecondary) return secondaryType;
+        if (getScalingStat(this.primaryType) != null) return this.primaryType;
+        if (hasSecondary) return this.secondaryType;
         return null;
     }
 
@@ -271,6 +281,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
     private Stats getScalingStat(ElementalType type) {
+        if (type == null) return null;
         ElementalTypes types = ElementalTypes.INSTANCE;
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && type.equals(types.getGRASS())) return Stats.SPEED;
         if (type.equals(types.getWATER())) return Stats.SPECIAL_ATTACK;
@@ -281,33 +292,31 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         return null;
     }
 
-    public double getSpeedModifier() {
+    public void fetchAoeRadius() {
         ItemStack pokemonItem = getPokemonItem();
-        if (pokemonItem == null || pokemonItem.isEmpty()) return 0.0;
-        Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-        ElementalType type = getActionType(pokemon);
-        return type == null ? 0 : getSpeedModifier(getScalingStat(type));
+        if (pokemonItem == null || pokemonItem.isEmpty()) {
+            this.aoeRadius = 0;
+        } else {
+            Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
+            if (getActionType() == null) {
+                this.aoeRadius = 0;
+            } else {
+                this.aoeRadius = Mth.clamp(pokemon.getLevel() / 10, 1, 10);
+            }
+        }
     }
 
     public int getAoeRadius() {
-        ItemStack pokemonItem = getPokemonItem();
-        if (pokemonItem == null || pokemonItem.isEmpty()) return 0;
-        Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-        if (getActionType(pokemon) == null) return 0;
-        return getAoeRadius(pokemon.getLevel()) + (pokemon.getShiny() ? 2 : 0);
-    }
-
-    public int getAoeRadius(int level) {
-        return Mth.clamp(level / 10, 1, 10);
+        return this.aoeRadius;
     }
 
     private int getActionProgress(ElementalType type) {
-        return Mth.floor(progress * getSpeedModifier(getScalingStat(type)));
+        return Mth.floor(progress * getSpeedModifier());
     }
 
     @Override
     public boolean hasWorker() {
-        return !this.pokemonInventory.getStackInSlot(0).isEmpty();
+        return !this.pokemonInventory.getStackInSlot(0).isEmpty() && this.primaryType != null;
     }
 
     @Override
@@ -354,6 +363,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         CompoundTag data = new CompoundTag();
         if (owner != null) data.putUUID("Owner", owner);
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
+        data.putString("PrimaryType", this.primaryType != null ? this.primaryType.getName() : "");
+        data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("ActionTime", actionTime);
         data.putInt("Progress", progress);
         data.putBoolean("SwapPriority", swapPriority);
@@ -369,7 +380,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
             this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
             this.initializeWorker();
         }
-
+        primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
+        secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
         actionTime = data.getInt("ActionTime");
         progress = data.getInt("Progress");
         swapPriority = data.getBoolean("SwapPriority");
