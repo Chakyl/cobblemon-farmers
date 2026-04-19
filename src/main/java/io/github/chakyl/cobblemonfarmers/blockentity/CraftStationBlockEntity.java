@@ -64,6 +64,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
     };
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         private ItemStack previousWorker;
+
         @Override
         protected void onContentsChanged(int slot) {
             ItemStack current = getStackInSlot(slot);
@@ -151,9 +152,9 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
                         this.fetchMultChance(recipe.get().getMultStat());
                     }
                 } else {
-                    this.speedModifier = 0;
-                    this.multChance = 0;
-                    this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
+                    if (recipe.isEmpty()) {
+                        PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level);
+                    }
                 }
             } else if (this.progress > 0) {
                 this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
@@ -311,6 +312,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
 
     protected boolean canProcess(CraftStationRecipe recipe) {
         ItemStack resultStack = recipe.getResultItem(this.level.registryAccess());
+
         if (resultStack.isEmpty()) {
             return false;
         } else {
@@ -335,6 +337,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
         data.putBoolean("SwapPriority", swapPriority);
+        data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
 
@@ -359,6 +362,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
         swapPriority = data.getBoolean("SwapPriority");
+        publicContract = data.getBoolean("PublicContract");
     }
 
     @Override

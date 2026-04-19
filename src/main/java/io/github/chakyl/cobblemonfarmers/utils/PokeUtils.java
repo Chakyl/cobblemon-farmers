@@ -98,7 +98,7 @@ public class PokeUtils {
         return Mth.floor(player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) < Mth.floor(player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get()).getValue());
     }
 
-    public static void handlePartySlot(Player player, Level level, PlayerPartyStore party, WorkstationPartySlot partySlot, WorkerSlot workerSlot) {
+    public static void handlePartySlot(Player player, Level level, PlayerPartyStore party, WorkstationPartySlot partySlot, WorkerSlot workerSlot, boolean publicContract) {
         if (level.isClientSide()) return;
         int difference = 0;
         int slotIndex = partySlot.index - 36;
@@ -106,7 +106,7 @@ public class PokeUtils {
         Pokemon newWorkerPokemon = null;
         ItemStack oldWorker = workerSlot.getItem().copy();
         boolean noWorker = oldWorker.isEmpty();
-        if (noWorker && !hasWorkerSlot(player)) return;
+        if (noWorker && (!publicContract && !hasWorkerSlot(player))) return;
         Pokemon oldWorkerPokemon = null;
         if (!oldWorker.isEmpty()) {
             oldWorkerPokemon = PokeUtils.getItemFormPokemon(oldWorker, level);
@@ -134,7 +134,7 @@ public class PokeUtils {
         } else if (newWorker.is(CobblemonItems.POKEMON_MODEL)) {
             workerSlot.set(newWorker);
         }
-        if (difference != 0) {
+        if (!publicContract && difference != 0) {
             AttributeInstance attr = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get());
             attr.setBaseValue(attr.getValue() - difference);
         }

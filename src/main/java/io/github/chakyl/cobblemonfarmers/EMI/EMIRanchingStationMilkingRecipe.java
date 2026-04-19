@@ -19,9 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.RANCHING_STATION_FORAGES;
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.RANCHING_STATION_MILKING;
@@ -39,12 +37,17 @@ public class EMIRanchingStationMilkingRecipe implements EmiRecipe {
 
     public EMIRanchingStationMilkingRecipe(RanchingStationMilkingRecipe recipe) {
         super();
-
         Species species = Objects.requireNonNull(PokemonSpecies.INSTANCE.getByName(recipe.getPokemon()));
-        FormData form = species.getStandardForm();
-        CobblemonStack cobblemonStack = new CobblemonStack(form);
+        CobblemonStack cobblemonStack;
+        if ((recipe.getForm()).isEmpty()) {
+            cobblemonStack = new CobblemonStack(species);
+        } else {
+            Set<String> recipeAspects = new HashSet<>();
+            recipeAspects.add(recipe.getForm());
+            cobblemonStack = new CobblemonStack(species, recipeAspects);
+        }
         this.output = new ArrayList<>();
-        this.id = new ResourceLocation(CobblemonFarmers.MODID, "ranching_station/milk/" + recipe.getPokemon()).withPrefix("/");
+        this.id = new ResourceLocation(CobblemonFarmers.MODID, "ranching_station/milk/" + recipe.getPokemon() + (recipe.getForm().isEmpty() ? "" : "_" + recipe.getForm())).withPrefix("/");
         this.input = new ArrayList<>();
         this.input.add(cobblemonStack);
         this.allOutput = new ArrayList<>();

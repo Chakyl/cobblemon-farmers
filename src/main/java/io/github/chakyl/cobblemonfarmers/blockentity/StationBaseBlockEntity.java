@@ -32,6 +32,7 @@ import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonRotati
 
 public class StationBaseBlockEntity extends BlockEntity {
     protected UUID owner;
+    protected boolean publicContract;
     private PokemonEntity workerEntity;
     Set<String> workerAspects;
     ElementalType primaryType;
@@ -129,6 +130,14 @@ public class StationBaseBlockEntity extends BlockEntity {
         this.owner = uuid;
     }
 
+    public UUID getOwner() {  return this.owner; }
+
+    public void setPublicContract(boolean publicContract) {
+        this.publicContract = publicContract;
+    }
+
+    public boolean getPublicContract() {  return this.publicContract; }
+    
     public boolean validateOwner(Player player) {
         if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer((ServerPlayer) player) != null) {
             player.sendSystemMessage(Component.translatable("message.cobblemon_farmers.in_battle").withStyle(ChatFormatting.RED));
@@ -156,4 +165,6 @@ public class StationBaseBlockEntity extends BlockEntity {
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         load(pkt.getTag());
     }
+
+
 }

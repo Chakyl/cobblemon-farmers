@@ -1,9 +1,12 @@
 package io.github.chakyl.cobblemonfarmers.block;
 
 import io.github.chakyl.cobblemonfarmers.blockentity.CraftStationBlockEntity;
+import io.github.chakyl.cobblemonfarmers.items.PublicContractItem;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,6 +30,8 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.grantWorkerSlot;
 
 public class CraftStationBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -81,7 +86,14 @@ public class CraftStationBlock extends Block implements EntityBlock {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof CraftStationBlockEntity craftStationBlockEntity) {
-                if (craftStationBlockEntity.validateOwner(pPlayer)) {
+                ItemStack heldItem = pPlayer.getItemInHand(pHand);
+                if (craftStationBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
+                    if (craftStationBlockEntity.getPublicContract()) {
+                        pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                        craftStationBlockEntity.setPublicContract(true);
+                    }
+                } else if (craftStationBlockEntity.getPublicContract() || craftStationBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

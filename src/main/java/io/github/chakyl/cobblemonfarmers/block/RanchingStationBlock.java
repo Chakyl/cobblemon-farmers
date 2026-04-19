@@ -1,9 +1,12 @@
 package io.github.chakyl.cobblemonfarmers.block;
 
 import io.github.chakyl.cobblemonfarmers.blockentity.RanchingStationBlockEntity;
+import io.github.chakyl.cobblemonfarmers.items.PublicContractItem;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -91,7 +94,14 @@ public class RanchingStationBlock extends Block implements EntityBlock {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
-                if (ranchingStationBlockEntity.validateOwner(pPlayer)) {
+                ItemStack heldItem = pPlayer.getItemInHand(pHand);
+                if (ranchingStationBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
+                    if (ranchingStationBlockEntity.getPublicContract()) {
+                        pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                        ranchingStationBlockEntity.setPublicContract(true);
+                    }
+                } else if (ranchingStationBlockEntity.validateOwner(pPlayer)) {
                     ranchingStationBlockEntity.handleInteraction(pLevel, (ServerPlayer) pPlayer, pPos, pPlayer.getMainHandItem().getItem());
                 }
             } else {

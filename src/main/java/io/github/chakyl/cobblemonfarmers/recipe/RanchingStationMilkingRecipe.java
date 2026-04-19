@@ -19,18 +19,19 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.applyMilkQuality;
-import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.applyQuality;
+import static io.github.chakyl.cobblemonfarmers.utils.RanchingStationUtils.*;
 
 public class RanchingStationMilkingRecipe implements Recipe<RecipeWrapper> {
     private final String pokemon;
+    private final String form;
     private final boolean consumeBucket;
     private final ItemStack smallMilk;
     private final ItemStack largeMilk;
     private final ResourceLocation id;
 
-    public RanchingStationMilkingRecipe(String pokemon, boolean consumeBucket, ItemStack smallMilk, ItemStack largeMilk, ResourceLocation id) {
+    public RanchingStationMilkingRecipe(String pokemon, String form, boolean consumeBucket, ItemStack smallMilk, ItemStack largeMilk, ResourceLocation id) {
         this.pokemon = pokemon;
+        this.form = form;
         this.consumeBucket = consumeBucket;
         this.smallMilk = smallMilk;
         this.largeMilk = largeMilk;
@@ -39,16 +40,7 @@ public class RanchingStationMilkingRecipe implements Recipe<RecipeWrapper> {
 
     @Override
     public boolean matches(RecipeWrapper pContainer, Level pLevel) {
-        if (pContainer.getItem(0).is(CobblemonItems.POKEMON_MODEL)) {
-            CompoundTag tag = pContainer.getItem(0).getTag();
-            if (tag != null && !tag.isEmpty()) {
-                String species = tag.getString("species");
-                if (!pokemon.contains(":")) return species.equals("cobblemon:" + pokemon);
-                return pokemon.equals(species);
-
-            }
-        }
-        return true;
+        return ranchingRecipeMatches(pContainer, pokemon, form);
     }
 
     @Override
@@ -97,9 +89,9 @@ public class RanchingStationMilkingRecipe implements Recipe<RecipeWrapper> {
         return result;
     }
 
-    public String getPokemon() {
-        return pokemon;
-    }
+    public String getPokemon() { return pokemon; }
+
+    public String getForm() { return form; }
 
     public boolean getIsBucketConsumed() {
         return this.consumeBucket;
@@ -130,6 +122,10 @@ public class RanchingStationMilkingRecipe implements Recipe<RecipeWrapper> {
         @Override
         public RanchingStationMilkingRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
             String pokemon = GsonHelper.getAsString(pSerializedRecipe, "pokemon");
+            String form = "";
+            if (pSerializedRecipe.has("form")) {
+                form = GsonHelper.getAsString(pSerializedRecipe, "form");
+            }
             boolean consumeBucket = GsonHelper.getAsBoolean(pSerializedRecipe, "consume_bucket");
 
             ItemStack smallMilk = ItemStack.EMPTY;
@@ -151,21 +147,23 @@ public class RanchingStationMilkingRecipe implements Recipe<RecipeWrapper> {
                     largeMilk = ShapedRecipe.itemStackFromJson(itemStackLgJson);
                 }
             }
-            return new RanchingStationMilkingRecipe(pokemon, consumeBucket, smallMilk, largeMilk, pRecipeId);
+            return new RanchingStationMilkingRecipe(pokemon, form, consumeBucket, smallMilk, largeMilk, pRecipeId);
         }
 
         @Override
         public @Nullable RanchingStationMilkingRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
             String pokemon = pBuffer.readUtf();
+            String form = pBuffer.readUtf();
             boolean consumeBucket = pBuffer.readBoolean();
             ItemStack smallMilk = pBuffer.readItem();
             ItemStack largeMilk = pBuffer.readItem();
-            return new RanchingStationMilkingRecipe(pokemon, consumeBucket, smallMilk, largeMilk, pRecipeId);
+            return new RanchingStationMilkingRecipe(pokemon, form, consumeBucket, smallMilk, largeMilk, pRecipeId);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf pBuffer, RanchingStationMilkingRecipe pRecipe) {
             pBuffer.writeUtf(pRecipe.getPokemon());
+            pBuffer.writeUtf(pRecipe.getForm());
             pBuffer.writeBoolean(pRecipe.getIsBucketConsumed());
             pBuffer.writeItemStack(pRecipe.getSmallMilk(), false);
             pBuffer.writeItemStack(pRecipe.getLargeMilk(), false);

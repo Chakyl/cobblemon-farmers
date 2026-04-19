@@ -316,6 +316,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
         data.putBoolean("SwapPriority", swapPriority);
+        data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
 
@@ -337,6 +338,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
         swapPriority = data.getBoolean("SwapPriority");
+        publicContract = data.getBoolean("PublicContract");
     }
 
     @Override

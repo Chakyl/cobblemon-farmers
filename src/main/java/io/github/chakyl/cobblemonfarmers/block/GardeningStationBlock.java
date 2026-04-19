@@ -1,9 +1,12 @@
 package io.github.chakyl.cobblemonfarmers.block;
 
 import io.github.chakyl.cobblemonfarmers.blockentity.GardeningStationBlockEntity;
+import io.github.chakyl.cobblemonfarmers.items.PublicContractItem;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -63,8 +66,8 @@ public class GardeningStationBlock extends Block implements EntityBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof GardeningStationBlockEntity GardeningStationBlockEntity) {
-               GardeningStationBlockEntity.drops();
+            if (blockEntity instanceof GardeningStationBlockEntity gardeningStationBlockEntity) {
+                gardeningStationBlockEntity.drops();
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -80,7 +83,14 @@ public class GardeningStationBlock extends Block implements EntityBlock {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof GardeningStationBlockEntity gardeningStationBlockEntity) {
-                if (gardeningStationBlockEntity.validateOwner(pPlayer)) {
+                ItemStack heldItem = pPlayer.getItemInHand(pHand);
+                if (gardeningStationBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
+                    if (gardeningStationBlockEntity.getPublicContract()) {
+                        pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                        gardeningStationBlockEntity.setPublicContract(true);
+                    }
+                } else if (gardeningStationBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

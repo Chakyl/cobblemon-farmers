@@ -65,19 +65,19 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
 
     @Override
     protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 34;
+        int centralX = 0;
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX + 8, 4, false, 0xFFFFFFFF, false, 0, 0);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX + 8, 74, false, 4210752, false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.actions").withStyle(ChatFormatting.BOLD), -16, 1, 0xFFFFFFFF, true);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 220, 112, 0xFFFFFFFF, true);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 140, 45, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 180, 112, false, 0xFFFFFFFF, true, 0, 0);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 126, 45, 0xFFFFFFFF, true);
 
         int friendshipHearts = this.menu.getFriendshipHearts();
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.friendship_hearts", friendshipHearts), centralX + 48, 45, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.friendship_hearts", friendshipHearts), centralX + 8, 46, false, 0xFFFFFFFF, true, 0, 0);
 
         int hpHearts = this.menu.getHPHearts();
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.hp_hearts", hpHearts), centralX + 44, 56, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.hp_hearts", hpHearts), centralX + 8, 58, false, 0xFFFFFFFF, true, 0,0 );
 
         int index = 0;
         for (int level : this.menu.getPartyLevels()) {

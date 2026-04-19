@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "dsd",
+    "sms",
+    "dsd"
+  ],
+  "key": {
+    "m": {
+      "item": "cobblemon:master_ball"
+    },
+    "d": {
+      "item": "minecraft:diamond_block"
+    },
+    "s": {
+      "item": "cobblemon:relic_coin_sack"
+    }
+  },
+  "result": {
+    "item": "cobblemon_farmers:worker_permit"
+  },
+  "show_notification": true
+}

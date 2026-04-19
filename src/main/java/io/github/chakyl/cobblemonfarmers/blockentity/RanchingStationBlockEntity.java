@@ -460,6 +460,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         data.putInt("DayLastForaged", dayLastForaged);
         data.putInt("DayLastMilked", dayLastMilked);
         data.putInt("DayLastFed", dayLastFed);
+        data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
 
@@ -479,6 +480,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         dayLastForaged = data.getInt("DayLastForaged");
         dayLastMilked = data.getInt("DayLastMilked");
         dayLastFed = data.getInt("DayLastFed");
+        publicContract = data.getBoolean("PublicContract");
     }
 
     @Override

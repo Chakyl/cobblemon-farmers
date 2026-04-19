@@ -368,6 +368,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         data.putInt("ActionTime", actionTime);
         data.putInt("Progress", progress);
         data.putBoolean("SwapPriority", swapPriority);
+        data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
 
@@ -385,6 +386,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         actionTime = data.getInt("ActionTime");
         progress = data.getInt("Progress");
         swapPriority = data.getBoolean("SwapPriority");
+        publicContract = data.getBoolean("PublicContract");
     }
 
     @Override

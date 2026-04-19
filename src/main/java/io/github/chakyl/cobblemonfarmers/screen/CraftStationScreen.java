@@ -56,20 +56,20 @@ public class CraftStationScreen extends AbstractContainerScreen<CraftStationMenu
 
     @Override
     protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
-        int centralX = (5 - this.font.width(CONTAINER_LABEL) / 2) + 34;
+        int centralX = 7;
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF, false, 0, 0);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752, false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 220, 112, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 180, 112, false, 0xFFFFFFFF, true, 0, 0);
         RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.swap_priority"), 44, 33, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
 
         double speedMod = this.menu.getSpeedModifier();
         if (speedMod > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.speed", speedMod), centralX + 44, 45, 0xFFFFFFFF, true);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.speed", speedMod), centralX, 46, false, 0xFFFFFFFF, true, 0, 0);
         }
         int multChance = this.menu.getMultChance();
         if (multChance > 0) {
-            GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.mult_chance", multChance + "%"), centralX + 44, 56, 0xFFFFFFFF, true);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.mult_chance", multChance + "%"), centralX, 58, false, 0xFFFFFFFF, true, 0, 0);
         }
 
         int index = 0;

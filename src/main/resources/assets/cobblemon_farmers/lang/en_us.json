@@ -21,6 +21,14 @@
     "item.cobblemon_farmers.dragon_type_worker": "Dragon Type Worker",
     "item.cobblemon_farmers.dark_type_worker": "Dark Type Worker",
     "item.cobblemon_farmers.fairy_type_worker": "Fairy Type Worker",
+    "item.cobblemon_farmers.worker_permit": "Worker Permit",
+    "item.cobblemon_farmers.public_contract": "Public Contract",
+    "item.cobblemon_farmers.worker_permit.description": "Increases worker cap by 1 when used",
+    "item.cobblemon_farmers.public_contract.description": "Infuse a worker slot into the workstation, allowing anyone to manage the worker.",
+    "item.cobblemon_farmers.public_contract.warn": "Allows anyone to retrieve the worker inside!",
+    "item.cobblemon_farmers.public_contract.used": "This workstation is now public!",
+    "item.cobblemon_farmers.public_contract.already_used": "This workstation is already public!",
+    "item.cobblemon_farmers.worker_permit.used": "Worker limit increased to %s!",
 
     "block.cobblemon_farmers.craft_station": "Craft Station",
     "block.cobblemon_farmers.gardening_station": "Gardening Station",
@@ -156,5 +164,8 @@
 
     "config.jade.plugin_cobblemon_farmers.cobblemon_farmers": "Cobblemon Farmers",
     "jade.cobblemon_farmers.workstation.pokemon.name": "%s Lv. %s",
-    "jade.cobblemon_farmers.workstation.no_worker": "No worker assigned"
+    "jade.cobblemon_farmers.workstation.no_worker": "No worker assigned",
+    "jade.cobblemon_farmers.workstation.public": "Public Workstation",
+    "jade.cobblemon_farmers.owner": "Owner: %s",
+    "item.cobblemon_farmers.public_contract.not_enough": "You don't have any free worker slots!"
 }

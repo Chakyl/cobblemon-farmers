@@ -193,6 +193,6 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     }
 
     private void transferFromPartyToWorkerSlot(Player player, MysteryMineMenu.PartySlot partySlot) {
-        handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1));
+        handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1), this.blockEntity.getPublicContract());
     }
 }

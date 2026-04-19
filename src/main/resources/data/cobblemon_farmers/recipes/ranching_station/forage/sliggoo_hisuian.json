@@ -1,0 +1,13 @@
+{
+	"type": "cobblemon_farmers:ranching_station/forage",
+	"pokemon": "sliggoo",
+	"form": "hisuian",
+	"forages": [
+		{
+			"item": "minecraft:iron_ingot",
+			"count": 1,
+			"chance": 1,
+			"min_hearts": 2
+		}
+	]
+}

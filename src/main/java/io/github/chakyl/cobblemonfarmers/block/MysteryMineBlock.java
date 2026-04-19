@@ -1,9 +1,12 @@
 package io.github.chakyl.cobblemonfarmers.block;
 
 import io.github.chakyl.cobblemonfarmers.blockentity.MysteryMineBlockEntity;
+import io.github.chakyl.cobblemonfarmers.items.PublicContractItem;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -80,7 +83,14 @@ public class MysteryMineBlock extends Block implements EntityBlock {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof MysteryMineBlockEntity mysteryMineBlockEntity) {
-                if (mysteryMineBlockEntity.validateOwner(pPlayer)) {
+                ItemStack heldItem = pPlayer.getItemInHand(pHand);
+                if (mysteryMineBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
+                    if (mysteryMineBlockEntity.getPublicContract()) {
+                        pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                        mysteryMineBlockEntity.setPublicContract(true);
+                    }
+                } else if (mysteryMineBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

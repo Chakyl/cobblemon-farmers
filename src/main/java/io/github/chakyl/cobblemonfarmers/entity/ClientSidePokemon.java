@@ -6,6 +6,7 @@ import com.cobblemon.mod.common.api.pokemon.Natures;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.pokemon.FormData;
+import com.cobblemon.mod.common.pokemon.Gender;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.util.DataKeys;
 import net.minecraft.nbt.CompoundTag;
@@ -27,6 +28,10 @@ public class ClientSidePokemon extends Pokemon {
         if (nbt.contains(DataKeys.POKEMON_SPECIES_IDENTIFIER)) {
             String pokemonSpeciesIdentifier = nbt.getString(DataKeys.POKEMON_SPECIES_IDENTIFIER);
             this.setSpecies(Objects.requireNonNull(PokemonSpecies.INSTANCE.getByName(pokemonSpeciesIdentifier.substring(pokemonSpeciesIdentifier.indexOf(":") + 1))));
+        }
+        if (nbt.contains(DataKeys.POKEMON_GENDER)) {
+            String pokemonGender = nbt.getString(DataKeys.POKEMON_GENDER);
+            this.setGender(Gender.valueOf(pokemonGender));
         }
 
         if (nbt.contains(DataKeys.POKEMON_SHINY)) {

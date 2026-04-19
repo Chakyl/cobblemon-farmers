@@ -11,6 +11,8 @@ import io.github.chakyl.cobblemonfarmers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobblemonfarmers.blockentity.GardeningStationBlockEntity;
 import io.github.chakyl.cobblemonfarmers.blockentity.MysteryMineBlockEntity;
 import io.github.chakyl.cobblemonfarmers.blockentity.RanchingStationBlockEntity;
+import io.github.chakyl.cobblemonfarmers.items.PublicContractItem;
+import io.github.chakyl.cobblemonfarmers.items.WorkerPermitItem;
 import io.github.chakyl.cobblemonfarmers.items.WorkerTypeItem;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
@@ -149,6 +151,8 @@ public final class CobblemonFarmersRegistery {
         public static final RegistryObject<Item> DARK_TYPE_WORKER = register("dark_type_worker", () -> new WorkerTypeItem(new Item.Properties().stacksTo(64), ElementalTypes.INSTANCE.getDARK()));
         public static final RegistryObject<Item> FAIRY_TYPE_WORKER = register("fairy_type_worker", () -> new WorkerTypeItem(new Item.Properties().stacksTo(64), ElementalTypes.INSTANCE.getFAIRY()));
 
+        public static final RegistryObject<Item> PUBLIC_CONTRACT = register("public_contract", () -> new PublicContractItem(new Item.Properties().stacksTo(64)));
+        public static final RegistryObject<Item> WORKER_PERMIT = register("worker_permit", () -> new WorkerPermitItem(new Item.Properties().stacksTo(64)));
 
         /**
          * Creates a registry object for a block item and adds it to the mod creative tab

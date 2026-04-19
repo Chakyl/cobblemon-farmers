@@ -10,7 +10,6 @@ import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkstationPartySlot;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -172,7 +171,7 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
     }
 
     private void transferFromPartyToWorkerSlot(Player player, RanchingStationMenu.PartySlot partySlot) {
-        handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1));
+        handlePartySlot(player, this.level, this.party, partySlot, (WorkerSlot) this.slots.get(this.slots.size() - 1), this.blockEntity.getPublicContract());
         if (!Objects.requireNonNull(this.blockEntity.getLevel()).isClientSide) this.blockEntity.initializeDayData(this.blockEntity.getLevel());
     }
 }
