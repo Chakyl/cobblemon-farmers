@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import io.github.chakyl.cobblemonfarmers.block.CraftStationBlock;
 import io.github.chakyl.cobblemonfarmers.blockentity.CraftStationBlockEntity;
+import io.github.chakyl.cobblemonfarmers.tag.CobblemonFarmersTags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,7 +31,7 @@ import java.util.*;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
 
 public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<CraftStationBlockEntity> {
-    private final Map<ItemStack, Float> itemRotations = new HashMap<>();
+    private final Map<Item, Float> itemRotations = new HashMap<>();
 
     public CraftStationBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -40,12 +42,15 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
         int maxStackDisplay = 6;
         float baseHeight = 1.01f;
         float heightIncrement = stack.getItem() instanceof BlockItem ? 0.2f : 0.03f;
+        if (stack.getItem().getDefaultInstance().is(CobblemonFarmersTags.CRAFT_STATION_RENDERS_FLAT)) {
+            heightIncrement = 0.03f;
+        }
         Direction direction = pBlockEntity.getBlockState().getValue(CraftStationBlock.FACING);
         boolean rotated = direction == Direction.EAST || direction == Direction.WEST;
         float indexTranslation = index == 0 ? 0.25f : 0.75f;
         for (int i = 0; i < maxStackDisplay && i < stack.getCount(); i++) {
-            itemRotations.computeIfAbsent(stack, k -> 30F);
-            float rotationAngle = itemRotations.get(stack);
+            itemRotations.computeIfAbsent(stack.getItem(), k -> 30F);
+            float rotationAngle = itemRotations.get(stack.getItem());
             pPoseStack.pushPose();
             pPoseStack.translate(!rotated ? indexTranslation : 0.5f, baseHeight, rotated ? indexTranslation : 0.5f);
             pPoseStack.scale(0.4f, 0.4f, 0.4f);

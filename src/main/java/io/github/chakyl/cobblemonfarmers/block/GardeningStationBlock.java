@@ -87,7 +87,7 @@ public class GardeningStationBlock extends Block implements EntityBlock {
                 if (gardeningStationBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
                     if (gardeningStationBlockEntity.getPublicContract()) {
                         pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
-                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, gardeningStationBlockEntity.hasWorker())) {
                         gardeningStationBlockEntity.setPublicContract(true);
                     }
                 } else if (gardeningStationBlockEntity.validateOwner(pPlayer)) {

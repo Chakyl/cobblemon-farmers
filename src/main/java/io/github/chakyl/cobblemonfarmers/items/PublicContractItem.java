@@ -26,7 +26,7 @@ public class PublicContractItem extends Item {
         list.add(Component.translatable("item.cobblemon_farmers.public_contract.warn").withStyle(ChatFormatting.RED));
     }
 
-    public boolean useContract(Level level, Player player, InteractionHand hand) {
+    public boolean useContract(Level level, Player player, InteractionHand hand, boolean hasWorker) {
         if (!level.isClientSide()) {
             AttributeInstance workerCapInstance = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get());
             AttributeInstance workerAssignedInstance = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get());
@@ -36,8 +36,10 @@ public class PublicContractItem extends Item {
                 player.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.not_enough").withStyle(ChatFormatting.RED));
                 return false;
             }
-            workerCapInstance.setBaseValue(workerCapInstance.getBaseValue() + -1.0);
-
+            workerCapInstance.setBaseValue(workerCapInstance.getBaseValue() - 1.0);
+            if (hasWorker) {
+                workerAssignedInstance.setBaseValue(workerAssignedInstance.getValue() + -1);
+            }
             if (!player.isCreative()) player.getItemInHand(hand).shrink(1);
             level.playSound(null, player.getOnPos(), CobblemonSounds.FOSSIL_MACHINE_FINISHED, SoundSource.BLOCKS, 1.0F, 0.9F);
             player.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.used").withStyle(ChatFormatting.GREEN));

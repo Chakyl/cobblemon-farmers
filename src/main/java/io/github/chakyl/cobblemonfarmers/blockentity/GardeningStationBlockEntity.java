@@ -378,8 +378,11 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         CompoundTag data = pTag.getCompound(CobblemonFarmers.MODID);
         owner = data.hasUUID("Owner") ? data.getUUID("Owner") : null;
         if (data.contains("PokemonInventory", Tag.TAG_COMPOUND)) {
-            this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
-            this.initializeWorker();
+            CompoundTag newInvTag = data.getCompound("PokemonInventory");
+            if (!this.pokemonInventory.serializeNBT().equals(newInvTag)) {
+                this.pokemonInventory.deserializeNBT(newInvTag);
+                this.initializeWorker();
+            }
         }
         primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));

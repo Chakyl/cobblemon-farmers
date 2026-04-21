@@ -328,10 +328,12 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         if (data.contains("InputInventory", Tag.TAG_COMPOUND)) {
             this.inputInventory.deserializeNBT(data.getCompound("InputInventory"));
         }
-
         if (data.contains("PokemonInventory", Tag.TAG_COMPOUND)) {
-            this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
-            this.initializeWorker();
+            CompoundTag newInvTag = data.getCompound("PokemonInventory");
+            if (!this.pokemonInventory.serializeNBT().equals(newInvTag)) {
+                this.pokemonInventory.deserializeNBT(newInvTag);
+                this.initializeWorker();
+            }
         }
         primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));

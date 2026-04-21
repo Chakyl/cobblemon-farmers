@@ -152,9 +152,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
                         this.fetchMultChance(recipe.get().getMultStat());
                     }
                 } else {
-                    if (recipe.isEmpty()) {
-                        PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level);
-                    }
+                    recipe.ifPresent(craftStationRecipe -> PokeUtils.validWorkerType(this, craftStationRecipe.getElementalType(), level));
                 }
             } else if (this.progress > 0) {
                 this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
@@ -354,8 +352,11 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
             this.outputInventory.deserializeNBT(data.getCompound("OutputInventory"));
         }
         if (data.contains("PokemonInventory", Tag.TAG_COMPOUND)) {
-            this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
-            this.initializeWorker();
+            CompoundTag newInvTag = data.getCompound("PokemonInventory");
+            if (!this.pokemonInventory.serializeNBT().equals(newInvTag)) {
+                this.pokemonInventory.deserializeNBT(newInvTag);
+                this.initializeWorker();
+            }
         }
         primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));

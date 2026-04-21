@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,9 +27,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -98,7 +95,7 @@ public class RanchingStationBlock extends Block implements EntityBlock {
                 if (ranchingStationBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
                     if (ranchingStationBlockEntity.getPublicContract()) {
                         pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
-                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, ranchingStationBlockEntity.hasWorker())) {
                         ranchingStationBlockEntity.setPublicContract(true);
                     }
                 } else if (ranchingStationBlockEntity.validateOwner(pPlayer)) {

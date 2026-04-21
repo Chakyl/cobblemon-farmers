@@ -31,8 +31,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.grantWorkerSlot;
-
 public class CraftStationBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -90,7 +88,7 @@ public class CraftStationBlock extends Block implements EntityBlock {
                 if (craftStationBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
                     if (craftStationBlockEntity.getPublicContract()) {
                         pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
-                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand)) {
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, craftStationBlockEntity.hasWorker())) {
                         craftStationBlockEntity.setPublicContract(true);
                     }
                 } else if (craftStationBlockEntity.getPublicContract() || craftStationBlockEntity.validateOwner(pPlayer)) {

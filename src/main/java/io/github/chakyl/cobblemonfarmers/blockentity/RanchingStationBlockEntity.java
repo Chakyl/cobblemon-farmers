@@ -473,8 +473,11 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             this.inputInventory.deserializeNBT(data.getCompound("InputInventory"));
         }
         if (data.contains("PokemonInventory", Tag.TAG_COMPOUND)) {
-            this.pokemonInventory.deserializeNBT(data.getCompound("PokemonInventory"));
-            this.initializeWorker();
+            CompoundTag newInvTag = data.getCompound("PokemonInventory");
+            if (!this.pokemonInventory.serializeNBT().equals(newInvTag)) {
+                this.pokemonInventory.deserializeNBT(newInvTag);
+                this.initializeWorker();
+            }
         }
         dayLastMagicSheared = data.getInt("DayLastMagicSheared");
         dayLastForaged = data.getInt("DayLastForaged");
