@@ -16,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.grantWorkerSlot;
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.removePublicContract;
 
 @Mod.EventBusSubscriber(modid = CobblemonFarmers.MODID)
 public class BreakEvents {
@@ -34,7 +35,7 @@ public class BreakEvents {
                 } else if (stationBaseBlockEntity.validateOwner(player)) {
                    if (stationBaseBlockEntity.getPublicContract()) {
                        if (!level.isClientSide()) {
-                           grantWorkerSlot(level, player);
+                           removePublicContract(level, player);
                        }
                    }
                 } else {
@@ -48,9 +49,11 @@ public class BreakEvents {
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
             double workerAssigned = event.getOriginal().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue();
-            double workerCap = event.getOriginal().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get()).getValue();
+            double workerPermits = event.getOriginal().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_PERMITS.get()).getValue();
+            double publicContracts = event.getOriginal().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get()).getValue();
             event.getEntity().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).setBaseValue(workerAssigned);
-            event.getEntity().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get()).setBaseValue(workerCap);
+            event.getEntity().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_PERMITS.get()).setBaseValue(workerPermits);
+            event.getEntity().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get()).setBaseValue(publicContracts);
             event.getOriginal().invalidateCaps();
         }
     }

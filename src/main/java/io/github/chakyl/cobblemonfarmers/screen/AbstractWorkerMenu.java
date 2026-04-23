@@ -8,6 +8,7 @@ import com.cobblemon.mod.common.pokemon.Pokemon;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
+import io.github.chakyl.cobblemonfarmers.utils.GeneralUtils;
 import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -110,7 +111,7 @@ public class AbstractWorkerMenu extends AbstractContainerMenu {
     }
 
     protected String getWorkersAssigned() {
-        return Mth.floor(this.player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) + "/" + Mth.floor(this.player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get()).getValue());
+        return Mth.floor(this.player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) + "/" + GeneralUtils.getWorkerCap(this.player);
     }
 
     @Override

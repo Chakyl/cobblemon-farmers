@@ -2,6 +2,7 @@ package io.github.chakyl.cobblemonfarmers.items;
 
 import com.cobblemon.mod.common.CobblemonSounds;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
+import io.github.chakyl.cobblemonfarmers.utils.GeneralUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -28,15 +29,15 @@ public class PublicContractItem extends Item {
 
     public boolean useContract(Level level, Player player, InteractionHand hand, boolean hasWorker) {
         if (!level.isClientSide()) {
-            AttributeInstance workerCapInstance = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get());
+            AttributeInstance publicContract = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get());
             AttributeInstance workerAssignedInstance = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get());
 
-            double currentWorkerCap = workerCapInstance.getValue();
+            double currentWorkerCap = GeneralUtils.getWorkerCap(player);
             if (currentWorkerCap <= 0 || currentWorkerCap - workerAssignedInstance.getValue() <= 0) {
                 player.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.not_enough").withStyle(ChatFormatting.RED));
                 return false;
             }
-            workerCapInstance.setBaseValue(workerCapInstance.getBaseValue() - 1.0);
+            publicContract.setBaseValue(publicContract.getBaseValue() + 1.0);
             if (hasWorker) {
                 workerAssignedInstance.setBaseValue(workerAssignedInstance.getValue() + -1);
             }

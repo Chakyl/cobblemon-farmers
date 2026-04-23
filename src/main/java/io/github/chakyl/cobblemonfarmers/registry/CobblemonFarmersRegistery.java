@@ -245,6 +245,8 @@ public final class CobblemonFarmersRegistery {
 
         public static final RegistryObject<Attribute> WORKERS_ASSIGNED = ATTRIBUTES.register("workers_assigned", () -> new RangedAttribute("attribute.cobblemon_farmers.workers_assigned", 0, 0, 1024).setSyncable(true));
         public static final RegistryObject<Attribute> WORKER_CAP = ATTRIBUTES.register("worker_cap", () -> new RangedAttribute("attribute.cobblemon_farmers.worker_cap", 5, 0, 1024).setSyncable(true));
+        public static final RegistryObject<Attribute> WORKER_PERMITS = ATTRIBUTES.register("worker_permits", () -> new RangedAttribute("attribute.cobblemon_farmers.worker_permits", 0, 0, 1024 - 5).setSyncable(true));
+        public static final RegistryObject<Attribute> PUBLIC_CONTRACTS = ATTRIBUTES.register("public_contracts", () -> new RangedAttribute("attribute.cobblemon_farmers.public_contracts", 0, 0, 1024).setSyncable(true));
     }
 
     public static final class CreativeTabReg {

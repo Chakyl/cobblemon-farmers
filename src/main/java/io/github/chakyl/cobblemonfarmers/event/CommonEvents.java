@@ -24,8 +24,10 @@ public class CommonEvents {
 
         @SubscribeEvent
         public static void setAttributes(final EntityAttributeModificationEvent event) {
-            event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get());
             event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get());
+            event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get());
+            event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKER_PERMITS.get());
+            event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get());
         }
     }
 }
