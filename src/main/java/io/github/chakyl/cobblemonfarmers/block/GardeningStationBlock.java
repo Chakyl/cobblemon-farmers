@@ -90,7 +90,7 @@ public class GardeningStationBlock extends Block implements EntityBlock {
                     } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, gardeningStationBlockEntity.hasWorker())) {
                         gardeningStationBlockEntity.setPublicContract(true);
                     }
-                } else if (gardeningStationBlockEntity.validateOwner(pPlayer)) {
+                } else if (gardeningStationBlockEntity.validateOwner(pPlayer) || gardeningStationBlockEntity.getPublicContract()) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

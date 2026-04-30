@@ -179,7 +179,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                         }
                     }
                     if (ranchingStationBlockEntity.getRanchingPower() > 1 && ranchingStationBlockEntity.canMilkToday(this.level) && ranchingStationBlockEntity.hasMilkingRecipe()) {
-                        if (ranchingStationBlockEntity.milkPokemon(this.level, null)) {
+                        if (ranchingStationBlockEntity.milkPokemon(this.level, null, centerPos, this.getBlockState().getValue(GardeningStationBlock.FACING))) {
                             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_NORMAL, SoundSource.BLOCKS, 1.0F, 0.9F);
                             return;
                         }

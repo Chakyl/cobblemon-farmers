@@ -238,7 +238,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                                 Component.translatable("message.cobblemon_farmers.ranching_station.cannot_be_milked").withStyle(ChatFormatting.RED),
                                 true
                         );
-                    } else if (milkPokemon(level, pPlayer)) return;
+                    } else if (milkPokemon(level, pPlayer, null, null)) return;
                 }
             }
         }
@@ -360,7 +360,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
     }
 
 
-    public boolean milkPokemon(Level level, Player player) {
+    public boolean milkPokemon(Level level, Player player, BlockPos overridePos, Direction overrideDirection) {
         RanchingStationMilkingRecipe currentRecipe = getMilkingRecipe();
         if (currentRecipe != null) {
             this.dayLastMilked = getDay(level);
@@ -370,7 +370,11 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                 if (player != null && currentRecipe.getIsBucketConsumed()) {
                     ItemUtils.createFilledResult(player.getMainHandItem(), player, milk.copy(), true);
                 } else {
-                    Block.popResourceFromFace(level, pos, this.getBlockState().getValue(RanchingStationBlock.FACING), milk.copy());
+                    if (overridePos != null && overrideDirection != null) {
+                        insertIntoFacingOrPopOut(level, overridePos, overrideDirection, milk.copy());
+                    } else {
+                        Block.popResourceFromFace(level, pos, this.getBlockState().getValue(RanchingStationBlock.FACING), milk.copy());
+                    }
                 }
                 this.level.playSound(null, this.getBlockPos(), SoundEvents.COW_MILK, SoundSource.BLOCKS, 1.0F, 1.0F);
                 generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_ON);

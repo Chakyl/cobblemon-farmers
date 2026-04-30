@@ -47,7 +47,6 @@ public class RanchingStationBlock extends Block implements EntityBlock {
     }
 
 
-
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         pBuilder.add(FACING);
@@ -70,12 +69,13 @@ public class RanchingStationBlock extends Block implements EntityBlock {
             ranchingStationBlockEntity.setOwner(player.getUUID());
         }
     }
+
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
-               ranchingStationBlockEntity.drops();
+                ranchingStationBlockEntity.drops();
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -98,7 +98,7 @@ public class RanchingStationBlock extends Block implements EntityBlock {
                     } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, ranchingStationBlockEntity.hasWorker())) {
                         ranchingStationBlockEntity.setPublicContract(true);
                     }
-                } else if (ranchingStationBlockEntity.validateOwner(pPlayer)) {
+                } else if (ranchingStationBlockEntity.validateOwner(pPlayer) || ranchingStationBlockEntity.getPublicContract()) {
                     ranchingStationBlockEntity.handleInteraction(pLevel, (ServerPlayer) pPlayer, pPos, pPlayer.getMainHandItem().getItem());
                 }
             } else {

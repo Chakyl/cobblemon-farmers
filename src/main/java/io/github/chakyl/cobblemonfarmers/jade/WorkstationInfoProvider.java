@@ -2,13 +2,17 @@ package io.github.chakyl.cobblemonfarmers.jade;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.pokemon.Species;
+import com.mojang.authlib.GameProfile;
 import io.github.chakyl.cobblemonfarmers.blockentity.StationBaseBlockEntity;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.UsernameCache;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -46,7 +50,13 @@ public enum WorkstationInfoProvider implements IBlockComponentProvider, IServerD
             tooltip.add(Component.translatable("jade.cobblemon_farmers.workstation.public").withStyle(ChatFormatting.GREEN));
         }
         if (accessor.getPlayer().isCrouching() && accessor.getServerData().hasUUID("owner")) {
-            tooltip.add(Component.translatable("jade.cobblemon_farmers.owner", UsernameCache.getLastKnownUsername(accessor.getServerData().getUUID("owner"))));
+            PlayerInfo info = Minecraft.getInstance().getConnection().getPlayerInfo(accessor.getServerData().getUUID("owner"));
+            if (info != null) {
+                String name = info.getProfile().getName();
+                tooltip.add(Component.translatable("jade.cobblemon_farmers.owner", name));
+            } else {
+                tooltip.add(Component.translatable("jade.cobblemon_farmers.owner", "Unknown"));
+            }
         }
     }
 
