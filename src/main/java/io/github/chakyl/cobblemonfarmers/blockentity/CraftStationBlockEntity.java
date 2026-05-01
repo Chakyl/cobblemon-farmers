@@ -89,8 +89,8 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> CraftStationBlockEntity.this.progress;
-                    case 1 -> CraftStationBlockEntity.this.craftingTime;
+                    case 0 -> getDataSendableTime(CraftStationBlockEntity.this.progress);
+                    case 1 -> getDataSendableTime(CraftStationBlockEntity.this.craftingTime);
                     case 2 -> Mth.floor(CraftStationBlockEntity.this.speedModifier * 100);
                     case 3 -> CraftStationBlockEntity.this.multChance;
                     case 4 -> CraftStationBlockEntity.this.swapPriority ? 1 : 0;

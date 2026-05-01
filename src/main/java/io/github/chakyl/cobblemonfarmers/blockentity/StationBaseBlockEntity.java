@@ -98,7 +98,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            this.speedModifier =  ((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) * (pokemon.getShiny() ? 2.0 : 1.0);
+            this.speedModifier = ((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) * (pokemon.getShiny() ? 2.0 : 1.0);
         } else {
             this.speedModifier = 0.0;
         }
@@ -130,14 +130,18 @@ public class StationBaseBlockEntity extends BlockEntity {
         this.owner = uuid;
     }
 
-    public UUID getOwner() {  return this.owner; }
+    public UUID getOwner() {
+        return this.owner;
+    }
 
     public void setPublicContract(boolean publicContract) {
         this.publicContract = publicContract;
     }
 
-    public boolean getPublicContract() {  return this.publicContract; }
-    
+    public boolean getPublicContract() {
+        return this.publicContract;
+    }
+
     public boolean validateOwner(Player player) {
         if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer((ServerPlayer) player) != null) {
             player.sendSystemMessage(Component.translatable("message.cobblemon_farmers.in_battle").withStyle(ChatFormatting.RED));
@@ -166,5 +170,10 @@ public class StationBaseBlockEntity extends BlockEntity {
         load(pkt.getTag());
     }
 
+    Short getDataSendableTime(int time) {
+        return (short) Math.min(Short.MAX_VALUE, Mth.floor((float) time / 20));
+    }
+
+    ;
 
 }

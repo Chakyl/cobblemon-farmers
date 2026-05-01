@@ -132,15 +132,14 @@ public class MysteryMineScreen extends AbstractContainerScreen<MysteryMineMenu> 
     }
 
     private Component getCraftingTimeTooltip() {
-        int totalTicks = this.menu.getTotalProcessingTime() ;
-        int currentTicks = this.menu.getCurrentProcessingTime();
-        int remainingTicks = totalTicks - currentTicks;
-        if (remainingTicks > 0 && this.menu.getScaledProgress() > 0) {
-            int seconds = remainingTicks / 20;
-            int minutes = seconds / 60;
-            seconds %= 60;
+        int totalSeconds = this.menu.getTotalProcessingTime() ;
+        int currentSeconds = this.menu.getCurrentProcessingTime();
+        int remainingSeconds = totalSeconds - currentSeconds;
+        if (remainingSeconds > 0 && this.menu.getScaledProgress() > 0) {
+            int minutes = remainingSeconds / 60;
+            remainingSeconds %= 60;
 
-            String formattedTime = String.format("%d:%02d Seconds", minutes, seconds);
+            String formattedTime = String.format("%d:%02d Seconds", minutes, remainingSeconds);
             return Component.translatable("tooltip.cobblemon_farmers.mystery_mine.processing_time", formattedTime);
         } else {
             return Component.translatable("tooltip.cobblemon_farmers.mystery_mine.processing_time", "0:00 Seconds");

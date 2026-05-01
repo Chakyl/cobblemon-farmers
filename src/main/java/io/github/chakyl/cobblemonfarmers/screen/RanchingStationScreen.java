@@ -71,7 +71,7 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.actions").withStyle(ChatFormatting.BOLD), -16, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 180, 112, false, 0xFFFFFFFF, true, 0, 0);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 126, 45, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 130, 45, 0xFFFFFFFF, true);
 
         int friendshipHearts = this.menu.getFriendshipHearts();
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.friendship_hearts", friendshipHearts), centralX + 8, 46, false, 0xFFFFFFFF, true, 0, 0);

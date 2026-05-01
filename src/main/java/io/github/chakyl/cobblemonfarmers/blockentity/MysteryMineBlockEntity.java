@@ -85,8 +85,8 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> MysteryMineBlockEntity.this.progress;
-                    case 1 -> MysteryMineBlockEntity.this.craftingTime;
+                    case 0 -> getDataSendableTime(MysteryMineBlockEntity.this.progress);
+                    case 1 -> getDataSendableTime(MysteryMineBlockEntity.this.craftingTime);
                     case 2 -> Mth.floor(MysteryMineBlockEntity.this.speedModifier * 100);
                     case 3 -> MysteryMineBlockEntity.this.multChance;
                     case 4 -> MysteryMineBlockEntity.this.swapPriority ? 1 : 0;

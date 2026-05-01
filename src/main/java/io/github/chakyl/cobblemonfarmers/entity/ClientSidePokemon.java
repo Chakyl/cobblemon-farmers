@@ -9,10 +9,15 @@ import com.cobblemon.mod.common.pokemon.FormData;
 import com.cobblemon.mod.common.pokemon.Gender;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.util.DataKeys;
+import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
+import javax.xml.crypto.Data;
 import java.util.Objects;
+import java.util.Set;
 
 public class ClientSidePokemon extends Pokemon {
     public ClientSidePokemon() {
@@ -33,7 +38,6 @@ public class ClientSidePokemon extends Pokemon {
             String pokemonGender = nbt.getString(DataKeys.POKEMON_GENDER);
             this.setGender(Gender.valueOf(pokemonGender));
         }
-
         if (nbt.contains(DataKeys.POKEMON_SHINY)) {
             this.setShiny(nbt.getBoolean(DataKeys.POKEMON_SHINY));
         }

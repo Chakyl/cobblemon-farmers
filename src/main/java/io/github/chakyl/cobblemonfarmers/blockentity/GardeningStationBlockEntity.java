@@ -81,8 +81,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> GardeningStationBlockEntity.this.progress;
-                    case 1 -> GardeningStationBlockEntity.this.actionTime;
+                    case 0 -> getDataSendableTime(GardeningStationBlockEntity.this.progress);
+                    case 1 -> getDataSendableTime(GardeningStationBlockEntity.this.actionTime);
                     case 2 -> Mth.floor(GardeningStationBlockEntity.this.speedModifier * 100);
                     case 3 -> GardeningStationBlockEntity.this.aoeRadius;
                     case 4 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
@@ -178,7 +178,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                             return;
                         }
                     }
-                    if (ranchingStationBlockEntity.getRanchingPower() > 1 && ranchingStationBlockEntity.canMilkToday(this.level) && ranchingStationBlockEntity.hasMilkingRecipe()) {
+                    if (ranchingStationBlockEntity.getRanchingPower() >= 1 && ranchingStationBlockEntity.canMilkToday(this.level) && ranchingStationBlockEntity.hasMilkingRecipe()) {
                         if (ranchingStationBlockEntity.milkPokemon(this.level, null, centerPos, this.getBlockState().getValue(GardeningStationBlock.FACING))) {
                             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_NORMAL, SoundSource.BLOCKS, 1.0F, 0.9F);
                             return;

@@ -98,7 +98,7 @@ public class RanchingStationBlock extends Block implements EntityBlock {
                     } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, ranchingStationBlockEntity.hasWorker())) {
                         ranchingStationBlockEntity.setPublicContract(true);
                     }
-                } else if (ranchingStationBlockEntity.validateOwner(pPlayer) || ranchingStationBlockEntity.getPublicContract()) {
+                } else if (ranchingStationBlockEntity.getPublicContract() || ranchingStationBlockEntity.validateOwner(pPlayer)) {
                     ranchingStationBlockEntity.handleInteraction(pLevel, (ServerPlayer) pPlayer, pPos, pPlayer.getMainHandItem().getItem());
                 }
             } else {

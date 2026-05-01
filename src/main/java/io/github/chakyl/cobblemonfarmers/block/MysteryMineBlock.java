@@ -91,7 +91,7 @@ public class MysteryMineBlock extends Block implements EntityBlock {
                     } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, mysteryMineBlockEntity.hasWorker())) {
                         mysteryMineBlockEntity.setPublicContract(true);
                     }
-                } else if (mysteryMineBlockEntity.validateOwner(pPlayer) || mysteryMineBlockEntity.getPublicContract()) {
+                } else if (mysteryMineBlockEntity.getPublicContract() ||mysteryMineBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {
