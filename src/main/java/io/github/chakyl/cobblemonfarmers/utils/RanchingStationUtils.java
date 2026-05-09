@@ -1,6 +1,7 @@
 package io.github.chakyl.cobblemonfarmers.utils;
 
 import com.cobblemon.mod.common.CobblemonItems;
+import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
@@ -12,12 +13,17 @@ public class RanchingStationUtils {
         if (pContainer.getItem(0).is(CobblemonItems.POKEMON_MODEL)) {
             CompoundTag tag = pContainer.getItem(0).getTag();
             if (tag != null && !tag.isEmpty()) {
+//                CobblemonFarmers.LOGGER.info("Testing recipe: " + pokemon + "/" + form);
                 String species = tag.getString("species");
-                boolean speciesMatches = species.equals("cobblemon:" + pokemon);
-                if (form.isEmpty() && !pokemon.contains(":")) return speciesMatches;
-                if (form.isEmpty()) return speciesMatches && pokemon.equals(species);
+                String formId = tag.getCompound("pokeData").getString("FormId");
+//                CobblemonFarmers.LOGGER.info("Testing Pokemon: " + species + "/" + formId);
+                boolean speciesMatches = pokemon.contains(":") ? species.equals(pokemon) : species.equals("cobblemon:" + pokemon);
+//                CobblemonFarmers.LOGGER.info("Species Matches and is normal: " + (form.isEmpty() && formId.equals("normal")));
+                if (form.isEmpty() && formId.equals("normal")) return speciesMatches;
+                else if (form.isEmpty()) return false;
                 ListTag aspects = (ListTag) tag.get("aspects");
                 if (aspects == null) return false;
+//                CobblemonFarmers.LOGGER.info("Species Matches and Form Matches: " + (speciesMatches && aspects.toString().contains(form)));
                 return speciesMatches && aspects.toString().contains(form);
 
             }

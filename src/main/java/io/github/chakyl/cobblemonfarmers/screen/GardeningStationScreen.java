@@ -68,7 +68,9 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
         }
         int workingRadius = this.menu.getAoeRadius();
         if (workingRadius > 0) {
-            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.working_radius", workingRadius), centralX , 58, false,0xFFFFFFFF, true, 0, 0);
+            workingRadius *= 2;
+            workingRadius += 1;
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.working_radius", workingRadius, Math.min(5, workingRadius) *  2, workingRadius), centralX , 58, false,0xFFFFFFFF, true, 0, 0);
         }
 
         int index = 0;

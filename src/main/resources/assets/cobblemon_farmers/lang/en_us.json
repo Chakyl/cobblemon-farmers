@@ -43,7 +43,7 @@
     "gui.cobblemon_farmers.party": "Party",
     "gui.cobblemon_farmers.speed": "Speed: x%s",
     "gui.cobblemon_farmers.mult_chance": "Mult Chance: %s",
-    "gui.cobblemon_farmers.working_radius": "Working Radius: %s",
+    "gui.cobblemon_farmers.working_radius": "Area: %sx%sx%s",
     "gui.cobblemon_farmers.swap_priority": "Swap Priority",
     "gui.cobblemon_farmers.prioritize_primary": "Prioritize Primary Type",
     "gui.cobblemon_farmers.prioritize_secondary": "Prioritize Secondary Type",
@@ -149,12 +149,12 @@
 
     "jei.cobblemon_farmers.gardening_station.action_time": "Time: %ss",
     "jei.cobblemon_farmers.gardening_station.speed_stat": "%s impacts time",
-    "jei.cobblemon_farmers.gardening_station.level_scaling.grass": "Working radius increases by 1 every 10 levels",
-    "jei.cobblemon_farmers.gardening_station.level_scaling.water": "Working radius increases by 1 every 10 levels",
-    "jei.cobblemon_farmers.gardening_station.level_scaling.normal": "Working radius increases by 1 every 10 levels",
-    "jei.cobblemon_farmers.gardening_station.level_scaling.fairy": "Working radius increases by 1 every 10 levels",
-    "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working radius increases by 1 every 10 levels",
-    "jei.cobblemon_farmers.gardening_station.level_scaling.flying": "Berry eating chance decreases and working radius increases by 1 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.grass": "Working area increases by 2 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.water": "Working area increases by 2 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.normal": "Working area increases by 2 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.fairy": "Working area increases by 2 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working area increases by 2 every 10 levels",
+    "jei.cobblemon_farmers.gardening_station.level_scaling.flying": "Berry eating chance decreases and working area increases by 2 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
     "gui.cobblemon_farmers.actions": "Actions",
     "gui.cobblemon_farmers.friendship_hearts": "Friendship: %s/5",
@@ -167,5 +167,8 @@
     "jade.cobblemon_farmers.workstation.no_worker": "No worker assigned",
     "jade.cobblemon_farmers.workstation.public": "Public Workstation",
     "jade.cobblemon_farmers.owner": "Owner: %s",
-    "item.cobblemon_farmers.public_contract.not_enough": "You don't have any free worker slots!"
+    "item.cobblemon_farmers.public_contract.not_enough": "You don't have any free worker slots!",
+    "tooltip.cobblemon_farmers.ranching_station.can_shear": "This Pokémon's drops can be harvested with shears at 5+ affection",
+    "tooltip.cobblemon_farmers.ranching_station.can_forage": "This Pokémon has a chance to forages for items daily",
+    "tooltip.cobblemon_farmers.ranching_station.can_milk": "This Pokémon can be milked with a bucket"
 }

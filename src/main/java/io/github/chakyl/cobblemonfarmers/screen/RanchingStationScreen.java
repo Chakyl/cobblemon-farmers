@@ -71,13 +71,13 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.actions").withStyle(ChatFormatting.BOLD), -16, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 180, 112, false, 0xFFFFFFFF, true, 0, 0);
-        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 130, 45, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.eats_berries"), centralX + 130, 45, false, 0xFFFFFFFF, true, 0, 0);
 
         int friendshipHearts = this.menu.getFriendshipHearts();
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.friendship_hearts", friendshipHearts), centralX + 8, 46, false, 0xFFFFFFFF, true, 0, 0);
 
         int hpHearts = this.menu.getHPHearts();
-        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.hp_hearts", hpHearts), centralX + 8, 58, false, 0xFFFFFFFF, true, 0,0 );
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.hp_hearts", hpHearts), centralX + 8, 58, false, 0xFFFFFFFF, true, 0, 0);
 
         int index = 0;
         for (int level : this.menu.getPartyLevels()) {
@@ -127,17 +127,36 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
                 mouseY >= ranchingPowerAreaTop && mouseY <= ranchingPowerAreaBottom;
     }
 
+    private boolean isMouseOverSidebar(int mouseX, int mouseY, int index) {
+        int area = 26;
+        int ranchingPowerAreaLeft = this.leftPos - area;
+        int ranchingPowerAreaTop = this.topPos + 14 + (area * index);
+        int ranchingPowerAreaRight = this.leftPos;
+        int ranchingPowerAreaBottom = ranchingPowerAreaTop + area - 1;
+        return mouseX >= ranchingPowerAreaLeft && mouseX <= ranchingPowerAreaRight &&
+                mouseY >= ranchingPowerAreaTop && mouseY <= ranchingPowerAreaBottom;
+    }
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        List<Component> tooltipList = new ArrayList<>();
+        if (this.menu.getCanShear() && isMouseOverSidebar(mouseX, mouseY, 0)) {
+            tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.can_shear"));
+        }
+        if (this.menu.getCanForage() && isMouseOverSidebar(mouseX, mouseY, 1)) {
+            tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.can_forage"));
+        }
+        if (this.menu.getCanMilk() && isMouseOverSidebar(mouseX, mouseY, 2)) {
+            tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.can_milk"));
+        }
         if (isMouseOverHearts(mouseX, mouseY)) {
-            List<Component> tooltipList = new ArrayList<>();
             tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.ranching_power", this.menu.getRanchingPower()));
             tooltipList.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.ranching_power_desc", this.menu.getRanchingPower()).withStyle(ChatFormatting.GRAY));
-            guiGraphics.renderComponentTooltip(this.font, tooltipList, mouseX, mouseY);
         }
+        guiGraphics.renderComponentTooltip(this.font, tooltipList, mouseX, mouseY);
     }
 
     private class ViewRecipesButton extends Button {

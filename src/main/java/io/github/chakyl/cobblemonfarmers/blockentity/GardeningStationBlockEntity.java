@@ -10,7 +10,6 @@ import com.cobblemon.mod.common.block.entity.BerryBlockEntity;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import cool.bot.botslib.util.Util;
-import cool.bot.dewdropfarmland.utils.CropHandlerUtils;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.GardeningStationBlock;
 import io.github.chakyl.cobblemonfarmers.block.MysteryMineBlock;
@@ -25,6 +24,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -47,6 +47,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cool.bot.dewdropfarmland.utils.CropHandlerUtils.growCrop;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getItemFormPokemon;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.insertIntoFacingOrPopOut;
 
@@ -57,6 +58,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private ResourceLocation lastRecipeID;
     private boolean swapPriority = false;
     private int aoeRadius;
+    private static final int MAX_Y_RADIUS = 2;
 
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         private ItemStack previousWorker;
@@ -149,21 +151,32 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         }
     }
 
+    private Iterable<BlockPos> getBetween(BlockPos centerPos, int radius) {
+        return BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - Math.min(MAX_Y_RADIUS, radius), centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + Math.min(MAX_Y_RADIUS, radius), centerPos.getZ() + radius));
+    }
+
     private void waterFarmland(int radius) {
         BlockPos centerPos = this.getBlockPos();
-        for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - radius, centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + radius, centerPos.getZ() + radius))) {
+        for (BlockPos pos : getBetween(centerPos, radius)) {
             if (Util.isDryWaterable((ServerLevel) this.level, pos)) {
                 Util.setMoist((ServerLevel) this.level, pos);
             }
         }
     }
 
+    private void growCropsInRadius(ServerLevel level, BlockPos centerPos, RandomSource random, int radius) {
+        for (BlockPos pos : getBetween(centerPos, radius)) {
+            growCrop(level.getBlockState(pos), level, pos, level.getBlockState(centerPos.below()), random, false);
+        }
+    }
+
     private void harvestFromRanchingStation(int radius, boolean fairy) {
         BlockPos centerPos = this.getBlockPos();
-        for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - radius, centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + radius, centerPos.getZ() + radius))) {
+        for (BlockPos pos : getBetween(centerPos, radius)) {
             BlockEntity entity = this.level.getBlockEntity(pos);
             if (entity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
-                if (ranchingStationBlockEntity.isHungry(this.level)) return;
+                if (!ranchingStationBlockEntity.hasWorker() || ranchingStationBlockEntity.isHungry(this.level))
+                    continue;
                 if (fairy) {
                     if (ranchingStationBlockEntity.getRanchingPower() > 1 && ranchingStationBlockEntity.canMagicShearToday(this.level) && ranchingStationBlockEntity.hasMagicShearDrops()) {
                         if (ranchingStationBlockEntity.magicShear(this.level, null, centerPos, this.getBlockState().getValue(GardeningStationBlock.FACING))) {
@@ -192,7 +205,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private void harvestNearbyBerries(int radius) {
         BlockPos centerPos = this.getBlockPos();
         boolean ateBerry = this.level.getRandom().nextDouble() < 1 - (radius * 0.1);
-        for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - radius, centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + radius, centerPos.getZ() + radius))) {
+        for (BlockPos pos : getBetween(centerPos, radius)) {
             if (this.level.getBlockEntity(pos) instanceof BerryBlockEntity berryBlockEntity) {
                 if (this.level.getBlockState(pos).getBlock() instanceof BerryBlock berryBlock && level.getBlockState(pos).hasProperty(BlockStateProperties.AGE_5)) {
                     if (level.getBlockState(pos).getValue(BlockStateProperties.AGE_5) == BerryBlock.FRUIT_AGE) {
@@ -242,7 +255,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         ElementalTypes types = ElementalTypes.INSTANCE;
         int radius = this.getAoeRadius();
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getGRASS())) {
-            CropHandlerUtils.growCropsInRadius((ServerLevel) this.level, this.getBlockPos(), this.getLevel().getRandom(), radius);
+            growCropsInRadius((ServerLevel) this.level, this.getBlockPos(), this.getLevel().getRandom(), radius);
             this.level.playSound(null, this.getBlockPos(), CobblemonSounds.IMPACT_GRASS, SoundSource.BLOCKS, 0.5F, 0.9F);
         } else if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && actionType.equals(types.getWATER())) {
             waterFarmland(radius);

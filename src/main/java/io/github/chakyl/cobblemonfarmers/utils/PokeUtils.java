@@ -30,6 +30,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getWorkerCap;
+
 public class PokeUtils {
 
     public static ItemStack getPokemonItemForm(Pokemon pokemon) {
@@ -95,7 +97,7 @@ public class PokeUtils {
     }
 
     public static boolean hasWorkerSlot(Player player) {
-        return Mth.floor(player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) < Mth.floor(player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get()).getValue());
+        return Mth.floor(player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.WORKERS_ASSIGNED.get()).getValue()) < getWorkerCap(player);
     }
 
     public static void handlePartySlot(Player player, Level level, PlayerPartyStore party, WorkstationPartySlot partySlot, WorkerSlot workerSlot, boolean publicContract) {
@@ -153,17 +155,20 @@ public class PokeUtils {
     public static void insertIntoFacingOrPopOut(Level level, BlockPos pos, Direction facing, ItemStack item) {
         BlockPos facingBlockPos = pos.relative(facing);
         BlockEntity facingBlockEntity = level.getBlockEntity(facingBlockPos);
+        boolean inserted = false;
 
-        if (!(facingBlockEntity instanceof BlockEntity)) {
-            Block.popResourceFromFace(level, facingBlockPos, Direction.UP, item);
-            return;
+        if (facingBlockEntity != null) {
+            inserted = facingBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).map(handler -> {
+                ItemStack remainder = net.minecraftforge.items.ItemHandlerHelper.insertItem(handler, item, false);
+
+                if (!remainder.isEmpty()) {
+                    Block.popResourceFromFace(level, facingBlockPos, Direction.UP, remainder);
+                }
+                return true;
+            }).orElse(false);
         }
-        facingBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).ifPresent(handler -> {
-            ItemStack remainder = net.minecraftforge.items.ItemHandlerHelper.insertItem(handler, item, false);
-
-            if (!remainder.isEmpty()) {
-                Block.popResourceFromFace(level, pos, Direction.UP, remainder);
-            }
-        });
+        if (!inserted) {
+            Block.popResourceFromFace(level, pos, Direction.UP, item);
+        }
     }
 }

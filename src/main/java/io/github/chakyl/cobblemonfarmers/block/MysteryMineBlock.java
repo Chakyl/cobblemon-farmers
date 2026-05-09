@@ -85,7 +85,7 @@ public class MysteryMineBlock extends Block implements EntityBlock {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof MysteryMineBlockEntity mysteryMineBlockEntity) {
                 ItemStack heldItem = pPlayer.getItemInHand(pHand);
-                if (mysteryMineBlockEntity.validateOwner(pPlayer) && heldItem.getItem() instanceof PublicContractItem publicContractItem) {
+                if (heldItem.getItem() instanceof PublicContractItem publicContractItem && mysteryMineBlockEntity.validateOwner(pPlayer)) {
                     if (mysteryMineBlockEntity.getPublicContract()) {
                         pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
                     } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, mysteryMineBlockEntity.hasWorker())) {

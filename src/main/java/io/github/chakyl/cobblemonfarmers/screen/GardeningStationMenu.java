@@ -100,7 +100,7 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
 
     @Override
     public boolean getPrioritySwapped() {
-        return this.data.get(2) == 1;
+        return this.data.get(4) == 1;
     }
 
     @Override

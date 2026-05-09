@@ -1,6 +1,5 @@
 package io.github.chakyl.cobblemonfarmers.jade;
 
-import io.github.chakyl.cobblemonfarmers.blockentity.CraftStationBlockEntity;
 import io.github.chakyl.cobblemonfarmers.blockentity.GardeningStationBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -26,9 +25,12 @@ public enum GardeningStationInfoProvider implements IBlockComponentProvider, ISe
             if (speed > 0) tooltip.add(Component.translatable("gui.cobblemon_farmers.speed", speed));
         }
         if (accessor.getServerData().contains("aoeRadius")) {
-            int chance = accessor.getServerData().getInt("aoeRadius");
-            if (chance > 0)
-                tooltip.add(Component.translatable("gui.cobblemon_farmers.working_radius", accessor.getServerData().getInt("aoeRadius")));
+            int radius = accessor.getServerData().getInt("aoeRadius");
+            if (radius > 0) {
+                radius *= 2;
+                radius += 1;
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.working_radius", radius, Math.min(5, radius), radius));
+            }
         }
         tooltip.add(Component.empty());
     }
