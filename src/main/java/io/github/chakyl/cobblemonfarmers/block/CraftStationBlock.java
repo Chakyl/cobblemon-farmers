@@ -91,7 +91,7 @@ public class CraftStationBlock extends Block implements EntityBlock {
                     } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, craftStationBlockEntity.hasWorker())) {
                         craftStationBlockEntity.setPublicContract(true);
                     }
-                } else if (craftStationBlockEntity.validateOwner(pPlayer) || craftStationBlockEntity.getPublicContract()) {
+                } else if (craftStationBlockEntity.validatePublicContract(pPlayer) || craftStationBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {

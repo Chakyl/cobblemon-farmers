@@ -142,6 +142,18 @@ public class StationBaseBlockEntity extends BlockEntity {
         return this.publicContract;
     }
 
+    public boolean validatePublicContract(Player player) {
+        if (this.publicContract) {
+            if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer((ServerPlayer) player) != null) {
+                player.sendSystemMessage(Component.translatable("message.cobblemon_farmers.in_battle").withStyle(ChatFormatting.RED));
+                return false;
+            }
+            return true;
+
+        }
+        return false;
+    }
+
     public boolean validateOwner(Player player) {
         if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer((ServerPlayer) player) != null) {
             player.sendSystemMessage(Component.translatable("message.cobblemon_farmers.in_battle").withStyle(ChatFormatting.RED));
