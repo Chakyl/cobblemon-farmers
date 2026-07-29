@@ -15,6 +15,7 @@ import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkstationPartySlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -65,9 +67,20 @@ public class PokeUtils {
     public static Pokemon getItemFormPokemon(ItemStack pokeItem, Level level) {
         CompoundTag tag = pokeItem.getTag();
         if (tag == null) throw new RuntimeException("Horrible thing happened! The Pokemon doesn't exist!!!!");
+
         if (level.isClientSide) {
-            return new ClientSidePokemon().loadFromNBTClient(tag.getCompound("pokeData"));
+            ClientSidePokemon clientPokemon = new ClientSidePokemon();
+            clientPokemon.loadFromNBTClient(tag.getCompound("pokeData"));
+            if (tag.contains("aspects", Tag.TAG_LIST)) {
+                Set<String> aspects = new HashSet<>();
+                for (Tag tagaspect : tag.getList("aspects", Tag.TAG_STRING)) {
+                    aspects.add(tagaspect.getAsString());
+                }
+                clientPokemon.setAspects(aspects);
+            }
+            return clientPokemon;
         }
+
         return Pokemon.Companion.loadFromNBT(tag.getCompound("pokeData"));
     }
 

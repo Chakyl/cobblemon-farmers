@@ -3,6 +3,7 @@ package io.github.chakyl.cobblemonfarmers.event;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.blockentity.StationBaseBlockEntity;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
+import io.github.chakyl.cobblemonfarmers.tag.CobblemonFarmersTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -10,6 +11,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,8 +27,7 @@ public class BreakEvents {
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         Player player = event.getPlayer();
         Level level = (Level) event.getLevel();
-
-        if (event.getState().is(CobblemonFarmersRegistery.BlockRegistry.CRAFT_STATION.get()) || event.getState().is(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get()) || event.getState().is(CobblemonFarmersRegistery.BlockRegistry.RANCHING_STATION.get()) ||event.getState().is(CobblemonFarmersRegistery.BlockRegistry.GARDENING_STATION.get())) {
+        if (event.getState().is(CobblemonFarmersTags.POKEMON_WORKSTATION_BLOCK)) {
             BlockEntity blockEntity = event.getLevel().getBlockEntity(event.getPos());
             if (blockEntity instanceof StationBaseBlockEntity stationBaseBlockEntity) {
                 if (stationBaseBlockEntity.hasWorker()) {

@@ -34,6 +34,8 @@
     "block.cobblemon_farmers.gardening_station": "Gardening Station",
     "block.cobblemon_farmers.mystery_mine": "Mystery Mine",
     "block.cobblemon_farmers.ranching_station": "Ranching Station",
+    "block.cobblemon_farmers.crystal_ball": "Crystal Ball",
+    "block.cobblemon_farmers.energy_pylon": "Energy Pylon",
 
     "gui.cobblemon_farmers.craft_station": "Craft Station",
     "gui.cobblemon_farmers.gardening_station": "Gardening Station",
@@ -51,6 +53,7 @@
     "tooltip.cobblemon_farmers.mystery_mine.processing_time": "Mining time left: %s",
     "tooltip.cobblemon_farmers.gardening_station.processing_time": "Gardening Time left: %s",
     "tooltip.cobblemon_farmers.craft_station.processing_time": "Crafting Time left: %s",
+    "tooltip.cobblemon_farmers.crystal_ball.processing_time": "Divination Time: %s",
     "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Affection",
     "tooltip.cobblemon_farmers.ranching_station.ranching_power_desc": "Scales off of friendship and HP",
 
@@ -116,6 +119,8 @@
     "info.cobblemon_farmers.mystery_mine.type.dragon": "Plunders gems",
     "info.cobblemon_farmers.mystery_mine.type.dark": "Can't work here",
     "info.cobblemon_farmers.mystery_mine.type.fairy": "Can't work here",
+
+    "info.cobblemon_farmers.crystal_ball.type.psychic": "Increases the chance of nearby worker stations",
 
     "message.cobblemon_farmers.in_battle": "You can't access this while battling!",
     "message.cobblemon_farmers.has_pokemon": "Remove worker before breaking!",

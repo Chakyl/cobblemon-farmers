@@ -3,6 +3,7 @@ package io.github.chakyl.cobblemonfarmers.entity;
 import com.cobblemon.mod.common.api.abilities.Abilities;
 import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.pokemon.Natures;
+import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.pokemon.FormData;
@@ -16,8 +17,10 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.xml.crypto.Data;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
 
 public class ClientSidePokemon extends Pokemon {
     public ClientSidePokemon() {
@@ -76,6 +79,13 @@ public class ClientSidePokemon extends Pokemon {
             if (!pokemonMintedNature.isEmpty()) {
                 this.setMintedNature(Objects.requireNonNull(Natures.INSTANCE.getNature(new ResourceLocation(pokemonMintedNature))));
             }
+        }
+        if (nbt.contains("aspects", Tag.TAG_LIST)) {
+            Set<String> aspects = new HashSet<>();
+            for (Tag tag : nbt.getList("aspects", Tag.TAG_STRING)) {
+                aspects.add(tag.getAsString());
+            }
+            this.setAspects(aspects);
         }
         if (nbt.contains(DataKeys.POKEMON_FORM_ID)) {
             FormData resolvedForm = this.getSpecies().getStandardForm();
