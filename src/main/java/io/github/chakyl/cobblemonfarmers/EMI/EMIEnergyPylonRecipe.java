@@ -9,6 +9,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
+import io.github.chakyl.cobblemonfarmers.blockentity.CrystalBallBlockEntity;
 import io.github.chakyl.cobblemonfarmers.recipe.EnergyPylonRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.ElementalTypeUtils;
@@ -30,14 +31,14 @@ public class EMIEnergyPylonRecipe implements EmiRecipe {
     int recipeTime;
     Stats speedStat = Stats.SPECIAL_ATTACK;
     Stats aoeStat = Stats.HP;
-    ElementalType elementalType = ElementalTypes.INSTANCE.getPSYCHIC();
+    ElementalType elementalType = ElementalTypes.INSTANCE.getELECTRIC();
     List<EmiIngredient> input;
     List<EmiStack> output;
     List<EmiStack> allOutput;
     float bonusSpeed;
     float consumeChance;
-    private int width = 96;
-    private int height = 84;
+    private int width = 128;
+    private int height = 85;
 
 
     public EMIEnergyPylonRecipe(EnergyPylonRecipe recipe) {
@@ -94,21 +95,21 @@ public class EMIEnergyPylonRecipe implements EmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addTexture(TEXTURE, 0, 0, this.width, this.height, 0, 0);
-        widgets.addSlot(input.get(0), 9, 27).drawBack(false);
+        widgets.addSlot(input.get(0), 25, 34).drawBack(false);
         widgets.addSlot(input.get(1), 0, 0).drawBack(false);
-        widgets.addSlot(output.get(0), 141, 8).drawBack(false).recipeContext(this);
+        widgets.addSlot(output.get(0), 85, 34).drawBack(false).recipeContext(this);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.elemental_type", elementalType.getDisplayName()), 22, 4, elementalType.getHue(), true);
         widgets.addTooltip(
-                List.of(ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.crystal_ball.type.psychic", this.speedStat.getDisplayName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
-                        ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.crystal_ball.speed_stat", this.speedStat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText()),
-                        ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.crystal_ball.aoe_stat", this.aoeStat.getDisplayName()).withStyle(ChatFormatting.GOLD).getVisualOrderText())
+                List.of(ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.energy_pylon.type.electric", this.speedStat.getDisplayName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
+                        ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.energy_pylon.speed_stat", this.speedStat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText()),
+                        ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.energy_pylon.aoe_stat", this.aoeStat.getDisplayName()).withStyle(ChatFormatting.GOLD).getVisualOrderText())
                 ),
-                168 - 16, 0, 16, 16
+                128 - 16, 0, 16, 16
         );
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.bonus_speed", this.bonusSpeed), 4, 50, 0xFFFFFFFF, false);
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.consume_chance", Math.round(this.consumeChance * 100) + "%"), 4, 60, 0xFFFFFFFF, false);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.bonus_speed", this.bonusSpeed), 6, 58, 0xFFFFFFFF, false);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.consume_chance", Math.round(this.consumeChance * 100) + "%"), 6, 68, 0xFFFFFFFF, false);
 
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.crafting_time", this.recipeTime / 20), 86, 36, 0xFFFFFFFF, true);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.crafting_time", CrystalBallBlockEntity.CRAFTING_TIME  / 20), 72, 17, 0xFF4b3658, false);
 
 
     }

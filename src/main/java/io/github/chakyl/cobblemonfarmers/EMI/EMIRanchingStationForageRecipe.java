@@ -14,6 +14,7 @@ import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.RanchingForage;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +33,7 @@ public class EMIRanchingStationForageRecipe implements EmiRecipe {
     List<EmiStack> output;
     List<EmiStack> allOutput;
     private int width = 175;
-    private int height = 57;
+    private int height = 42;
 
 
     public EMIRanchingStationForageRecipe(RanchingStationForageRecipe recipe) {
@@ -112,8 +113,11 @@ public class EMIRanchingStationForageRecipe implements EmiRecipe {
                 slot.appendTooltip(Component.translatable("jei.cobblemon_farmers.ranching_station.forage.affection.quality").withStyle(ChatFormatting.GREEN));
             slot.recipeContext(this);
         }
-        if (this.forages.size() <= 9)
-            widgets.addText(Component.translatable("jei.cobblemon_farmers.ranching_station.more_info"), 8, 46, 0xFFFFFFFF, false);
+        widgets.addTooltip(
+                List.of(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.ranching_station.more_info").withStyle(ChatFormatting.WHITE).getVisualOrderText())
+                ),
+                175 - 16, 0, 16, 16
+        );
     }
 
 }

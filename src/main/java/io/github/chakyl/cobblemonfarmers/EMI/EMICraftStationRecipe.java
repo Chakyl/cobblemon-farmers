@@ -33,7 +33,7 @@ public class EMICraftStationRecipe implements EmiRecipe {
     List<EmiStack> output;
     List<EmiStack> allOutput;
     private int width = 96;
-    private int height = 64;
+    private int height = 60;
 
 
     public EMICraftStationRecipe(CraftStationRecipe recipe) {
@@ -92,20 +92,20 @@ public class EMICraftStationRecipe implements EmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addTexture(TEXTURE, 0, 0, this.width, this.height, 0, 0);
-        widgets.addSlot(input.get(0), 89, 8).drawBack(false);
+        widgets.addSlot(input.get(0), 9, 27).drawBack(false);
         widgets.addSlot(input.get(1), 0, 0).drawBack(false);
-        widgets.addSlot(output.get(0), 141, 8).drawBack(false).recipeContext(this);
+        widgets.addSlot(output.get(0), 69, 27).drawBack(false).recipeContext(this);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.elemental_type", elementalType.getDisplayName()), 22, 4, elementalType.getHue(), true);
         List<ClientTooltipComponent> tooltipComponents = new ArrayList<>(List.of(
-                ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.craft_station.type." + elementalType.getDisplayName(), this.speedStat.getDisplayName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
+                ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.craft_station.type." + elementalType.getName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
                 ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.craft_station.speed_stat", this.speedStat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText())
         ));
 
         if (this.multStat != null) {
             tooltipComponents.add(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.craft_station.mult_stat", this.multStat.getDisplayName()).withStyle(ChatFormatting.GREEN).getVisualOrderText()));
         }
-        widgets.addTooltip(tooltipComponents, 0, 0, 16, 16);
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.crafting_time", this.recipeTime / 20), 86, 36, 0xFFFFFFFF, true);
+        widgets.addTooltip(tooltipComponents, 96-16, 0, 16, 16);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.crafting_time", this.recipeTime / 20), 8, 49, 0xFFFFFFFF, false);
 
 
     }

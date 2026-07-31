@@ -107,8 +107,7 @@ public class EMIMysteryMineRecipe implements EmiRecipe {
         int rowLength = 8;
         for (int i = 0; i < this.allOutput.toArray().length; i++) {
             if (i % rowLength == 0) row++;
-            SlotWidget slot = widgets.addSlot(this.allOutput.get(i), (16 * rowLength) + 22 + ((i - (row * rowLength)) * 18), 52 + ((18 * (i / rowLength)))).drawBack(false);
-
+            SlotWidget slot = widgets.addSlot(this.allOutput.get(i), (16 * rowLength) + 24 + ((i - (row * rowLength)) * 18), 35 + ((18 * (i / rowLength)))).drawBack(false);
             int weightTotal = 0;
             int currentWeight = this.weights.get(i);
             for (Integer weight : this.weights) weightTotal += weight;
@@ -116,17 +115,17 @@ public class EMIMysteryMineRecipe implements EmiRecipe {
             slot.recipeContext(this);
 
         }
-        List<ClientTooltipComponent> tooltipComponents = new ArrayList<>(List.of(ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.mystery_mine.type." + elementalType.getDisplayName(), this.speedStat.getDisplayName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
+        List<ClientTooltipComponent> tooltipComponents = new ArrayList<>(List.of(ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.mystery_mine.type." + elementalType.getName(), this.speedStat.getDisplayName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
                 ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.mystery_mine.speed_stat", this.speedStat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText())
         ))
                 ;
         if (this.multStat != null) {
             tooltipComponents.add(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.mystery_mine.mult_stat", this.multStat.getDisplayName()).withStyle(ChatFormatting.GREEN).getVisualOrderText()));
         }
-        widgets.addTooltip(tooltipComponents, 168 - 16, 0, 16, 16);
+        widgets.addTooltip(tooltipComponents, 160 - 16, 0, 16, 16);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.mystery_mine.elemental_type", elementalType.getDisplayName()), 42, 5, elementalType.getHue(), true);
 
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.mystery_mine.crafting_time", this.recipeTime / 20), 92, 5, 0xFF4b3658, false);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.mystery_mine.crafting_time", this.recipeTime / 20), 110, 22, 0xFF4b3658, false);
 
 
     }
