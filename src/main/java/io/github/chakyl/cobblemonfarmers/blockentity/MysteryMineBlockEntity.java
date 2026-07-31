@@ -286,6 +286,8 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 outputItem = results.get(i).copy();
                 outputItem.setCount(Mth.clamp(outputItem.getCount() * mult, 0, outputItem.getMaxStackSize()));
                 insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(MysteryMineBlock.FACING), outputItem.copy());
+                this.bonusSpeed = 0;
+                this.bonusMult = 0;
                 break;
             }
         }
@@ -305,6 +307,16 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
     }
 
     @Override
+    public boolean canReceiveBonusMult() {
+        if (this.hasBonusMult()) return false;
+        Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
+        if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
+            return recipe.get().getMultStat() != null;
+        }
+        return false;
+    }
+
+    @Override
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         CompoundTag data = new CompoundTag();
@@ -315,6 +327,8 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
+        data.putInt("BonusMult", this.bonusMult);
+        data.putDouble("BonusSpeed", this.bonusSpeed);
         data.putBoolean("SwapPriority", swapPriority);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
@@ -339,6 +353,8 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
+        bonusMult = data.getInt("BonusMult");
+        bonusSpeed = data.getDouble("BonusSpeed");
         swapPriority = data.getBoolean("SwapPriority");
         publicContract = data.getBoolean("PublicContract");
     }

@@ -1,0 +1,9 @@
+{
+  "type": "cobblemon_farmers:crystal_ball",
+  "affected_types": [],
+  "consume_chance": 0.4,
+  "bonus_chance": 0.15,
+  "ingredient": {
+    "item": "minecraft:diamond"
+  }
+}

@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -22,9 +23,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MysteryMineBlockEntityRenderer implements BlockEntityRenderer<MysteryMineBlockEntity> {
-    private final Map<ItemStack, Float> itemRotations = new HashMap<>();
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderBonusParticles;
 
+public class MysteryMineBlockEntityRenderer implements BlockEntityRenderer<MysteryMineBlockEntity> {
     public MysteryMineBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -49,6 +50,16 @@ public class MysteryMineBlockEntityRenderer implements BlockEntityRenderer<Myste
                 pRenderer.render(pokemonEntity, 0, pPartialTick, pPoseStack, pBuffer, pPackedLight);
             }
             pPoseStack.popPose();
+        }
+        if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusMult()) {
+            if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.08F) {
+                renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), ParticleTypes.ENCHANT);
+            }
+        }
+        if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusSpeed()) {
+            if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.01F) {
+                renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), ParticleTypes.ANGRY_VILLAGER);
+            }
         }
     }
 

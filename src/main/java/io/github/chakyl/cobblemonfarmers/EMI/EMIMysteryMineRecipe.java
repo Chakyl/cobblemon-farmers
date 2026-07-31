@@ -13,6 +13,7 @@ import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.ElementalTypeUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.MYSTERY_MINE;
-import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.emiWordWrap;
 
 public class EMIMysteryMineRecipe implements EmiRecipe {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/jei/mystery_mine.png");
@@ -37,7 +37,7 @@ public class EMIMysteryMineRecipe implements EmiRecipe {
     List<EmiStack> allOutput;
     List<Integer> weights;
     private int width = 160;
-    private int height = 112;
+    private int height = 94;
 
 
     public EMIMysteryMineRecipe(MysteryMineRecipe recipe) {
@@ -116,11 +116,16 @@ public class EMIMysteryMineRecipe implements EmiRecipe {
             slot.recipeContext(this);
 
         }
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.mystery_mine.elemental_type", elementalType.getDisplayName()), 42, 5, elementalType.getHue(), true);
-        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.mystery_mine.speed_stat", this.speedStat.getDisplayName()), 0, 22, 0xFF4b3658, 80, false);
+        List<ClientTooltipComponent> tooltipComponents = new ArrayList<>(List.of(ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.mystery_mine.type." + elementalType.getDisplayName(), this.speedStat.getDisplayName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
+                ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.mystery_mine.speed_stat", this.speedStat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText())
+        ))
+                ;
         if (this.multStat != null) {
-            emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.mystery_mine.mult_stat", this.multStat.getDisplayName()), 81, 22, 0xFF4b3658, 80, false);
+            tooltipComponents.add(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.mystery_mine.mult_stat", this.multStat.getDisplayName()).withStyle(ChatFormatting.GREEN).getVisualOrderText()));
         }
+        widgets.addTooltip(tooltipComponents, 168 - 16, 0, 16, 16);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.mystery_mine.elemental_type", elementalType.getDisplayName()), 42, 5, elementalType.getHue(), true);
+
         widgets.addText(Component.translatable("jei.cobblemon_farmers.mystery_mine.crafting_time", this.recipeTime / 20), 92, 5, 0xFF4b3658, false);
 
 

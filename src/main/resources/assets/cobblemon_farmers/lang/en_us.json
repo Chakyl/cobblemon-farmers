@@ -23,6 +23,10 @@
     "item.cobblemon_farmers.fairy_type_worker": "Fairy Type Worker",
     "item.cobblemon_farmers.worker_permit": "Worker Permit",
     "item.cobblemon_farmers.public_contract": "Public Contract",
+    "item.cobblemon_farmers.uncharged_battery": "Uncharged Battery",
+    "item.cobblemon_farmers.battery": "Battery",
+    "item.cobblemon_farmers.spectral_battery": "Spectral Battery",
+    "item.cobblemon_farmers.endless_battery": "Endless Battery",
     "item.cobblemon_farmers.worker_permit.description": "Increases worker cap by 1 when used",
     "item.cobblemon_farmers.public_contract.description": "Infuse a worker slot into the workstation, allowing anyone to manage the worker.",
     "item.cobblemon_farmers.public_contract.warn": "Allows anyone to retrieve the worker inside!",
@@ -76,7 +80,7 @@
     "info.cobblemon_farmers.craft_station.type.psychic": "Can't work here",
     "info.cobblemon_farmers.craft_station.type.ice": "Can't work here",
     "info.cobblemon_farmers.craft_station.type.bug": "Can't work here",
-    "info.cobblemon_farmers.craft_station.type.ghost": "Can't work here",
+    "info.cobblemon_farmers.craft_station.type.ghost": "Haunts items",
     "info.cobblemon_farmers.craft_station.type.steel": "Doubles raw ores",
     "info.cobblemon_farmers.craft_station.type.dragon": "Can't work here",
     "info.cobblemon_farmers.craft_station.type.dark": "Can't work here",
@@ -120,7 +124,9 @@
     "info.cobblemon_farmers.mystery_mine.type.dark": "Can't work here",
     "info.cobblemon_farmers.mystery_mine.type.fairy": "Can't work here",
 
-    "info.cobblemon_farmers.crystal_ball.type.psychic": "Increases the chance of nearby worker stations",
+    "info.cobblemon_farmers.crystal_ball.type.psychic": "Boosts chances of Cobblemon Farmers workstations",
+
+    "info.cobblemon_farmers.energy_pylon.type.electric": "Boosts speed of Cobblemon Farmers workstations",
 
     "message.cobblemon_farmers.in_battle": "You can't access this while battling!",
     "message.cobblemon_farmers.has_pokemon": "Remove worker before breaking!",
@@ -138,9 +144,26 @@
     "jei.cobblemon_farmers.mystery_mine.chance": "Chance: %s",
     "jei.cobblemon_farmers.mystery_mine.consume_chance": "Chance to consume: %s",
 
+    "jei.cobblemon_farmers.crystal_ball.elemental_type": "%s",
+    "jei.cobblemon_farmers.crystal_ball.crafting_time": "Time: %ss",
+    "jei.cobblemon_farmers.crystal_ball.speed_stat": "%s impacts time",
+    "jei.cobblemon_farmers.crystal_ball.aoe_stat": "%s impacts working area",
+    "jei.cobblemon_farmers.crystal_ball.bonus_chance": "Bonus chance: +%s",
+    "jei.cobblemon_farmers.crystal_ball.consume_chance": "Consume chance: %s",
+    "jei.cobblemon_farmers.crystal_ball.affected_types": "Affected types",
+
+    "jei.cobblemon_farmers.energy_pylon.elemental_type": "%s",
+    "jei.cobblemon_farmers.energy_pylon.crafting_time": "Time: %ss",
+    "jei.cobblemon_farmers.energy_pylon.speed_stat": "%s impacts time",
+    "jei.cobblemon_farmers.energy_pylon.aoe_stat": "%s impacts working area",
+    "jei.cobblemon_farmers.energy_pylon.bonus_speed": "Bonus speed: +%sx",
+    "jei.cobblemon_farmers.energy_pylon.consume_chance": "Consume chance: %s",
+
     "emi.category.cobblemon_farmers.emi.craft_station": "Elemental Crafting",
     "emi.category.cobblemon_farmers.emi.gardening_station": "Gardening Station",
     "emi.category.cobblemon_farmers.emi.mystery_mine": "Mystery Mining",
+    "emi.category.cobblemon_farmers.emi.crystal_ball": "Crystal Ball Divination",
+    "emi.category.cobblemon_farmers.emi.energy_pylon": "Energy Pylon Speed Boosting",
     "emi.category.cobblemon_farmers.emi.ranching_station_milking": "Ranching: Milking",
     "emi.category.cobblemon_farmers.emi.ranching_station_forages": "Ranching: Foraging",
     "jei.cobblemon_farmers.ranching_station.category.milking": "Ranching: Milking",
@@ -175,5 +198,6 @@
     "item.cobblemon_farmers.public_contract.not_enough": "You don't have any free worker slots!",
     "tooltip.cobblemon_farmers.ranching_station.can_shear": "This Pokémon's drops can be harvested with shears at 5+ affection",
     "tooltip.cobblemon_farmers.ranching_station.can_forage": "This Pokémon has a chance to forages for items daily",
-    "tooltip.cobblemon_farmers.ranching_station.can_milk": "This Pokémon can be milked with a bucket"
+    "tooltip.cobblemon_farmers.ranching_station.can_milk": "This Pokémon can be milked with a bucket",
+    "gui.cobblemon_farmers.bonus_mult_chance": "Bonus Mult: %s"
 }

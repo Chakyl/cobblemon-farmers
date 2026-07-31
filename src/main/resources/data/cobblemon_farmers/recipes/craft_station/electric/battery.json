@@ -1,0 +1,12 @@
+{
+  "type": "cobblemon_farmers:craft_station",
+  "elemental_type": "electric",
+  "crafting_time": 24000,
+  "speed_stat": "SPECIAL_ATTACK",
+  "ingredient": {
+    "item": "cobblemon_farmers:uncharged_battery"
+  },
+  "result": {
+    "item": "cobblemon_farmers:booster_battery"
+  }
+}

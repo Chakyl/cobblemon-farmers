@@ -26,6 +26,7 @@ public class ClientEvents {
                 MenuScreens.register(CobblemonFarmersRegistery.MenuRegistry.GARDENING_STATION.get(), GardeningStationScreen::new);
                 MenuScreens.register(CobblemonFarmersRegistery.MenuRegistry.RANCHING_STATION.get(), RanchingStationScreen::new);
                 MenuScreens.register(CobblemonFarmersRegistery.MenuRegistry.CRYSTAL_BALL.get(), CrystalBallScreen::new);
+                MenuScreens.register(CobblemonFarmersRegistery.MenuRegistry.ENERGY_PYLON.get(), EnergyPylonScreen::new);
             });
         }
         @SubscribeEvent
@@ -35,6 +36,7 @@ public class ClientEvents {
             event.registerBlockEntityRenderer(CobblemonFarmersRegistery.BlockEntityRegistry.GARDENING_STATION.get(), GardeningStationBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(CobblemonFarmersRegistery.BlockEntityRegistry.RANCHING_STATION.get(), RanchingStationBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(CobblemonFarmersRegistery.BlockEntityRegistry.CRYSTAL_BALL.get(), CrystalBallBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(CobblemonFarmersRegistery.BlockEntityRegistry.ENERGY_PYLON.get(), EnergyPylonBlockEntityRenderer::new);
         }
         public static final ResourceLocation CRYSTAL_BALL_BALL = ResourceLocation.fromNamespaceAndPath(CobblemonFarmers.MODID, "block/crystal_ball_ball");
 

@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.CrystalBallRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.CraftStationMenu;
 import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
@@ -13,7 +14,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -37,6 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+
+import static cool.bot.dewdropfarmland.utils.CropHandlerUtils.growCrop;
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetween;
 
 public class CraftStationBlockEntity extends StationBaseBlockEntity implements MenuProvider {
     protected final ContainerData data;
@@ -206,7 +212,19 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
             }
         }
         if (!inputStack.isEmpty()) inputStack.shrink(1);
+        this.bonusSpeed = 0;
+        this.bonusMult = 0;
         return true;
+    }
+
+    @Override
+    public boolean canReceiveBonusMult() {
+        if (this.hasBonusMult()) return false;
+        Optional<CraftStationRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
+        if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
+            return recipe.get().getMultStat() != null;
+        }
+        return false;
     }
 
     @Override
@@ -333,7 +351,9 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         data.putString("PrimaryType", this.primaryType != null ? this.primaryType.getName() : "");
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("CraftingTime", craftingTime);
-        data.putInt("Progress", progress);
+        data.putInt("Progress", progress);;
+        data.putInt("BonusMult", this.bonusMult);
+        data.putDouble("BonusSpeed", this.bonusSpeed);
         data.putBoolean("SwapPriority", swapPriority);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
@@ -362,6 +382,8 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
         craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
+        bonusMult = data.getInt("BonusMult");
+        bonusSpeed = data.getDouble("BonusSpeed");
         swapPriority = data.getBoolean("SwapPriority");
         publicContract = data.getBoolean("PublicContract");
     }

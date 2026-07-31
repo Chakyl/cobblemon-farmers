@@ -85,15 +85,6 @@ public class CrystalBallMenu extends AbstractWorkerMenu {
         return this.data.get(0);
     }
 
-    @Override
-    public boolean getPrioritySwapped() {
-        return this.data.get(4) == 1;
-    }
-
-    @Override
-    public void setPrioritySwapped() {
-        this.blockEntity.setPrioritySwapped();
-    }
 
     public int getTotalProcessingTime() {
         return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));

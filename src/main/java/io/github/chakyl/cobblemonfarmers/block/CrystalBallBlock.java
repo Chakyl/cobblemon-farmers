@@ -58,8 +58,8 @@ public class CrystalBallBlock extends Block implements EntityBlock {
     @Override
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (placer instanceof Player player && level.getBlockEntity(pos) instanceof CrystalBallBlockEntity craftStationBlockEntity) {
-            craftStationBlockEntity.setOwner(player.getUUID());
+        if (placer instanceof Player player && level.getBlockEntity(pos) instanceof CrystalBallBlockEntity crystalBallBlockEntity) {
+            crystalBallBlockEntity.setOwner(player.getUUID());
         }
     }
 
@@ -67,8 +67,8 @@ public class CrystalBallBlock extends Block implements EntityBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof CrystalBallBlockEntity craftStationBlockEntity) {
-               craftStationBlockEntity.drops();
+            if (blockEntity instanceof CrystalBallBlockEntity crystalBallBlockEntity) {
+               crystalBallBlockEntity.drops();
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -83,19 +83,19 @@ public class CrystalBallBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!pLevel.isClientSide) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof CrystalBallBlockEntity craftStationBlockEntity) {
+            if (entity instanceof CrystalBallBlockEntity crystalBallBlockEntity) {
                 ItemStack heldItem = pPlayer.getItemInHand(pHand);
-                if (heldItem.getItem() instanceof PublicContractItem publicContractItem && craftStationBlockEntity.validateOwner(pPlayer)) {
-                    if (craftStationBlockEntity.getPublicContract()) {
+                if (heldItem.getItem() instanceof PublicContractItem publicContractItem && crystalBallBlockEntity.validateOwner(pPlayer)) {
+                    if (crystalBallBlockEntity.getPublicContract()) {
                         pPlayer.sendSystemMessage(Component.translatable("item.cobblemon_farmers.public_contract.already_used").withStyle(ChatFormatting.RED));
-                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, craftStationBlockEntity.hasWorker())) {
-                        craftStationBlockEntity.setPublicContract(true);
+                    } else if (publicContractItem.useContract(pLevel, pPlayer, pHand, crystalBallBlockEntity.hasWorker())) {
+                        crystalBallBlockEntity.setPublicContract(true);
                     }
-                } else if (craftStationBlockEntity.validatePublicContract(pPlayer) || craftStationBlockEntity.validateOwner(pPlayer)) {
+                } else if (crystalBallBlockEntity.validatePublicContract(pPlayer) || crystalBallBlockEntity.validateOwner(pPlayer)) {
                     NetworkHooks.openScreen((ServerPlayer) pPlayer, (MenuProvider) entity, pPos);
                 }
             } else {
-                throw new IllegalStateException("No Container Provider for Craft Station");
+                throw new IllegalStateException("No Container Provider for Crystal Ball");
             }
         }
         return InteractionResult.sidedSuccess(pLevel.isClientSide());

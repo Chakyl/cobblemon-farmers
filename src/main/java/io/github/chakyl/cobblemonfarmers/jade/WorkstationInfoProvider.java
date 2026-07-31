@@ -45,7 +45,33 @@ public enum WorkstationInfoProvider implements IBlockComponentProvider, IServerD
         } else {
             tooltip.add(Component.translatable("jade.cobblemon_farmers.workstation.no_worker"));
         }
-
+        if (accessor.getServerData().contains("speedModifier")) {
+            double speed = accessor.getServerData().getDouble("speedModifier");
+            double bonusSpeed = 0;
+            if (accessor.getServerData().contains("bonusSpeed")) {
+                bonusSpeed = accessor.getServerData().getDouble("bonusSpeed");
+            }
+            if (speed > 0)
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.speed", speed + (bonusSpeed > 0 ? "( " + speed + " + " + bonusSpeed + ")" : "")));
+        }
+        if (accessor.getServerData().contains("multChance")) {
+            int chance = accessor.getServerData().getInt("multChance");
+            int bonusMult = 0;
+            if (accessor.getServerData().contains("bonusMult")) {
+                bonusMult = accessor.getServerData().getInt("bonusMult");
+            }
+            if (chance > 0)
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.mult_chance", (chance + bonusMult) + "%" + (bonusMult > 0 ? " (" + chance + "% + " + bonusMult + "%)" : "")).withStyle(bonusMult > 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY));
+        }
+        if (accessor.getServerData().contains("aoeRadius")) {
+            int radius = accessor.getServerData().getInt("aoeRadius");
+            if (radius > 0) {
+                radius *= 2;
+                radius += 1;
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.working_radius", radius, Math.min(5, radius), radius));
+            }
+        }
+        tooltip.add(Component.empty());
         if (accessor.getServerData().getBoolean("public")) {
             tooltip.add(Component.translatable("jade.cobblemon_farmers.workstation.public").withStyle(ChatFormatting.GREEN));
         }
@@ -69,6 +95,12 @@ public enum WorkstationInfoProvider implements IBlockComponentProvider, IServerD
         data.putBoolean("public", stationBaseBlockEntity.getPublicContract());
         if (stationBaseBlockEntity.getOwner() != null)
             data.putUUID("owner", Objects.requireNonNull(stationBaseBlockEntity.getOwner()));
+
+        data.putDouble("speedModifier", stationBaseBlockEntity.getSpeedModifier());
+        data.putDouble("bonusSpeed", stationBaseBlockEntity.getBonusSpeed());
+        data.putDouble("aoeRadius", stationBaseBlockEntity.getAoeRadius());
+        data.putInt("multChance", stationBaseBlockEntity.getMultChance());
+        data.putInt("bonusMult", stationBaseBlockEntity.getBonusMult());
     }
 
     @Override

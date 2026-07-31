@@ -8,10 +8,7 @@ import io.github.chakyl.cobblemonfarmers.blockentity.*;
 import io.github.chakyl.cobblemonfarmers.items.PublicContractItem;
 import io.github.chakyl.cobblemonfarmers.items.WorkerPermitItem;
 import io.github.chakyl.cobblemonfarmers.items.WorkerTypeItem;
-import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationForageRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationMilkingRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.*;
 import io.github.chakyl.cobblemonfarmers.screen.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -83,6 +80,8 @@ public final class CobblemonFarmersRegistery {
                 new RanchingStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).noOcclusion().strength(1.5F, 6.0F)));
         public static final RegistryObject<Block> CRYSTAL_BALL = registerWithItem("crystal_ball", () ->
                 new CrystalBallBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).noOcclusion().strength(1.5F, 6.0F)));
+        public static final RegistryObject<Block> ENERGY_PYLON = registerWithItem("energy_pylon", () ->
+                new EnergyPylonBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(SoundType.COPPER).noOcclusion().strength(1.5F, 6.0F)));
 
         private static RegistryObject<Block> registerWithItem(final String name, final Supplier<Block> supplier) {
             return registerWithItem(name, supplier, ItemRegistry::registerBlockItem);
@@ -114,6 +113,8 @@ public final class CobblemonFarmersRegistery {
                 () -> BlockEntityType.Builder.of(RanchingStationBlockEntity::new, BlockRegistry.RANCHING_STATION.get()).build(null));
         public static final RegistryObject<BlockEntityType<CrystalBallBlockEntity>> CRYSTAL_BALL = BLOCK_ENTITY_TYPES.register("crystal_ball",
                 () -> BlockEntityType.Builder.of(CrystalBallBlockEntity::new, BlockRegistry.CRYSTAL_BALL.get()).build(null));
+        public static final RegistryObject<BlockEntityType<EnergyPylonBlockEntity>> ENERGY_PYLON = BLOCK_ENTITY_TYPES.register("energy_pylon",
+                () -> BlockEntityType.Builder.of(EnergyPylonBlockEntity::new, BlockRegistry.ENERGY_PYLON.get()).build(null));
     }
 
 
@@ -148,6 +149,11 @@ public final class CobblemonFarmersRegistery {
 
         public static final RegistryObject<Item> PUBLIC_CONTRACT = register("public_contract", () -> new PublicContractItem(new Item.Properties().stacksTo(64)));
         public static final RegistryObject<Item> WORKER_PERMIT = register("worker_permit", () -> new WorkerPermitItem(new Item.Properties().stacksTo(64)));
+       
+        public static final RegistryObject<Item> UNCHARGED_BATTERY = register("uncharged_battery", () -> new Item(new Item.Properties().stacksTo(64)));
+        public static final RegistryObject<Item> BOOSTER_BATTERY = register("booster_battery", () -> new Item(new Item.Properties().stacksTo(64)));
+        public static final RegistryObject<Item> SPECTRAL_BATTERY = register("spectral_battery", () -> new Item(new Item.Properties().stacksTo(64)));
+        public static final RegistryObject<Item> ENDLESS_BATTERY = register("endless_battery", () -> new Item(new Item.Properties().stacksTo(64)));
 
         /**
          * Creates a registry object for a block item and adds it to the mod creative tab
@@ -195,6 +201,9 @@ public final class CobblemonFarmersRegistery {
         public static final RegistryObject<MenuType<CrystalBallMenu>> CRYSTAL_BALL = MENU_TYPES.register("crystal_ball", () ->
                 IForgeMenuType.create(CrystalBallMenu::new)
         );
+        public static final RegistryObject<MenuType<EnergyPylonMenu>> ENERGY_PYLON = MENU_TYPES.register("energy_pylon", () ->
+                IForgeMenuType.create(EnergyPylonMenu::new)
+        );
     }
 
     public static final class RecipeRegistry {
@@ -206,6 +215,8 @@ public final class CobblemonFarmersRegistery {
 
         public static final RegistryObject<RecipeSerializer<CraftStationRecipe>> CRAFT_STATION_SERIALIZER = RECIPE_SERIALIZERS.register("craft_station", CraftStationRecipe.Serializer::new);
         public static final RegistryObject<RecipeSerializer<MysteryMineRecipe>> MYSTERY_MINE_SERIALIZER = RECIPE_SERIALIZERS.register("mystery_mine", MysteryMineRecipe.Serializer::new);
+        public static final RegistryObject<RecipeSerializer<CrystalBallRecipe>> CRYSTAL_BALL_SERIALIZER = RECIPE_SERIALIZERS.register("crystal_ball", CrystalBallRecipe.Serializer::new);
+        public static final RegistryObject<RecipeSerializer<EnergyPylonRecipe>> ENERGY_PYLON_SERIALIZER = RECIPE_SERIALIZERS.register("energy_pylon", EnergyPylonRecipe.Serializer::new);
         public static final RegistryObject<RecipeSerializer<RanchingStationForageRecipe>> RANCHING_STATION_FORAGE_SERIALIZER = RECIPE_SERIALIZERS.register("ranching_station/forage", RanchingStationForageRecipe.Serializer::new);
         public static final RegistryObject<RecipeSerializer<RanchingStationMilkingRecipe>> RANCHING_STATION_MILK_SERIALIZER = RECIPE_SERIALIZERS.register("ranching_station/milk", RanchingStationMilkingRecipe.Serializer::new);
 
@@ -219,6 +230,18 @@ public final class CobblemonFarmersRegistery {
             @Override
             public String toString() {
                 return "mystery_mine";
+            }
+        });
+        public static final RegistryObject<RecipeType<CrystalBallRecipe>> CRYSTAL_BALL = RECIPE_TYPES.register("crystal_ball", () -> new RecipeType<>() {
+            @Override
+            public String toString() {
+                return "crystal_ball";
+            }
+        });
+        public static final RegistryObject<RecipeType<EnergyPylonRecipe>> ENERGY_PYLON = RECIPE_TYPES.register("energy_pylon", () -> new RecipeType<>() {
+            @Override
+            public String toString() {
+                return "energy_pylon";
             }
         });
         public static final RegistryObject<RecipeType<RanchingStationForageRecipe>> RANCHING_STATION_FORAGE = RECIPE_TYPES.register("ranching_station/forage", () -> new RecipeType<>() {

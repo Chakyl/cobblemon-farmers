@@ -1,9 +1,14 @@
 package io.github.chakyl.cobblemonfarmers.blockentity;
 
+import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
+import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
+import io.github.chakyl.cobblemonfarmers.recipe.CrystalBallRecipe;
+import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.CrystalBallMenu;
+import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -18,26 +23,28 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetweenManhattan;
 
 public class CrystalBallBlockEntity extends StationBaseBlockEntity implements MenuProvider {
+    public static int CRAFTING_TIME = 4800;
     protected final ContainerData data;
     private int progress = 0;
-    private int craftingTime;
     private ResourceLocation lastRecipeID;
     private boolean checkNewRecipe;
-    private boolean swapPriority = false;
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(1) {
         @Override
@@ -47,6 +54,7 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
             setChanged();
         }
     };
+    private final LazyOptional<ItemStackHandler> inputOptional = LazyOptional.of(() -> this.inputInventory);
     private final ItemStackHandler pokemonInventory = new ItemStackHandler(1) {
         private ItemStack previousWorker;
 
@@ -62,8 +70,6 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
             }
         }
     };
-
-    private final LazyOptional<ItemStackHandler> inputOptional = LazyOptional.of(() -> this.inputInventory);
     private final LazyOptional<ItemStackHandler> pokemonOptional = LazyOptional.of(() -> this.pokemonInventory);
 
     public CrystalBallBlockEntity(BlockPos pos, BlockState state) {
@@ -74,10 +80,9 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
             public int get(int pIndex) {
                 return switch (pIndex) {
                     case 0 -> getDataSendableTime(CrystalBallBlockEntity.this.progress);
-                    case 1 -> getDataSendableTime(CrystalBallBlockEntity.this.craftingTime);
+                    case 1 -> getDataSendableTime(CRAFTING_TIME);
                     case 2 -> Mth.floor(CrystalBallBlockEntity.this.speedModifier * 100);
-                    case 3 -> CrystalBallBlockEntity.this.multChance;
-                    case 4 -> CrystalBallBlockEntity.this.swapPriority ? 1 : 0;
+                    case 3 -> CrystalBallBlockEntity.this.aoeRadius;
                     default -> 0;
                 };
             }
@@ -86,10 +91,9 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
                     case 0 -> CrystalBallBlockEntity.this.progress = pValue;
-                    case 1 -> CrystalBallBlockEntity.this.craftingTime = pValue;
+                    case 1 -> CRAFTING_TIME = pValue;
                     case 2 -> CrystalBallBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> CrystalBallBlockEntity.this.multChance = pValue;
-                    case 4 -> CrystalBallBlockEntity.this.swapPriority = pValue == 1;
+                    case 3 -> CrystalBallBlockEntity.this.aoeRadius = pValue;
                 }
 
             }
@@ -107,12 +111,6 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
         return ItemStack.EMPTY;
     }
 
-    public void setPrioritySwapped() {
-        this.swapPriority = !this.swapPriority;
-        checkNewRecipe = true;
-        setChanged();
-    }
-
     @Override
     public ItemStack getPokemonItem() {
         return this.pokemonInventory.getStackInSlot(0);
@@ -123,29 +121,86 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
         boolean hasInput = !this.inputInventory.getStackInSlot(0).isEmpty();
         boolean didInventoryChange = false;
         super.tick(level, pos, state);
-//        if (!level.isClientSide()) {
-//            if (hasWorker && hasInput) {
-//                Optional<CraftStationRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
-//                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
-//                    didInventoryChange = this.processRecipe(recipe.get());
-//                    if (this.speedModifier <= 0) {
-//                        this.fetchSpeedModifier(recipe.get().getSpeedStat());
-//                        this.fetchMultChance(recipe.get().getMultStat());
-//                    }
-//                } else {
-//                    recipe.ifPresent(craftStationRecipe -> PokeUtils.validWorkerType(this, craftStationRecipe.getElementalType(), level));
-//                }
-//            } else if (this.progress > 0) {
-//                this.progress = Mth.clamp(this.progress - 2, 0, this.craftingTime);
-//                this.speedModifier = 0;
-//                this.multChance = 0;
-//            }
-//            if (didInventoryChange) {
-//                setChanged();
-//                level.sendBlockUpdated(pos, state, state, 3);
-//            }
-//        }
+        if (!level.isClientSide()) {
+            if (hasWorker && hasInput) {
+                Optional<CrystalBallRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
+                if (recipe.isPresent() && PokeUtils.validWorkerType(this, ElementalTypes.INSTANCE.getPSYCHIC(), level)) {
+                    didInventoryChange = this.processRecipe(recipe.get());
+                    if (this.speedModifier <= 0) {
+                        this.fetchSpeedModifier(Stats.SPECIAL_ATTACK);
+                        this.fetchAoeRadius(Stats.HP);
+                    }
+                } else {
+                    recipe.ifPresent(crystalBallRecipe -> PokeUtils.validWorkerType(this, ElementalTypes.INSTANCE.getPSYCHIC(), level));
+                }
+            } else if (this.progress > 0) {
+                this.progress = Mth.clamp(this.progress - 2, 0, CRAFTING_TIME);
+                this.speedModifier = 0;
+                this.multChance = 0;
+            }
+            if (didInventoryChange) {
+                setChanged();
+                level.sendBlockUpdated(pos, state, state, 3);
+            }
+        }
 
+    }
+
+    private boolean processRecipe(CrystalBallRecipe recipe) {
+        if (level == null) return false;
+        ++progress;
+        if (Mth.floor(progress * this.getSpeedModifier()) < CRAFTING_TIME) {
+            return false;
+        }
+        if (buffNearestStation(this.getBlockPos(), this.aoeRadius, recipe)) {
+            ItemStack inputStack = inputInventory.getStackInSlot(0);
+            if (!inputStack.isEmpty() && Math.random() < recipe.getConsumeChance()) inputStack.shrink(1);
+        }
+        progress = 0;
+        return true;
+    }
+
+    private boolean buffNearestStation(BlockPos centerPos, int radius, CrystalBallRecipe recipe) {
+        for (BlockPos pos : getBetweenManhattan(centerPos, radius, radius)) {
+            if (this.level.getBlockEntity(pos) instanceof StationBaseBlockEntity stationBaseBlockEntity && stationBaseBlockEntity.hasWorker() && stationBaseBlockEntity.canReceiveBonusMult()) {
+                if (recipe.canAffectType(stationBaseBlockEntity.getPrimaryType()) || recipe.canAffectType(stationBaseBlockEntity.getSecondaryType())) {
+                    stationBaseBlockEntity.setBonusMult((int) (recipe.getBonusChance() * 100));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Optional<CrystalBallRecipe> getMatchingRecipe(RecipeWrapper inventoryWrapper) {
+        if (level == null) return Optional.empty();
+        if (lastRecipeID != null) {
+            Recipe<RecipeWrapper> recipe = ((CWRecipeManagerAccessor) level.getRecipeManager()).getRecipeMap(CrystalBallRecipe.Type.INSTANCE).get(lastRecipeID);
+            if (recipe instanceof CrystalBallRecipe) {
+                if (recipe.matches(inventoryWrapper, level)) {
+                    return Optional.of((CrystalBallRecipe) recipe);
+                }
+            }
+        }        if (checkNewRecipe) {
+            List<CrystalBallRecipe> validRecipes = level.getRecipeManager().getRecipesFor(CrystalBallRecipe.Type.INSTANCE, inventoryWrapper, level);
+            CrystalBallRecipe foundRecipe = null;
+            for (CrystalBallRecipe recipe : validRecipes) {
+                foundRecipe = recipe;
+                break;
+            }
+            if (foundRecipe == null) {
+                for (CrystalBallRecipe recipe : validRecipes) {
+                    foundRecipe = recipe;
+                    break;
+                }
+            }
+            if (foundRecipe != null) {
+                lastRecipeID = foundRecipe.getId();
+                return Optional.of(foundRecipe);
+            }
+        }
+        checkNewRecipe = false;
+        return Optional.empty();
     }
 
     @Override
@@ -156,7 +211,10 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        return this.inputOptional.cast();
+        if (cap == net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER) {
+            return this.inputOptional.cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     public <T> LazyOptional<T> getPokemonCapability(Capability<T> cap) {
@@ -207,9 +265,8 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putString("PrimaryType", this.primaryType != null ? this.primaryType.getName() : "");
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
-        data.putInt("CraftingTime", craftingTime);
         data.putInt("Progress", progress);
-        data.putBoolean("SwapPriority", swapPriority);
+        data.putDouble("BonusSpeed", this.bonusSpeed);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
@@ -231,9 +288,8 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
         }
         primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
-        craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
-        swapPriority = data.getBoolean("SwapPriority");
+        bonusSpeed = data.getDouble("BonusSpeed");
         publicContract = data.getBoolean("PublicContract");
     }
 

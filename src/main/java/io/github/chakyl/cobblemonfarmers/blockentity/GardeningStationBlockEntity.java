@@ -13,8 +13,10 @@ import cool.bot.botslib.util.Util;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.GardeningStationBlock;
 import io.github.chakyl.cobblemonfarmers.block.MysteryMineBlock;
+import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.GardeningStationMenu;
+import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -42,12 +44,15 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cool.bot.dewdropfarmland.utils.CropHandlerUtils.growCrop;
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetween;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getItemFormPokemon;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.insertIntoFacingOrPopOut;
 
@@ -145,6 +150,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                     Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
                     runAction(actionType, pokemon);
                     progress = 0;
+                    this.bonusSpeed = 0;
+                    this.bonusMult = 0;
                 }
             } else if (progress > 0) {
                 --progress;
@@ -152,13 +159,10 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         }
     }
 
-    private Iterable<BlockPos> getBetween(BlockPos centerPos, int radius) {
-        return BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - Math.min(MAX_Y_RADIUS, radius), centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + Math.min(MAX_Y_RADIUS, radius), centerPos.getZ() + radius));
-    }
 
     private void waterFarmland(int radius) {
         BlockPos centerPos = this.getBlockPos();
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             if (Util.isDryWaterable((ServerLevel) this.level, pos)) {
                 Util.setMoist((ServerLevel) this.level, pos);
             }
@@ -166,14 +170,14 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
     private void growCropsInRadius(ServerLevel level, BlockPos centerPos, RandomSource random, int radius) {
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             growCrop(level.getBlockState(pos), level, pos, level.getBlockState(centerPos.below()), random, false);
         }
     }
 
     private void harvestFromRanchingStation(int radius, boolean fairy) {
         BlockPos centerPos = this.getBlockPos();
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             BlockEntity entity = this.level.getBlockEntity(pos);
             if (entity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
                 if (!ranchingStationBlockEntity.hasWorker() || ranchingStationBlockEntity.isHungry(this.level))
@@ -206,7 +210,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private void harvestNearbyBerries(int radius) {
         BlockPos centerPos = this.getBlockPos();
         boolean ateBerry = this.level.getRandom().nextDouble() < 1 - (radius * 0.1);
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             if (this.level.getBlockEntity(pos) instanceof BerryBlockEntity berryBlockEntity) {
                 if (this.level.getBlockState(pos).getBlock() instanceof BerryBlock berryBlock && level.getBlockState(pos).hasProperty(BlockStateProperties.AGE_5)) {
                     if (level.getBlockState(pos).getValue(BlockStateProperties.AGE_5) == BerryBlock.FRUIT_AGE) {
@@ -320,10 +324,6 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         }
     }
 
-    public int getAoeRadius() {
-        return this.aoeRadius;
-    }
-
     private int getActionProgress(ElementalType type) {
         return Mth.floor(progress * getSpeedModifier());
     }
@@ -381,6 +381,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("ActionTime", actionTime);
         data.putInt("Progress", progress);
+        data.putDouble("BonusSpeed", this.bonusSpeed);
         data.putBoolean("SwapPriority", swapPriority);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
@@ -402,6 +403,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
         actionTime = data.getInt("ActionTime");
         progress = data.getInt("Progress");
+        bonusSpeed = data.getDouble("BonusSpeed");
         swapPriority = data.getBoolean("SwapPriority");
         publicContract = data.getBoolean("PublicContract");
     }

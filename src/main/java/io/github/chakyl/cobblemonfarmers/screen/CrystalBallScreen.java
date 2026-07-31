@@ -92,7 +92,6 @@ public class CrystalBallScreen extends AbstractContainerScreen<CrystalBallMenu> 
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
-
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
         if (this.menu.getPrioritySwapped()) guiGraphics.blit(TEXTURE, x + 36, y + 34, 0, 176, 4, 4);
         renderProgressArrow(guiGraphics, x, y);

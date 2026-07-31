@@ -6,6 +6,7 @@ import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
+import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -39,6 +40,9 @@ public class StationBaseBlockEntity extends BlockEntity {
     ElementalType secondaryType;
     double speedModifier;
     int multChance;
+    int aoeRadius;
+    double bonusSpeed = 0;
+    int bonusMult = 0;
 
     public StationBaseBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
@@ -79,6 +83,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         }
         this.speedModifier = 0;
         this.multChance = 0;
+        this.aoeRadius = 0;
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
@@ -98,7 +103,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            this.speedModifier = ((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) * (pokemon.getShiny() ? 2.0 : 1.0);
+            this.speedModifier = (((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) + this.bonusSpeed) * (pokemon.getShiny() ? 2.0 : 1.0);
         } else {
             this.speedModifier = 0.0;
         }
@@ -108,9 +113,20 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            this.multChance = (Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100)) * (pokemon.getShiny() ? 2 : 1);
+            this.multChance = ((Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100)) + this.bonusMult) * (pokemon.getShiny() ? 2 : 1);
         } else {
             this.multChance = 0;
+        }
+    }
+
+    public void fetchAoeRadius(Stats scalingStat) {
+        ItemStack pokemonItem = getPokemonItem();
+        if (!pokemonItem.isEmpty() && scalingStat != null) {
+            Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
+            CobblemonFarmers.LOGGER.info(pokemon.getStat(scalingStat) + "");
+            this.aoeRadius = (int) (((Mth.clamp((pokemon.getStat(scalingStat) / 500.0) * 10.0 * (pokemon.getShiny() ? 2.0 : 1.0), 0.0, 10.0))));
+        } else {
+            this.aoeRadius = 0;
         }
     }
 
@@ -122,6 +138,35 @@ public class StationBaseBlockEntity extends BlockEntity {
         return this.multChance;
     }
 
+    public int getAoeRadius() {
+        return this.aoeRadius;
+    }
+
+    public int getBonusMult() { return  this.bonusMult; }
+
+    public double getBonusSpeed() { return  this.bonusSpeed; }
+
+    public boolean hasBonusMult() {
+        return this.bonusMult > 0;
+    }
+
+    public boolean hasBonusSpeed() {
+        return this.bonusSpeed > 0;
+    }
+
+    public void setBonusMult(int bonusMult) {
+        this.bonusMult = bonusMult;
+        this.setChanged();
+    }
+
+    public void setBonusSpeed(float bonusSpeed) {
+        this.bonusSpeed = bonusSpeed;
+        this.setChanged();
+    }
+
+    public boolean canReceiveBonusMult() {
+        return false;
+    }
     public ItemStack getPokemonItem() {
         return null;
     }
@@ -186,6 +231,5 @@ public class StationBaseBlockEntity extends BlockEntity {
         return (short) Math.min(Short.MAX_VALUE, Mth.floor((float) time / 20));
     }
 
-    ;
 
 }

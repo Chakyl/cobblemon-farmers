@@ -1,0 +1,11 @@
+{
+  "type": "cobblemon_farmers:energy_pylon",
+  "consume_chance": 0.25,
+  "bonus_speed": 0.5,
+  "ingredient": {
+    "item": "cobblemon_farmers:booster_battery"
+  },
+  "result": {
+    "item": "cobblemon_farmers:uncharged_battery"
+  }
+}
