@@ -1,7 +1,6 @@
 package io.github.chakyl.cobblemonfarmers.recipe;
 
 
-import com.cobblemon.mod.common.CobblemonItems;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
@@ -9,7 +8,6 @@ import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.RanchingForage;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -71,11 +69,11 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
         return CobblemonFarmersRegistery.RecipeRegistry.RANCHING_STATION_FORAGE_SERIALIZER.get();
     }
 
-    public List<ItemStack> getScaledDrops(int hearts) {
+    public List<ItemStack> getScaledDrops(int hearts, double bonusMult) {
         List<ItemStack> drops = new ArrayList<>(this.forages.size());
         for (RanchingForage forage : forages) {
             if (forage.getMinHearts() <= hearts) {
-                if (Math.random() < forage.getChance()) {
+                if (Math.random() < (forage.getChance() * (bonusMult > 0 ? 1 + (bonusMult * 0.01) : 1))) {
                     ItemStack result = forage.getItem();
                     if (forage.hasQuality()) {
                         result = applyQuality(result, hearts);

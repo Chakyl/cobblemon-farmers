@@ -21,12 +21,6 @@ public class PublicContractItem extends Item {
         super(pProperties);
     }
 
-    @Override
-    public void appendHoverText(ItemStack pStack, Level pLevel, List<Component> list, TooltipFlag pFlag) {
-        list.add(Component.translatable("item.cobblemon_farmers.public_contract.description").withStyle(ChatFormatting.GRAY));
-        list.add(Component.translatable("item.cobblemon_farmers.public_contract.warn").withStyle(ChatFormatting.RED));
-    }
-
     public boolean useContract(Level level, Player player, InteractionHand hand, boolean hasWorker) {
         if (!level.isClientSide()) {
             AttributeInstance publicContract = player.getAttribute(CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get());

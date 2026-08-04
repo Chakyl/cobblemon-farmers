@@ -1,0 +1,12 @@
+{
+  "type": "cobblemon_farmers:craft_station",
+  "elemental_type": "electric",
+  "crafting_time": 48000,
+  "speed_stat": "DEFENCE",
+  "ingredient": {
+    "item": "cobblemon_farmers:booster_battery"
+  },
+  "result": {
+    "item": "cobblemon_farmers:endless_battery"
+  }
+}

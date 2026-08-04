@@ -10,6 +10,8 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.ElementalTypeUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -29,8 +31,8 @@ public class EMIGardeningStationRecipe implements EmiRecipe {
     List<EmiIngredient> input;
     List<EmiStack> output;
     List<EmiStack> allOutput;
-    private int width = 168;
-    private int height = 84;
+    private int width = 160;
+    private int height = 72;
 
 
     public EMIGardeningStationRecipe(ElementalType elementalType, Stats stat, int recipeTime) {
@@ -52,6 +54,7 @@ public class EMIGardeningStationRecipe implements EmiRecipe {
     public EmiRecipeCategory getCategory() {
         return GARDENING_STATION;
     }
+
 
     @Override
     public @Nullable ResourceLocation getId() {
@@ -87,11 +90,15 @@ public class EMIGardeningStationRecipe implements EmiRecipe {
     public void addWidgets(WidgetHolder widgets) {
         widgets.addTexture(TEXTURE, 0, 0, this.width, this.height, 0, 0);
         widgets.addSlot(input.get(0), 0, 0).drawBack(false);
-        emiWordWrap(widgets, Component.translatable("info.cobblemon_farmers.gardening_station.type." + elementalType.getName()), 86, 6, 0xFFFFFFFF, 84, false);
+        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.gardening_station.type." + elementalType.getName()), 6, 38, 0xFFFFFFFF, 152, false);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.gardening_station.elemental_type", elementalType.getDisplayName()), 22, 4, elementalType.getHue(), true);
-        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.gardening_station.speed_stat", this.stat.getDisplayName()), 0, 22, 0xFF4b3658, 84, false);
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.gardening_station.action_time", this.recipeTime / 20), 86, 32, 0xFFFFFFFF, false);
-        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + elementalType.getName()), 0, 54, 0xFF4b3658, 164, false);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.gardening_station.action_time", this.recipeTime / 20), 100, 22, 0xFF4b3658, false);
+        widgets.addTooltip(
+                List.of(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.gardening_station.speed_stat", this.stat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText()),
+                        ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + elementalType.getName()).withStyle(ChatFormatting.GOLD).getVisualOrderText())
+                ),
+                160 - 16, 0, 16, 16
+        );
     }
 
 }

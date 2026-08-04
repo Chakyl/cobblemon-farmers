@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "cobblemon_farmers:block/energy_pylon",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cobblemon_farmers:block/energy_pylon"
+    },
+    "facing=south": {
+      "model": "cobblemon_farmers:block/energy_pylon",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cobblemon_farmers:block/energy_pylon",
+      "y": 270
+    }
+  }
+}

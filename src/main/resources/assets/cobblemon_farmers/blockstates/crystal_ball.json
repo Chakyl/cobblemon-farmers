@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "cobblemon_farmers:block/crystal_ball",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cobblemon_farmers:block/crystal_ball"
+    },
+    "facing=south": {
+      "model": "cobblemon_farmers:block/crystal_ball",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cobblemon_farmers:block/crystal_ball",
+      "y": 270
+    }
+  }
+}

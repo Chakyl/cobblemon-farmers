@@ -1,0 +1,9 @@
+{
+  "type": "cobblemon_farmers:crystal_ball",
+  "affected_types": ["water"],
+  "consume_chance": 0.50,
+  "bonus_chance": 0.25,
+  "ingredient": {
+    "item": "cobblemon:water_gem"
+  }
+}

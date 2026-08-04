@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -29,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderBonusParticles;
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderTheyOrb;
 
 public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<CraftStationBlockEntity> {
     private final Map<Item, Float> itemRotations = new HashMap<>();
@@ -80,6 +83,7 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
             Set<String> newAspects = new HashSet<>(pokemonEntity.getAspects());
             newAspects.addAll(pokemonEntity.getForm().getAspects());
             pokemonEntity.getEntityData().set(PokemonEntity.getASPECTS(), newAspects);
+
             BlockState blockState = pBlockEntity.getBlockState();
             pPoseStack.pushPose();
             float hitbox = pokemonEntity.getPokemon().getSpecies().getHitbox().width;
@@ -91,6 +95,15 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
                 pRenderer.render(pokemonEntity, 0, pPartialTick, pPoseStack, pBuffer, pPackedLight);
             }
             pPoseStack.popPose();
+        }
+
+        if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusMult()) {
+            renderTheyOrb(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, (float) pBlockEntity.getLevel().getGameTime() + pPartialTick);
+        }
+        if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusSpeed()) {
+            if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.01F) {
+                renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos().above(), ParticleTypes.ANGRY_VILLAGER);
+            }
         }
     }
 

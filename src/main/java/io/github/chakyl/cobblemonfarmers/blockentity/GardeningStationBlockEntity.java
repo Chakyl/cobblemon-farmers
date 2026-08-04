@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static cool.bot.dewdropfarmland.utils.CropHandlerUtils.growCrop;
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetween;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getItemFormPokemon;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.insertIntoFacingOrPopOut;
 
@@ -87,8 +88,9 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                     case 0 -> getDataSendableTime(GardeningStationBlockEntity.this.progress);
                     case 1 -> getDataSendableTime(GardeningStationBlockEntity.this.actionTime);
                     case 2 -> Mth.floor(GardeningStationBlockEntity.this.speedModifier * 100);
-                    case 3 -> GardeningStationBlockEntity.this.aoeRadius;
-                    case 4 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
+                    case 3 -> Mth.floor(GardeningStationBlockEntity.this.bonusSpeed * 100);
+                    case 4 -> GardeningStationBlockEntity.this.aoeRadius;
+                    case 5 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -99,15 +101,16 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                     case 0 -> GardeningStationBlockEntity.this.progress = pValue;
                     case 1 -> GardeningStationBlockEntity.this.actionTime = pValue;
                     case 2 -> GardeningStationBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> GardeningStationBlockEntity.this.aoeRadius = pValue;
-                    case 4 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
+                    case 3 -> GardeningStationBlockEntity.this.bonusSpeed = (double) pValue / 100;
+                    case 4 -> GardeningStationBlockEntity.this.aoeRadius = pValue;
+                    case 5 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 5;
+                return 6;
             }
         };
     }
@@ -129,7 +132,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     public void tick(Level level, BlockPos pos, BlockState state) {
         super.tick(level, pos, state);
         if (!level.isClientSide() && hasWorker()) {
-            if (this.getSpeedModifier() == 0.0 && getActionType() != null) {
+            if (this.getBoostedSpeedModifier() == 0.0 && getActionType() != null) {
                 ElementalType type = getActionType();
                 this.fetchSpeedModifier(getScalingStat(type));
                 this.fetchAoeRadius();
@@ -145,6 +148,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                     Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
                     runAction(actionType, pokemon);
                     progress = 0;
+                    this.bonusSpeed = 0;
+                    this.bonusMult = 0;
                 }
             } else if (progress > 0) {
                 --progress;
@@ -152,13 +157,10 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         }
     }
 
-    private Iterable<BlockPos> getBetween(BlockPos centerPos, int radius) {
-        return BlockPos.betweenClosed(new BlockPos(centerPos.getX() - radius, centerPos.getY() - Math.min(MAX_Y_RADIUS, radius), centerPos.getZ() - radius), new BlockPos(centerPos.getX() + radius, centerPos.getY() + Math.min(MAX_Y_RADIUS, radius), centerPos.getZ() + radius));
-    }
 
     private void waterFarmland(int radius) {
         BlockPos centerPos = this.getBlockPos();
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             if (Util.isDryWaterable((ServerLevel) this.level, pos)) {
                 Util.setMoist((ServerLevel) this.level, pos);
             }
@@ -166,14 +168,14 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
     private void growCropsInRadius(ServerLevel level, BlockPos centerPos, RandomSource random, int radius) {
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             growCrop(level.getBlockState(pos), level, pos, level.getBlockState(centerPos.below()), random, false);
         }
     }
 
     private void harvestFromRanchingStation(int radius, boolean fairy) {
         BlockPos centerPos = this.getBlockPos();
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             BlockEntity entity = this.level.getBlockEntity(pos);
             if (entity instanceof RanchingStationBlockEntity ranchingStationBlockEntity) {
                 if (!ranchingStationBlockEntity.hasWorker() || ranchingStationBlockEntity.isHungry(this.level))
@@ -206,7 +208,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     private void harvestNearbyBerries(int radius) {
         BlockPos centerPos = this.getBlockPos();
         boolean ateBerry = this.level.getRandom().nextDouble() < 1 - (radius * 0.1);
-        for (BlockPos pos : getBetween(centerPos, radius)) {
+        for (BlockPos pos : getBetween(centerPos, radius, MAX_Y_RADIUS)) {
             if (this.level.getBlockEntity(pos) instanceof BerryBlockEntity berryBlockEntity) {
                 if (this.level.getBlockState(pos).getBlock() instanceof BerryBlock berryBlock && level.getBlockState(pos).hasProperty(BlockStateProperties.AGE_5)) {
                     if (level.getBlockState(pos).getValue(BlockStateProperties.AGE_5) == BerryBlock.FRUIT_AGE) {
@@ -274,7 +276,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
 
-    private ElementalType getActionType() {
+    public ElementalType getActionType() {
         boolean hasSecondary = this.secondaryType != null && getScalingStat(this.secondaryType) != null;
         if (this.swapPriority && hasSecondary) return secondaryType;
         if (getScalingStat(this.primaryType) != null) return this.primaryType;
@@ -294,7 +296,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         return -1;
     }
 
-    private Stats getScalingStat(ElementalType type) {
+    public Stats getScalingStat(ElementalType type) {
         if (type == null) return null;
         ElementalTypes types = ElementalTypes.INSTANCE;
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && type.equals(types.getGRASS())) return Stats.SPEED;
@@ -320,12 +322,8 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         }
     }
 
-    public int getAoeRadius() {
-        return this.aoeRadius;
-    }
-
     private int getActionProgress(ElementalType type) {
-        return Mth.floor(progress * getSpeedModifier());
+        return Mth.floor(progress * getBoostedSpeedModifier());
     }
 
     @Override
@@ -381,6 +379,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("ActionTime", actionTime);
         data.putInt("Progress", progress);
+        data.putDouble("BonusSpeed", this.bonusSpeed);
         data.putBoolean("SwapPriority", swapPriority);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
@@ -402,6 +401,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
         actionTime = data.getInt("ActionTime");
         progress = data.getInt("Progress");
+        bonusSpeed = data.getDouble("BonusSpeed");
         swapPriority = data.getBoolean("SwapPriority");
         publicContract = data.getBoolean("PublicContract");
     }

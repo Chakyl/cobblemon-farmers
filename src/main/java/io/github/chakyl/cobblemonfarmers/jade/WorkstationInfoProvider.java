@@ -2,7 +2,6 @@ package io.github.chakyl.cobblemonfarmers.jade;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.pokemon.Species;
-import com.mojang.authlib.GameProfile;
 import io.github.chakyl.cobblemonfarmers.blockentity.StationBaseBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -10,9 +9,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -45,7 +42,33 @@ public enum WorkstationInfoProvider implements IBlockComponentProvider, IServerD
         } else {
             tooltip.add(Component.translatable("jade.cobblemon_farmers.workstation.no_worker"));
         }
-
+        if (accessor.getServerData().contains("speedModifier")&& accessor.getServerData().contains("boostedSpeedModifier")) {
+            double speed = accessor.getServerData().getDouble("speedModifier");
+            double bonusSpeed = 0;
+            if (accessor.getServerData().contains("bonusSpeed")) {
+                bonusSpeed = accessor.getServerData().getDouble("bonusSpeed") ;
+            }
+            if (speed > 0)
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.speed", accessor.getServerData().getDouble("boostedSpeedModifier") + (bonusSpeed > 0 ? " (" + speed + " + " + bonusSpeed + ")" : "")).withStyle(bonusSpeed > 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY));
+        }
+        if (accessor.getServerData().contains("multChance") && accessor.getServerData().contains("boostedMultChance")) {
+            int chance = accessor.getServerData().getInt("multChance");
+            int bonusMult = 0;
+            if (accessor.getServerData().contains("bonusMult")) {
+                bonusMult = accessor.getServerData().getInt("bonusMult") + 100;
+            }
+            if (chance > 0)
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.mult_chance", accessor.getServerData().getDouble("boostedMultChance") +  "%" + (bonusMult > 0 ? " (" + chance + "% x " + bonusMult + "%)" : "")).withStyle(bonusMult > 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY));
+        }
+        if (accessor.getServerData().contains("aoeRadius")) {
+            int radius = accessor.getServerData().getInt("aoeRadius");
+            if (radius > 0) {
+                radius *= 2;
+                radius += 1;
+                tooltip.add(Component.translatable("gui.cobblemon_farmers.working_radius", radius, Math.min(5, radius), radius));
+            }
+        }
+        tooltip.add(Component.empty());
         if (accessor.getServerData().getBoolean("public")) {
             tooltip.add(Component.translatable("jade.cobblemon_farmers.workstation.public").withStyle(ChatFormatting.GREEN));
         }
@@ -69,6 +92,14 @@ public enum WorkstationInfoProvider implements IBlockComponentProvider, IServerD
         data.putBoolean("public", stationBaseBlockEntity.getPublicContract());
         if (stationBaseBlockEntity.getOwner() != null)
             data.putUUID("owner", Objects.requireNonNull(stationBaseBlockEntity.getOwner()));
+
+        data.putDouble("boostedSpeedModifier", stationBaseBlockEntity.getBoostedSpeedModifier());
+        data.putDouble("speedModifier", stationBaseBlockEntity.getSpeedModifier());
+        data.putDouble("bonusSpeed", stationBaseBlockEntity.getBonusSpeed());
+        data.putDouble("aoeRadius", stationBaseBlockEntity.getAoeRadius());
+        data.putDouble("boostedMultChance", stationBaseBlockEntity.getBoostedMultChance());
+        data.putInt("multChance", stationBaseBlockEntity.getMultChance());
+        data.putInt("bonusMult", stationBaseBlockEntity.getBonusMult());
     }
 
     @Override

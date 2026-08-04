@@ -1,7 +1,6 @@
 package io.github.chakyl.cobblemonfarmers.utils;
 
 import com.cobblemon.mod.common.CobblemonItems;
-import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;

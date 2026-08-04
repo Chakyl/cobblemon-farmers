@@ -1,6 +1,7 @@
 package io.github.chakyl.cobblemonfarmers.screen;
 
 import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.api.storage.NoPokemonStoreException;
 import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
@@ -40,7 +41,7 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
     public GardeningStationMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(5));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(6));
     }
 
     public GardeningStationMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -84,7 +85,9 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
         return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
     }
 
-    public double getSpeedModifier() { return (double) this.data.get(2) / 100; }
+    public double getSpeedModifier() {
+        return (double) Math.round((this.data.get(2) + this.data.get(3))) / 100.0;
+    }
 
     public int getAoeRadius() {
         return this.data.get(3);
@@ -97,6 +100,10 @@ public class GardeningStationMenu extends AbstractWorkerMenu {
     public ElementalType getSecondaryType() {
         return this.blockEntity.getSecondaryType();
     }
+
+    public ElementalType getActionType() { return this.blockEntity.getActionType(); }
+
+    public Stats getScalingStat(ElementalType type) { return this.blockEntity.getScalingStat(type); }
 
     @Override
     public boolean getPrioritySwapped() {

@@ -41,7 +41,7 @@ public class RanchingStationMenu extends AbstractWorkerMenu {
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
     public RanchingStationMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(5));
     }
 
     public RanchingStationMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {

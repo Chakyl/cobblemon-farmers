@@ -55,13 +55,14 @@ public class GardeningStationBlock extends Block implements EntityBlock {
         return new GardeningStationBlockEntity(pPos, pState);
     }
 
+
     @Override
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (placer instanceof Player player && level.getBlockEntity(pos) instanceof GardeningStationBlockEntity GardeningStationBlockEntity) {
             GardeningStationBlockEntity.setOwner(player.getUUID());
         }
-    }
+    };
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()) {

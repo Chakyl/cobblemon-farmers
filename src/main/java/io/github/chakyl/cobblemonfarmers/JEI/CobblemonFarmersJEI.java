@@ -1,6 +1,5 @@
 package io.github.chakyl.cobblemonfarmers.JEI;
 
-import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.CobblemonItems;
 import com.cobblemon.mod.common.api.pokemon.stats.Stats;
 import com.cobblemon.mod.common.api.types.ElementalTypes;

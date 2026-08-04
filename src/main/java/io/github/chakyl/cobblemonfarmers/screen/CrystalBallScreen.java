@@ -1,0 +1,167 @@
+package io.github.chakyl.cobblemonfarmers.screen;
+
+
+import com.cobblemon.mod.common.api.gui.GuiUtilsKt;
+import com.cobblemon.mod.common.api.pokemon.stats.Stats;
+import com.cobblemon.mod.common.api.types.ElementalTypes;
+import com.cobblemon.mod.common.client.CobblemonResources;
+import com.cobblemon.mod.common.client.render.RenderHelperKt;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemon;
+
+public class CrystalBallScreen extends AbstractContainerScreen<CrystalBallMenu> {
+    public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/gui/crystal_ball.png");
+    public static final ResourceLocation ELEMENT_TEXTURE = new ResourceLocation("cobblemon:textures/gui/types_small.png");
+    public static final ResourceLocation SWAP_BUTTON = new ResourceLocation(CobblemonFarmers.MODID, "textures/gui/swap_button.png");
+    private static final Component CONTAINER_LABEL = Component.translatable("gui.cobblemon_farmers.crystal_ball");
+    private static final ResourceLocation COBBLE_FONT = CobblemonResources.INSTANCE.getDEFAULT_LARGE();
+
+    private static final int PROGRESS_TEXTURE_X = 0;
+    private static final int PROGRESS_TEXTURE_Y = 166;
+    private static final int PROGRESS_WIDTH = 24;
+    private static final int PROGRESS_HEIGHT = 10;
+    private static final int PROGRESS_GUI_X = 114;
+    private static final int PROGRESS_GUI_Y = 23;
+    private static final int PROGRESS_GUI_HEIGHT = PROGRESS_HEIGHT * 2;
+
+    public CrystalBallScreen(CrystalBallMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
+        super(pMenu, pPlayerInventory, pTitle);
+        this.imageWidth = 245;
+        this.inventoryLabelX = 26;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        this.inventoryLabelY = 10000;
+        this.titleLabelY = 10000;
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+        int centralX = 7;
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.title.getContents()), centralX, 4, false, 0xFFFFFFFF, false, 0, 0);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752, false, 0, 0);
+        GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
+        GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 180, 112, false, 0xFFFFFFFF, true, 0, 0);
+
+        double speedMod = this.menu.getSpeedModifier();
+        if (speedMod > 0) {
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.speed", speedMod), centralX, 46, false, 0xFFFFFFFF, true, 0, 0);
+        }
+        int workingRadius = this.menu.getAoeRadius();
+        if (workingRadius > 0) {
+            workingRadius *= 2;
+            workingRadius += 1;
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.working_radius", workingRadius, Math.min(5, workingRadius * 2), workingRadius), centralX, 58, false, 0xFFFFFFFF, true, 0, 0);
+        }
+        int index = 0;
+        for (int level : this.menu.getPartyLevels()) {
+            if (level > 0) {
+                RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.literal("Lv." + level), index % 2 == 0 ? 182 : 213, (((index / 2) * 31) + (index % 2 == 0 ? 15 : 23)), 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
+            }
+            index++;
+        }
+        Pokemon pokemon = this.menu.getWorkerPokemon();
+        if (pokemon != null) {
+            RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.literal("Lv." + pokemon.getLevel()), 8, 15, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, pokemon.getPrimaryType() != ElementalTypes.INSTANCE.getPSYCHIC() ? Component.translatable("info.cobblemon_farmers.crystal_ball.type.other") : Component.translatable("info.cobblemon_farmers.crystal_ball.type." + pokemon.getPrimaryType().getName().toLowerCase() + ".short"), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
+            if (pokemon.getSecondaryType() != null) {
+                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, pokemon.getPrimaryType() != ElementalTypes.INSTANCE.getPSYCHIC() ? Component.translatable("info.cobblemon_farmers.crystal_ball.type.other") :Component.translatable("info.cobblemon_farmers.crystal_ball.type." + pokemon.getSecondaryType().getName().toLowerCase() + ".short"), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
+            }
+        }
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, TEXTURE);
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+        if (this.menu.getPrioritySwapped()) guiGraphics.blit(TEXTURE, x + 36, y + 34, 0, 176, 4, 4);
+        renderProgressArrow(guiGraphics, x, y);
+        renderPokemon(guiGraphics, x, y, this.menu.getPrimaryType(), this.menu.getSecondaryType());
+    }
+
+    private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
+        if (menu.isCrafting()) {
+            guiGraphics.blit(TEXTURE, x + PROGRESS_GUI_X, y + PROGRESS_GUI_Y, PROGRESS_TEXTURE_X, PROGRESS_TEXTURE_Y, menu.getScaledProgress(), PROGRESS_HEIGHT);
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, delta);
+        renderTooltip(guiGraphics, mouseX, mouseY);
+
+        if (isMouseOverCraftingTimeArea(mouseX, mouseY)) {
+            Component tooltip = getCraftingTimeTooltip();
+            guiGraphics.renderTooltip(this.font, tooltip, mouseX, mouseY);
+        }
+
+        if (this.menu.getCurrentProcessingTime() > 0 && isMouseOverStatArea(mouseX, mouseY)) {
+            List<Component> tooltipComponents = getStatImpactTooltip();
+            if (!tooltipComponents.isEmpty()) {
+                guiGraphics.renderComponentTooltip(this.font, tooltipComponents, mouseX, mouseY);
+            }
+        }
+    }
+
+    private List<Component> getStatImpactTooltip() {
+        return new ArrayList<>(List.of(
+                Component.translatable("jei.cobblemon_farmers.crystal_ball.speed_stat", Stats.SPECIAL_ATTACK.getDisplayName()).withStyle(ChatFormatting.AQUA),
+                Component.translatable("jei.cobblemon_farmers.crystal_ball.aoe_stat", Stats.HP.getDisplayName()).withStyle(ChatFormatting.GOLD)
+        ));
+    }
+
+    private boolean isMouseOverCraftingTimeArea(int mouseX, int mouseY) {
+        int craftingTimeAreaLeft = this.leftPos + PROGRESS_GUI_X;
+        int craftingTimeAreaTop = this.topPos + PROGRESS_GUI_Y - (PROGRESS_GUI_HEIGHT / 2);
+        int craftingTimeAreaRight = this.leftPos + PROGRESS_GUI_X + PROGRESS_WIDTH;
+        int craftingTimeAreaBottom = this.topPos + PROGRESS_GUI_Y + (PROGRESS_GUI_HEIGHT / 2);
+        return mouseX >= craftingTimeAreaLeft && mouseX <= craftingTimeAreaRight &&
+                mouseY >= craftingTimeAreaTop && mouseY <= craftingTimeAreaBottom;
+    }
+
+    private boolean isMouseOverStatArea(int mouseX, int mouseY) {
+        int statAreaLeft = this.leftPos + 4;
+        int statAreaTop = this.topPos + 42;
+        int statAreaRight = this.leftPos + 80;
+        int statAreaBottom = this.topPos + 72;
+        return mouseX >= statAreaLeft && mouseX <= statAreaRight &&
+                mouseY >= statAreaTop && mouseY <= statAreaBottom;
+    }
+
+    private Component getCraftingTimeTooltip() {
+        int totalSeconds = this.menu.getTotalProcessingTime();
+        int currentSeconds = this.menu.getCurrentProcessingTime();
+        int remainingSeconds = totalSeconds - currentSeconds;
+
+        if (remainingSeconds > 0 && this.menu.getScaledProgress() > 0) {
+            int minutes = remainingSeconds / 60;
+            remainingSeconds %= 60;
+
+            String formattedTime = String.format("%d:%02d Seconds", minutes, remainingSeconds);
+            return Component.translatable("tooltip.cobblemon_farmers.crystal_ball.processing_time", formattedTime);
+        } else {
+            return Component.translatable("tooltip.cobblemon_farmers.crystal_ball.processing_time", "0:00 Seconds");
+        }
+    }
+}

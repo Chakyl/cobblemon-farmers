@@ -11,10 +11,9 @@ import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.ElementalTypeUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.locale.Language;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -22,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.CRAFT_STATION;
-import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.GARDENING_STATION;
-import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.emiWordWrap;
 
 public class EMICraftStationRecipe implements EmiRecipe {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/jei/craft_station.png");
@@ -35,8 +32,8 @@ public class EMICraftStationRecipe implements EmiRecipe {
     List<EmiIngredient> input;
     List<EmiStack> output;
     List<EmiStack> allOutput;
-    private int width = 168;
-    private int height = 64;
+    private int width = 96;
+    private int height = 60;
 
 
     public EMICraftStationRecipe(CraftStationRecipe recipe) {
@@ -95,15 +92,20 @@ public class EMICraftStationRecipe implements EmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addTexture(TEXTURE, 0, 0, this.width, this.height, 0, 0);
-        widgets.addSlot(input.get(0), 89, 8).drawBack(false);
+        widgets.addSlot(input.get(0), 9, 27).drawBack(false);
         widgets.addSlot(input.get(1), 0, 0).drawBack(false);
-        widgets.addSlot(output.get(0), 141, 8).drawBack(false).recipeContext(this);
+        widgets.addSlot(output.get(0), 69, 27).drawBack(false).recipeContext(this);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.elemental_type", elementalType.getDisplayName()), 22, 4, elementalType.getHue(), true);
-        emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.craft_station.speed_stat", this.speedStat.getDisplayName()), 0, 22, 0xFF4b3658, 84, false);
+        List<ClientTooltipComponent> tooltipComponents = new ArrayList<>(List.of(
+                ClientTooltipComponent.create(Component.translatable("info.cobblemon_farmers.craft_station.type." + elementalType.getName()).withStyle(ChatFormatting.GRAY).getVisualOrderText()),
+                ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.craft_station.speed_stat", this.speedStat.getDisplayName()).withStyle(ChatFormatting.AQUA).getVisualOrderText())
+        ));
+
         if (this.multStat != null) {
-            emiWordWrap(widgets, Component.translatable("jei.cobblemon_farmers.craft_station.mult_stat", this.multStat.getDisplayName()), 0, 44, 0xFF4b3658, 84, false);
+            tooltipComponents.add(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.craft_station.mult_stat", this.multStat.getDisplayName()).withStyle(ChatFormatting.GREEN).getVisualOrderText()));
         }
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.crafting_time", this.recipeTime / 20), 86, 36, 0xFFFFFFFF, true);
+        widgets.addTooltip(tooltipComponents, 96-16, 0, 16, 16);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.crafting_time", this.recipeTime / 20), 8, 49, 0xFFFFFFFF, false);
 
 
     }

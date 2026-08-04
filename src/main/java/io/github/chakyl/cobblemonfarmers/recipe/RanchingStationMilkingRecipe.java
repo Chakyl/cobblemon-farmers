@@ -1,12 +1,10 @@
 package io.github.chakyl.cobblemonfarmers.recipe;
 
 
-import com.cobblemon.mod.common.CobblemonItems;
 import com.google.gson.JsonObject;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;

@@ -1,0 +1,11 @@
+{
+  "type": "cobblemon_farmers:energy_pylon",
+  "consume_chance": 1,
+  "bonus_speed": 0.1,
+  "ingredient": {
+    "item": "cobblemon:cell_battery"
+  },
+  "result": {
+    "item": "minecraft:iron_nugget"
+  }
+}

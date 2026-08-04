@@ -1,7 +1,6 @@
 package io.github.chakyl.cobblemonfarmers.EMI;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
-import com.cobblemon.mod.common.pokemon.FormData;
 import com.cobblemon.mod.common.pokemon.Species;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -13,15 +12,14 @@ import io.github.chakyl.cobbleemibackported.CobblemonStack;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.recipe.RanchingStationMilkingRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
-import io.github.chakyl.cobblemonfarmers.utils.RanchingForage;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.RANCHING_STATION_FORAGES;
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.RANCHING_STATION_MILKING;
 
 public class EMIRanchingStationMilkingRecipe implements EmiRecipe {
@@ -32,7 +30,7 @@ public class EMIRanchingStationMilkingRecipe implements EmiRecipe {
     List<EmiStack> output;
     List<EmiStack> allOutput;
     private int width = 175;
-    private int height = 57;
+    private int height = 42;
 
 
     public EMIRanchingStationMilkingRecipe(RanchingStationMilkingRecipe recipe) {
@@ -107,7 +105,11 @@ public class EMIRanchingStationMilkingRecipe implements EmiRecipe {
             }
             slot.recipeContext(this);
         }
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.ranching_station.more_info"), 8, 46, 0xFFFFFFFF, false);
+        widgets.addTooltip(
+                List.of(ClientTooltipComponent.create(Component.translatable("jei.cobblemon_farmers.ranching_station.more_info").withStyle(ChatFormatting.WHITE).getVisualOrderText())
+                ),
+                175 - 16, 0, 16, 16
+        );
     }
 
 }

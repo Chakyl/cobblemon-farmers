@@ -103,6 +103,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                     case 1 -> RanchingStationBlockEntity.this.dayLastForaged;
                     case 2 -> RanchingStationBlockEntity.this.dayLastMilked;
                     case 3 -> RanchingStationBlockEntity.this.dayLastFed;
+                    case 4 -> RanchingStationBlockEntity.this.bonusMult;
                     default -> 0;
                 };
             }
@@ -114,13 +115,14 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                     case 1 -> RanchingStationBlockEntity.this.dayLastForaged = pValue;
                     case 2 -> RanchingStationBlockEntity.this.dayLastMilked = pValue;
                     case 3 -> RanchingStationBlockEntity.this.dayLastFed = pValue;
+                    case 4 -> RanchingStationBlockEntity.this.bonusMult = pValue;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 4;
+                return 5;
             }
         };
     }
@@ -265,7 +267,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         RanchingStationForageRecipe currentRecipe = getForageRecipe();
         if (currentRecipe != null) {
             this.dayLastForaged = getDay(level);
-            List<ItemStack> drops = currentRecipe.getScaledDrops(this.getRanchingPower());
+            List<ItemStack> drops = currentRecipe.getScaledDrops(this.getRanchingPower(), ((double) this.bonusMult / 100));
             if (!drops.isEmpty()) {
                 BlockPos pos = this.getBlockPos();
                 for (ItemStack drop : drops) {
@@ -277,6 +279,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
                 }
                 this.level.playSound(null, this.getBlockPos(), CobblemonSounds.BERRY_HARVEST, SoundSource.BLOCKS, 1.0F, 0.9F);
                 generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_ON);
+                this.bonusMult = 0;
                 return true;
             }
         } else {
@@ -335,6 +338,15 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         return true;
     }
 
+    @Override
+    public boolean canReceiveBonusMult() {
+        return !this.hasBonusMult();
+    }
+
+    @Override
+    public boolean canReceiveBonusSpeed() {
+        return false;
+    }
     private RanchingStationMilkingRecipe getMilkingRecipe() {
         List<RanchingStationMilkingRecipe> validRecipes = level.getRecipeManager().getRecipesFor(RanchingStationMilkingRecipe.Type.INSTANCE, new RecipeWrapper(this.pokemonInventory), level);
         for (RanchingStationMilkingRecipe recipe : validRecipes) {
@@ -464,6 +476,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         data.putInt("DayLastForaged", dayLastForaged);
         data.putInt("DayLastMilked", dayLastMilked);
         data.putInt("DayLastFed", dayLastFed);
+        data.putInt("BonusMult", bonusMult);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
@@ -487,6 +500,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         dayLastForaged = data.getInt("DayLastForaged");
         dayLastMilked = data.getInt("DayLastMilked");
         dayLastFed = data.getInt("DayLastFed");
+        bonusMult = data.getInt("BonusMult");
         publicContract = data.getBoolean("PublicContract");
     }
 

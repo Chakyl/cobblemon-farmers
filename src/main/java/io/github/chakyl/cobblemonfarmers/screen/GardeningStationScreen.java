@@ -2,6 +2,7 @@ package io.github.chakyl.cobblemonfarmers.screen;
 
 
 import com.cobblemon.mod.common.api.gui.GuiUtilsKt;
+import com.cobblemon.mod.common.api.types.ElementalType;
 import com.cobblemon.mod.common.client.CobblemonResources;
 import com.cobblemon.mod.common.client.render.RenderHelperKt;
 import com.cobblemon.mod.common.pokemon.Pokemon;
@@ -19,6 +20,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemon;
 
@@ -121,8 +125,23 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
             Component tooltip = getCraftingTimeTooltip();
             guiGraphics.renderTooltip(this.font, tooltip, mouseX, mouseY);
         }
+        if (isMouseOverStatArea(mouseX, mouseY)) {
+            List<Component> tooltipComponents = getStatImpactTooltip();
+            if (!tooltipComponents.isEmpty()) {
+                guiGraphics.renderComponentTooltip(this.font, tooltipComponents, mouseX, mouseY);
+            }
+        }
     }
-
+    private List<Component> getStatImpactTooltip() {
+        ElementalType actionType = this.menu.getActionType();
+        if (actionType != null) {
+            return new ArrayList<>(List.of(
+                    Component.translatable("jei.cobblemon_farmers.gardening_station.speed_stat", this.menu.getScalingStat(actionType).getDisplayName()).withStyle(ChatFormatting.AQUA),
+                    Component.translatable("jei.cobblemon_farmers.gardening_station.level_scaling." + actionType.getName()).withStyle(ChatFormatting.GOLD)
+            ));
+        }
+        return List.of();
+    }
     private boolean isMouseOverCraftingTimeArea(int mouseX, int mouseY) {
         int craftingTimeAreaLeft = this.leftPos + PROGRESS_GUI_X;
         int craftingTimeAreaTop = this.topPos + PROGRESS_GUI_Y - (PROGRESS_GUI_HEIGHT / 2);
@@ -133,6 +152,15 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
                 mouseY >= craftingTimeAreaTop && mouseY <= craftingTimeAreaBottom;
     }
 
+    private boolean isMouseOverStatArea(int mouseX, int mouseY) {
+        int statAreaLeft = this.leftPos + 4;
+        int statAreaTop = this.topPos + 42;
+        int statAreaRight = this.leftPos + 80;
+        int statAreaBottom = this.topPos + 72;
+        return mouseX >= statAreaLeft && mouseX <= statAreaRight &&
+                mouseY >= statAreaTop && mouseY <= statAreaBottom;
+    }
+    
     private Component getCraftingTimeTooltip() {
         int totalSeconds = this.menu.getTotalProcessingTime();
         int currentSeconds = this.menu.getCurrentProcessingTime();
@@ -143,9 +171,9 @@ public class GardeningStationScreen extends AbstractContainerScreen<GardeningSta
             remainingSeconds %= 60;
 
             String formattedTime = String.format("%d:%02d Seconds", minutes, remainingSeconds);
-            return Component.translatable("tooltip.cobblemon_farmers.craft_station.processing_time", formattedTime);
+            return Component.translatable("tooltip.cobblemon_farmers.gardening_station.processing_time", formattedTime);
         } else {
-            return Component.translatable("tooltip.cobblemon_farmers.craft_station.processing_time", "0:00 Seconds");
+            return Component.translatable("tooltip.cobblemon_farmers.gardening_station.processing_time", "0:00 Seconds");
         }
     }
 

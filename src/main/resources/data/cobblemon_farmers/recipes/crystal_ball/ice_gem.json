@@ -1,0 +1,9 @@
+{
+  "type": "cobblemon_farmers:crystal_ball",
+  "affected_types": ["ice"],
+  "consume_chance": 0.50,
+  "bonus_chance": 0.25,
+  "ingredient": {
+    "item": "cobblemon:ice_gem"
+  }
+}
