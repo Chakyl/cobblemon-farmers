@@ -31,10 +31,5 @@ public class CommonEvents {
             event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKER_PERMITS.get());
             event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get());
         }
-
-        @SubscribeEvent
-        public static void onRegisterCommands(RegisterCommandsEvent event) {
-            SetOwnerCommand.register(event.getDispatcher());
-        }
     }
 }

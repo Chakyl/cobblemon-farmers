@@ -2,6 +2,7 @@ package io.github.chakyl.cobblemonfarmers.event;
 
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.blockentity.StationBaseBlockEntity;
+import io.github.chakyl.cobblemonfarmers.command.SetOwnerCommand;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.tag.CobblemonFarmersTags;
 import net.minecraft.ChatFormatting;
@@ -11,6 +12,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -55,5 +57,10 @@ public class BreakEvents {
             event.getEntity().getAttribute(CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get()).setBaseValue(publicContracts);
             event.getOriginal().invalidateCaps();
         }
+    }
+
+    @SubscribeEvent
+    public static void onRegisterCommands(RegisterCommandsEvent event) {
+        SetOwnerCommand.register(event.getDispatcher());
     }
 }

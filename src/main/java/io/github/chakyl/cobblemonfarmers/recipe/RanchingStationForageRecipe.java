@@ -73,7 +73,7 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
         List<ItemStack> drops = new ArrayList<>(this.forages.size());
         for (RanchingForage forage : forages) {
             if (forage.getMinHearts() <= hearts) {
-                if (Math.random() < forage.getChance() + bonusMult) {
+                if (Math.random() < (forage.getChance() * (bonusMult > 0 ? 1 + (bonusMult * 0.01) : 1))) {
                     ItemStack result = forage.getItem();
                     if (forage.hasQuality()) {
                         result = applyQuality(result, hearts);

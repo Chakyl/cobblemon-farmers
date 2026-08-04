@@ -1,12 +1,12 @@
 {
   "type": "cobblemon_farmers:craft_station",
-  "elemental_type": "ghost",
-  "crafting_time": 4800,
-  "speed_stat": "HP",
+  "elemental_type": "electric",
+  "crafting_time": 48000,
+  "speed_stat": "DEFENCE",
   "ingredient": {
     "item": "cobblemon_farmers:booster_battery"
   },
   "result": {
-    "item": "cobblemon_farmers:spectral_battery"
+    "item": "cobblemon_farmers:endless_battery"
   }
 }
