@@ -1,9 +1,11 @@
 package io.github.chakyl.cobblemonfarmers.event;
 
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
+import io.github.chakyl.cobblemonfarmers.command.SetOwnerCommand;
 import io.github.chakyl.cobblemonfarmers.network.PacketHandler;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -28,6 +30,11 @@ public class CommonEvents {
             event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKER_CAP.get());
             event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.WORKER_PERMITS.get());
             event.add(EntityType.PLAYER, CobblemonFarmersRegistery.AttributeRegistry.PUBLIC_CONTRACTS.get());
+        }
+
+        @SubscribeEvent
+        public static void onRegisterCommands(RegisterCommandsEvent event) {
+            SetOwnerCommand.register(event.getDispatcher());
         }
     }
 }

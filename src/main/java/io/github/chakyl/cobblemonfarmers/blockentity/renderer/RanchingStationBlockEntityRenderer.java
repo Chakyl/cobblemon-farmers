@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -25,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderBonusParticles;
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderTheyOrb;
 
 public class RanchingStationBlockEntityRenderer implements BlockEntityRenderer<RanchingStationBlockEntity> {
     private final Map<ItemStack, Float> itemRotations = new HashMap<>();
@@ -52,12 +52,11 @@ public class RanchingStationBlockEntityRenderer implements BlockEntityRenderer<R
                 pRenderer.render(pokemonEntity, 0, pPartialTick, pPoseStack, pBuffer, pPackedLight);
             }
             pPoseStack.popPose();
-        }
-        if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusMult()) {
-            if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.08F) {
-                renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), ParticleTypes.ENCHANT);
+            if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusMult()) {
+                renderTheyOrb(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, (float) pBlockEntity.getLevel().getGameTime() + pPartialTick, pokemonEntity.getPokemon().getSpecies().getHitbox().height - 0.6f);
             }
         }
+
         if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusSpeed()) {
             if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.01F) {
                 renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), ParticleTypes.ANGRY_VILLAGER);

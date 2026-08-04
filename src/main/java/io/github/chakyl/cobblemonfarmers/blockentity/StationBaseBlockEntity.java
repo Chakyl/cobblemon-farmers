@@ -23,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -103,7 +104,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            this.speedModifier = (((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100) + this.bonusSpeed) * (pokemon.getShiny() ? 2.0 : 1.0);
+            this.speedModifier = (((double) Mth.floor(((double) pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100) / 100)) * (pokemon.getShiny() ? 2.0 : 1.0);
         } else {
             this.speedModifier = 0.0;
         }
@@ -113,7 +114,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         ItemStack pokemonItem = getPokemonItem();
         if (!pokemonItem.isEmpty() && scalingStat != null) {
             Pokemon pokemon = getItemFormPokemon(pokemonItem, this.level);
-            this.multChance = ((Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100)) + this.bonusMult) * (pokemon.getShiny() ? 2 : 1);
+            this.multChance = ((Mth.floor((pokemon.getStat(scalingStat) / (255.0 / 2.0)) * 100))) * (pokemon.getShiny() ? 2 : 1);
         } else {
             this.multChance = 0;
         }
@@ -130,8 +131,16 @@ public class StationBaseBlockEntity extends BlockEntity {
         }
     }
 
+    public double getBoostedSpeedModifier() {
+        return Math.round((this.speedModifier + this.bonusSpeed) * 100.0) / 100.0;
+    }
+
     public double getSpeedModifier() {
         return this.speedModifier;
+    }
+
+    public int getBoostedMultChance() {
+        return (int) (this.multChance * (this.bonusMult > 0 ? 1 + (this.bonusMult * 0.01) : 1));
     }
 
     public int getMultChance() {
@@ -142,9 +151,13 @@ public class StationBaseBlockEntity extends BlockEntity {
         return this.aoeRadius;
     }
 
-    public int getBonusMult() { return  this.bonusMult; }
+    public int getBonusMult() {
+        return this.bonusMult;
+    }
 
-    public double getBonusSpeed() { return  this.bonusSpeed; }
+    public double getBonusSpeed() {
+        return this.bonusSpeed;
+    }
 
     public boolean hasBonusMult() {
         return this.bonusMult > 0;
@@ -159,7 +172,7 @@ public class StationBaseBlockEntity extends BlockEntity {
         this.setChanged();
     }
 
-    public void setBonusSpeed(float bonusSpeed) {
+    public void setBonusSpeed(double bonusSpeed) {
         this.bonusSpeed = bonusSpeed;
         this.setChanged();
     }
@@ -167,6 +180,11 @@ public class StationBaseBlockEntity extends BlockEntity {
     public boolean canReceiveBonusMult() {
         return false;
     }
+
+    public boolean canReceiveBonusSpeed() {
+        return !this.hasBonusSpeed();
+    }
+
     public ItemStack getPokemonItem() {
         return null;
     }
@@ -231,5 +249,9 @@ public class StationBaseBlockEntity extends BlockEntity {
         return (short) Math.min(Short.MAX_VALUE, Mth.floor((float) time / 20));
     }
 
+    @Override
+    public AABB getRenderBoundingBox() {
+        return new AABB(this.getBlockPos()).inflate(5.0);
+    }
 
 }

@@ -88,8 +88,10 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                     case 0 -> getDataSendableTime(MysteryMineBlockEntity.this.progress);
                     case 1 -> getDataSendableTime(MysteryMineBlockEntity.this.craftingTime);
                     case 2 -> Mth.floor(MysteryMineBlockEntity.this.speedModifier * 100);
-                    case 3 -> MysteryMineBlockEntity.this.multChance;
-                    case 4 -> MysteryMineBlockEntity.this.swapPriority ? 1 : 0;
+                    case 3 -> Mth.floor(MysteryMineBlockEntity.this.bonusSpeed * 100);
+                    case 4 -> MysteryMineBlockEntity.this.multChance;
+                    case 5 -> MysteryMineBlockEntity.this.bonusMult;
+                    case 6 -> MysteryMineBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -100,15 +102,17 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                     case 0 -> MysteryMineBlockEntity.this.progress = pValue;
                     case 1 -> MysteryMineBlockEntity.this.craftingTime = pValue;
                     case 2 -> MysteryMineBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> MysteryMineBlockEntity.this.multChance = pValue;
-                    case 4 -> MysteryMineBlockEntity.this.swapPriority = pValue == 1;
+                    case 3 -> MysteryMineBlockEntity.this.bonusSpeed = (double) pValue / 100;
+                    case 4 -> MysteryMineBlockEntity.this.multChance = pValue;
+                    case 5 -> MysteryMineBlockEntity.this.bonusMult = pValue;
+                    case 6 -> MysteryMineBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 5;
+                return 7;
             }
         };
     }
@@ -123,7 +127,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         super.tick(level, pos, state);
         if (!level.isClientSide()) {
             if (this.hasWorker() && this.hasInput()) {
-                Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
+                Optional<MysteryMineRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
                 if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
                     didInventoryChange = this.processRecipe(recipe.get());
                     if (this.speedModifier <= 0) {
@@ -209,7 +213,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         return new MysteryMineMenu(pContainerId, pPlayerInventory, this, this.data);
     }
 
-    private Optional<MysteryMineRecipe> getCurrentRecipe(RecipeWrapper inventoryWrapper) {
+    private Optional<MysteryMineRecipe> getMatchingRecipe(RecipeWrapper inventoryWrapper) {
         if (level == null) return Optional.empty();
         if (lastRecipeID != null) {
             Recipe<RecipeWrapper> recipe = ((CWRecipeManagerAccessor) level.getRecipeManager())
@@ -256,7 +260,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
 
         ++progress;
         craftingTime = recipe.getCraftingTime();
-        if (Mth.floor(progress * getSpeedModifier()) < craftingTime) {
+        if (Mth.floor(progress * getBoostedSpeedModifier()) < craftingTime) {
             return false;
         }
         progress = 0;
@@ -276,7 +280,7 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
             currentWeight += weights.get(i);
             if (currentWeight >= result) {
                 int mult = 1;
-                int multChance = getMultChance();
+                int multChance = getBoostedMultChance();
                 if (multChance > 0) {
                     Random r = new Random();
                     if (r.nextDouble() * 100 < multChance) mult = 2;
@@ -286,7 +290,9 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 outputItem = results.get(i).copy();
                 outputItem.setCount(Mth.clamp(outputItem.getCount() * mult, 0, outputItem.getMaxStackSize()));
                 insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(MysteryMineBlock.FACING), outputItem.copy());
-                this.bonusSpeed = 0;
+                if (recipe.getCraftingTime() > 30 || Math.random() < 0.25) {
+                    this.bonusSpeed = 0;
+                }
                 this.bonusMult = 0;
                 break;
             }
@@ -306,12 +312,20 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
         return true;
     }
 
+    public MysteryMineRecipe getCurrentRecipe() {
+        Optional<MysteryMineRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
+        if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
+            return recipe.get();
+        }
+        return null;
+    }
+
     @Override
     public boolean canReceiveBonusMult() {
         if (this.hasBonusMult()) return false;
-        Optional<MysteryMineRecipe> recipe = this.getCurrentRecipe(new RecipeWrapper(this.inputInventory));
-        if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
-            return recipe.get().getMultStat() != null;
+        MysteryMineRecipe recipe = getCurrentRecipe();
+        if (recipe != null) {
+            return recipe.getMultStat() != null;
         }
         return false;
     }

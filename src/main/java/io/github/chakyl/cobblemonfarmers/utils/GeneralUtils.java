@@ -11,9 +11,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-import java.util.Comparator;
-import java.util.List;
-
 public class GeneralUtils {
 
     public static void grantWorkerSlot(Level level, Player player) {
@@ -44,5 +41,9 @@ public class GeneralUtils {
     public static Iterable<BlockPos> getBetweenManhattan(BlockPos centerPos, int radius, int maxYRadius) {
         int yRadius = Math.min(maxYRadius, radius);
         return BlockPos.withinManhattan(centerPos, radius, yRadius, radius);
+    }
+
+    public static boolean isSamePos(BlockPos pos1, BlockPos pos2) {
+        return pos1.getX() == pos2.getX() && pos1.getY() == pos2.getY() && pos1.getZ() == pos2.getZ();
     }
 }

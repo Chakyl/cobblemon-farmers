@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.ENERGY_PYLON;
-import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.emiWordWrap;
 
 public class EMIEnergyPylonRecipe implements EmiRecipe {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/jei/energy_pylon.png");
@@ -35,7 +34,7 @@ public class EMIEnergyPylonRecipe implements EmiRecipe {
     List<EmiIngredient> input;
     List<EmiStack> output;
     List<EmiStack> allOutput;
-    float bonusSpeed;
+    double bonusSpeed;
     float consumeChance;
     private int width = 128;
     private int height = 85;

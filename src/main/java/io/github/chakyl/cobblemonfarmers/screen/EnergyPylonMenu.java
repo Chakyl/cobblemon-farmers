@@ -88,16 +88,6 @@ public class EnergyPylonMenu extends AbstractWorkerMenu {
         return this.data.get(0);
     }
 
-    @Override
-    public boolean getPrioritySwapped() {
-        return this.data.get(4) == 1;
-    }
-
-    @Override
-    public void setPrioritySwapped() {
-        this.blockEntity.setPrioritySwapped();
-    }
-
     public int getTotalProcessingTime() {
         return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
     }
@@ -162,10 +152,8 @@ public class EnergyPylonMenu extends AbstractWorkerMenu {
     }
 
 
-    public double getSpeedModifier() { return (double) this.data.get(2) / 100; }
-
-    public int getMultChance() {
-        return this.data.get(3);
+    public double getSpeedModifier() {
+        return (double) Math.round((this.data.get(2) + this.data.get(3))) / 100.0;
     }
 
     public ElementalType getPrimaryType() {
@@ -180,6 +168,10 @@ public class EnergyPylonMenu extends AbstractWorkerMenu {
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
                 pPlayer, CobblemonFarmersRegistery.BlockRegistry.ENERGY_PYLON.get());
+    }
+
+    public int getAoeRadius() {
+        return this.data.get(4);
     }
 
     private class PartySlot extends WorkstationPartySlot {

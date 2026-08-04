@@ -5,9 +5,6 @@ import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobblemonfarmers.recipe.EnergyPylonRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.EnergyPylonRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.EnergyPylonRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.EnergyPylonRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.EnergyPylonMenu;
 import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
@@ -37,21 +34,18 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetweenManhattan;
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.isSamePos;
 
 public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements MenuProvider {
-    public static int CRAFTING_TIME = 4800;
+    public static int CRAFTING_TIME = 2400;
     protected final ContainerData data;
     private int progress = 0;
-    private int craftingTime;
     private ResourceLocation lastRecipeID;
     private boolean checkNewRecipe;
-    private boolean swapPriority = false;
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(1) {
         @Override
@@ -97,10 +91,10 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
             public int get(int pIndex) {
                 return switch (pIndex) {
                     case 0 -> getDataSendableTime(EnergyPylonBlockEntity.this.progress);
-                    case 1 -> getDataSendableTime(EnergyPylonBlockEntity.this.craftingTime);
+                    case 1 -> getDataSendableTime(CRAFTING_TIME);
                     case 2 -> Mth.floor(EnergyPylonBlockEntity.this.speedModifier * 100);
-                    case 3 -> EnergyPylonBlockEntity.this.multChance;
-                    case 4 -> EnergyPylonBlockEntity.this.swapPriority ? 1 : 0;
+                    case 3 -> Mth.floor(EnergyPylonBlockEntity.this.bonusSpeed * 100);
+                    case 4 -> EnergyPylonBlockEntity.this.aoeRadius;
                     default -> 0;
                 };
             }
@@ -109,10 +103,10 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
                     case 0 -> EnergyPylonBlockEntity.this.progress = pValue;
-                    case 1 -> EnergyPylonBlockEntity.this.craftingTime = pValue;
+                    case 1 -> CRAFTING_TIME = pValue;
                     case 2 -> EnergyPylonBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> EnergyPylonBlockEntity.this.multChance = pValue;
-                    case 4 -> EnergyPylonBlockEntity.this.swapPriority = pValue == 1;
+                    case 3 -> EnergyPylonBlockEntity.this.bonusSpeed = (double) pValue / 100;
+                    case 4 -> EnergyPylonBlockEntity.this.aoeRadius = pValue;
                 }
 
             }
@@ -122,21 +116,6 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
                 return 5;
             }
         };
-    }
-
-    public List<ItemStack> getRenderItems() {
-        List<ItemStack> stacks = new ArrayList<>(2);
-        ItemStack inputStack = this.inputInventory.getStackInSlot(0);
-        ItemStack outputStack = this.outputInventory.getStackInSlot(0);
-        if (!inputStack.isEmpty()) stacks.add(inputStack);
-        if (!outputStack.isEmpty()) stacks.add(outputStack);
-        return stacks;
-    }
-
-    public void setPrioritySwapped() {
-        this.swapPriority = !this.swapPriority;
-        checkNewRecipe = true;
-        setChanged();
     }
 
     @Override
@@ -152,14 +131,14 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
         if (!level.isClientSide()) {
             if (hasWorker && hasInput) {
                 Optional<EnergyPylonRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
-                if (recipe.isPresent() && PokeUtils.validWorkerType(this, ElementalTypes.INSTANCE.getPSYCHIC(), level)) {
+                if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, ElementalTypes.INSTANCE.getELECTRIC(), level)) {
                     didInventoryChange = this.processRecipe(recipe.get());
                     if (this.speedModifier <= 0) {
                         this.fetchSpeedModifier(Stats.SPECIAL_ATTACK);
                         this.fetchAoeRadius(Stats.HP);
                     }
                 } else {
-                    recipe.ifPresent(energyPylonRecipe -> PokeUtils.validWorkerType(this, ElementalTypes.INSTANCE.getPSYCHIC(), level));
+                    recipe.ifPresent(energyPylonRecipe -> PokeUtils.validWorkerType(this, ElementalTypes.INSTANCE.getELECTRIC(), level));
                 }
             } else if (this.progress > 0) {
                 this.progress = Mth.clamp(this.progress - 2, 0, CRAFTING_TIME);
@@ -173,6 +152,7 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
         }
 
     }
+
     @Override
     public boolean hasWorker() {
         return !this.pokemonInventory.getStackInSlot(0).isEmpty() && this.primaryType != null;
@@ -181,22 +161,44 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
     private boolean processRecipe(EnergyPylonRecipe recipe) {
         if (level == null) return false;
         ++progress;
-        if (Mth.floor(progress * this.getSpeedModifier()) < CRAFTING_TIME) {
+        if (Mth.floor(progress * this.getBoostedSpeedModifier()) < CRAFTING_TIME) {
             return false;
         }
         if (buffNearestStation(this.getBlockPos(), this.aoeRadius, recipe)) {
+            ItemStack outputStack = outputInventory.getStackInSlot(0);
             ItemStack inputStack = inputInventory.getStackInSlot(0);
-            if (!inputStack.isEmpty() && Math.random() < recipe.getConsumeChance()) inputStack.shrink(1);
+            ItemStack resultStack = recipe.getResultItem(this.level.registryAccess());
+            ItemStack nbtResultStack = resultStack.copy();
+            if (!outputStack.isEmpty() && !ItemStack.isSameItemSameTags(outputStack, nbtResultStack)) return false;
+            if (!inputStack.isEmpty() && Math.random() < recipe.getConsumeChance()) {
+                inputStack.shrink(1);
+                if (outputStack.isEmpty()) {
+                    ItemStack newResult = resultStack.copy();
+                    if (inputStack.getTag() != null) newResult.setTag(inputStack.getTag());
+                    newResult.setCount(newResult.getCount());
+                    outputInventory.setStackInSlot(0, newResult);
+                } else if (ItemStack.isSameItem(outputStack, resultStack)) {
+                    if (outputStack.getCount() < outputStack.getMaxStackSize())
+                        outputStack.grow(resultStack.getCount());
+                }
+                progress = 0;
+                this.bonusSpeed = 0;
+                return true;
+            }
+        } else {
+            progress -= 20;
+            return false;
         }
-        progress = 0;
         return true;
     }
 
     private boolean buffNearestStation(BlockPos centerPos, int radius, EnergyPylonRecipe recipe) {
         for (BlockPos pos : getBetweenManhattan(centerPos, radius, radius)) {
-            if (this.level.getBlockEntity(pos) instanceof StationBaseBlockEntity stationBaseBlockEntity && stationBaseBlockEntity.hasWorker() && !(stationBaseBlockEntity instanceof RanchingStationBlockEntity)) {
-                stationBaseBlockEntity.setBonusSpeed(recipe.getBonusSpeed());
-                return true;
+            if (!isSamePos(pos, centerPos) && this.level.getBlockEntity(pos) instanceof StationBaseBlockEntity stationBaseBlockEntity && stationBaseBlockEntity.hasWorker() && !(stationBaseBlockEntity instanceof RanchingStationBlockEntity)) {
+                if (stationBaseBlockEntity.canReceiveBonusSpeed()) {
+                    stationBaseBlockEntity.setBonusSpeed((double) Mth.floor(recipe.getBonusSpeed() * 100.0) / 100);
+                    return true;
+                }
             }
         }
         return false;
@@ -265,7 +267,8 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
                     return Optional.of((EnergyPylonRecipe) recipe);
                 }
             }
-        }        if (checkNewRecipe) {
+        }
+        if (checkNewRecipe) {
             List<EnergyPylonRecipe> validRecipes = level.getRecipeManager().getRecipesFor(EnergyPylonRecipe.Type.INSTANCE, inventoryWrapper, level);
             EnergyPylonRecipe foundRecipe = null;
             for (EnergyPylonRecipe recipe : validRecipes) {
@@ -287,6 +290,20 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
         return Optional.empty();
     }
 
+    protected boolean canProcess(EnergyPylonRecipe recipe) {
+        ItemStack resultStack = recipe.getResultItem(this.level.registryAccess());
+
+        if (resultStack.isEmpty()) {
+            return false;
+        } else {
+            int mult = 1;
+            int multChance = getBoostedMultChance();
+            if (multChance >= 100) mult = 2;
+            if (multChance >= 200) mult = 3;
+            return outputInventory.getStackInSlot(0).getCount() + (resultStack.getCount() * mult) <= resultStack.getMaxStackSize();
+        }
+    }
+
     @Override
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
@@ -297,11 +314,10 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
         data.put("PokemonInventory", this.pokemonInventory.serializeNBT());
         data.putString("PrimaryType", this.primaryType != null ? this.primaryType.getName() : "");
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
-        data.putInt("CraftingTime", craftingTime);
-        data.putInt("Progress", progress);;
+        data.putInt("Progress", progress);
+        ;
         data.putInt("BonusMult", this.bonusMult);
         data.putDouble("BonusSpeed", this.bonusSpeed);
-        data.putBoolean("SwapPriority", swapPriority);
         data.putBoolean("PublicContract", publicContract);
         tag.put(CobblemonFarmers.MODID, data);
     }
@@ -327,11 +343,9 @@ public class EnergyPylonBlockEntity extends StationBaseBlockEntity implements Me
         }
         primaryType = ElementalTypes.INSTANCE.get(data.getString("PrimaryType"));
         secondaryType = ElementalTypes.INSTANCE.get(data.getString("SecondaryType"));
-        craftingTime = data.getInt("CraftingTime");
         progress = data.getInt("Progress");
         bonusMult = data.getInt("BonusMult");
         bonusSpeed = data.getDouble("BonusSpeed");
-        swapPriority = data.getBoolean("SwapPriority");
         publicContract = data.getBoolean("PublicContract");
     }
 

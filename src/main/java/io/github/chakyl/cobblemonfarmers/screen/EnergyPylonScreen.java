@@ -2,23 +2,25 @@ package io.github.chakyl.cobblemonfarmers.screen;
 
 
 import com.cobblemon.mod.common.api.gui.GuiUtilsKt;
+import com.cobblemon.mod.common.api.pokemon.stats.Stats;
+import com.cobblemon.mod.common.api.types.ElementalTypes;
 import com.cobblemon.mod.common.client.CobblemonResources;
 import com.cobblemon.mod.common.client.render.RenderHelperKt;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
-import io.github.chakyl.cobblemonfarmers.network.PacketHandler;
-import io.github.chakyl.cobblemonfarmers.network.ServerBoundSwapPriorityPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.StateSwitchingButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemon;
 
@@ -48,8 +50,6 @@ public class EnergyPylonScreen extends AbstractContainerScreen<EnergyPylonMenu> 
     @Override
     protected void init() {
         super.init();
-        this.togglePriorityButton = this.addRenderableWidget(new TogglePriorityButton(this.leftPos + 34, this.topPos + 20, 40, 20, this.menu.getPrioritySwapped()));
-        this.togglePriorityButton.initTextureValues(0, 0, 28, 18, SWAP_BUTTON);
         this.inventoryLabelY = 10000;
         this.titleLabelY = 10000;
     }
@@ -61,17 +61,17 @@ public class EnergyPylonScreen extends AbstractContainerScreen<EnergyPylonMenu> 
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, MutableComponent.create(this.playerInventoryTitle.getContents()), centralX, 74, false, 4210752, false, 0, 0);
         GuiUtilsKt.drawCenteredText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.party").withStyle(ChatFormatting.BOLD), 205, 1, 0xFFFFFFFF, true);
         GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.workers_assigned", this.menu.getWorkersAssigned()), 180, 112, false, 0xFFFFFFFF, true, 0, 0);
-        RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.swap_priority"), 44, 33, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
 
         double speedMod = this.menu.getSpeedModifier();
         if (speedMod > 0) {
             GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.speed", speedMod), centralX, 46, false, 0xFFFFFFFF, true, 0, 0);
         }
-        int multChance = this.menu.getMultChance();
-        if (multChance > 0) {
-            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.mult_chance", multChance + "%"), centralX, 58, false, 0xFFFFFFFF, true, 0, 0);
+        int workingRadius = this.menu.getAoeRadius();
+        if (workingRadius > 0) {
+            workingRadius *= 2;
+            workingRadius += 1;
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("gui.cobblemon_farmers.working_radius", workingRadius, Math.min(5, workingRadius *  2), workingRadius), centralX , 58, false,0xFFFFFFFF, true, 0, 0);
         }
-
         int index = 0;
         for (int level : this.menu.getPartyLevels()) {
             if (level > 0) {
@@ -82,12 +82,11 @@ public class EnergyPylonScreen extends AbstractContainerScreen<EnergyPylonMenu> 
         Pokemon pokemon = this.menu.getWorkerPokemon();
         if (pokemon != null) {
             RenderHelperKt.drawScaledText(pGuiGraphics, COBBLE_FONT, Component.literal("Lv." + pokemon.getLevel()), 8, 15, 0.7f, 1, 200, 0xFFFFFFFF, false, true, 0, 0);
-            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobblemon_farmers.energy_pylon.type." + pokemon.getPrimaryType().getName().toLowerCase()), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
+            GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, pokemon.getPrimaryType() != ElementalTypes.INSTANCE.getELECTRIC() ? Component.translatable("info.cobblemon_farmers.energy_pylon.type.other") : Component.translatable("info.cobblemon_farmers.energy_pylon.type." + pokemon.getPrimaryType().getName().toLowerCase() + ".short"), centralX + 90, 44, false, 0xFFFFFFFF, false, 0, 0);
             if (pokemon.getSecondaryType() != null) {
-                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, Component.translatable("info.cobblemon_farmers.energy_pylon.type." + pokemon.getSecondaryType().getName().toLowerCase()), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
+                GuiUtilsKt.drawText(pGuiGraphics, COBBLE_FONT, pokemon.getPrimaryType() != ElementalTypes.INSTANCE.getELECTRIC() ? Component.translatable("info.cobblemon_farmers.energy_pylon.type.other") :Component.translatable("info.cobblemon_farmers.energy_pylon.type." + pokemon.getSecondaryType().getName().toLowerCase() + ".short"), centralX + 90, 58, false, 0xFFFFFFFF, false, 0, 0);
             }
         }
-
     }
 
     @Override
@@ -120,6 +119,20 @@ public class EnergyPylonScreen extends AbstractContainerScreen<EnergyPylonMenu> 
             Component tooltip = getCraftingTimeTooltip();
             guiGraphics.renderTooltip(this.font, tooltip, mouseX, mouseY);
         }
+
+        if (isMouseOverStatArea(mouseX, mouseY)) {
+            List<Component> tooltipComponents = getStatImpactTooltip();
+            if (!tooltipComponents.isEmpty()) {
+                guiGraphics.renderComponentTooltip(this.font, tooltipComponents, mouseX, mouseY);
+            }
+        }
+    }
+
+    private List<Component> getStatImpactTooltip() {
+        return new ArrayList<>(List.of(
+                Component.translatable("jei.cobblemon_farmers.energy_pylon.speed_stat", Stats.SPECIAL_ATTACK.getDisplayName()).withStyle(ChatFormatting.AQUA),
+                Component.translatable("jei.cobblemon_farmers.energy_pylon.aoe_stat", Stats.HP.getDisplayName()).withStyle(ChatFormatting.GOLD)
+        ));
     }
 
     private boolean isMouseOverCraftingTimeArea(int mouseX, int mouseY) {
@@ -129,6 +142,15 @@ public class EnergyPylonScreen extends AbstractContainerScreen<EnergyPylonMenu> 
         int craftingTimeAreaBottom = this.topPos + PROGRESS_GUI_Y + (PROGRESS_GUI_HEIGHT / 2);
         return mouseX >= craftingTimeAreaLeft && mouseX <= craftingTimeAreaRight &&
                 mouseY >= craftingTimeAreaTop && mouseY <= craftingTimeAreaBottom;
+    }
+
+    private boolean isMouseOverStatArea(int mouseX, int mouseY) {
+        int statAreaLeft = this.leftPos + 4;
+        int statAreaTop = this.topPos + 42;
+        int statAreaRight = this.leftPos + 80;
+        int statAreaBottom = this.topPos + 72;
+        return mouseX >= statAreaLeft && mouseX <= statAreaRight &&
+                mouseY >= statAreaTop && mouseY <= statAreaBottom;
     }
 
     private Component getCraftingTimeTooltip() {
@@ -144,27 +166,6 @@ public class EnergyPylonScreen extends AbstractContainerScreen<EnergyPylonMenu> 
             return Component.translatable("tooltip.cobblemon_farmers.energy_pylon.processing_time", formattedTime);
         } else {
             return Component.translatable("tooltip.cobblemon_farmers.energy_pylon.processing_time", "0:00 Seconds");
-        }
-    }
-
-    private class TogglePriorityButton extends StateSwitchingButton {
-        private static final Component PRIORITIZE_PRIMARY_TYPE = Component.translatable("gui.cobblemon_farmers.prioritize_primary");
-        private static final Component PRIORITIZE_SECONDARY_TYPE = Component.translatable("gui.cobblemon_farmers.prioritize_secondary");
-
-        public TogglePriorityButton(int x, int y, int width, int height, boolean state) {
-            super(x, y, width, height, state);
-            this.updateTooltip();
-        }
-
-        @Override
-        public void onClick(double mouseX, double mouseY) {
-            this.isStateTriggered = !this.isStateTriggered;
-            PacketHandler.sendToServer(new ServerBoundSwapPriorityPacket());
-            this.updateTooltip();
-        }
-
-        private void updateTooltip() {
-            this.setTooltip(Tooltip.create(this.isStateTriggered ? PRIORITIZE_PRIMARY_TYPE : PRIORITIZE_SECONDARY_TYPE));
         }
     }
 }

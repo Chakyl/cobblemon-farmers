@@ -11,13 +11,11 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.grantWorkerSlot;
 import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.removePublicContract;
 
 @Mod.EventBusSubscriber(modid = CobblemonFarmers.MODID)

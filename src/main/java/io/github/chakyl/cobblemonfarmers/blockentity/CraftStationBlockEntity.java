@@ -4,7 +4,6 @@ import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobblemonfarmers.recipe.CraftStationRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.CrystalBallRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.CraftStationMenu;
 import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
@@ -14,9 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -40,9 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-
-import static cool.bot.dewdropfarmland.utils.CropHandlerUtils.growCrop;
-import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetween;
 
 public class CraftStationBlockEntity extends StationBaseBlockEntity implements MenuProvider {
     protected final ContainerData data;
@@ -98,8 +92,10 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
                     case 0 -> getDataSendableTime(CraftStationBlockEntity.this.progress);
                     case 1 -> getDataSendableTime(CraftStationBlockEntity.this.craftingTime);
                     case 2 -> Mth.floor(CraftStationBlockEntity.this.speedModifier * 100);
-                    case 3 -> CraftStationBlockEntity.this.multChance;
-                    case 4 -> CraftStationBlockEntity.this.swapPriority ? 1 : 0;
+                    case 3 -> Mth.floor(CraftStationBlockEntity.this.bonusSpeed * 100);
+                    case 4 -> CraftStationBlockEntity.this.multChance;
+                    case 5 -> CraftStationBlockEntity.this.bonusMult;
+                    case 6 -> CraftStationBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -110,15 +106,17 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
                     case 0 -> CraftStationBlockEntity.this.progress = pValue;
                     case 1 -> CraftStationBlockEntity.this.craftingTime = pValue;
                     case 2 -> CraftStationBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> CraftStationBlockEntity.this.multChance = pValue;
-                    case 4 -> CraftStationBlockEntity.this.swapPriority = pValue == 1;
+                    case 3 -> CraftStationBlockEntity.this.bonusSpeed = (double) pValue / 100;
+                    case 4 -> CraftStationBlockEntity.this.multChance = pValue;
+                    case 5 -> CraftStationBlockEntity.this.bonusMult = pValue;
+                    case 6 -> CraftStationBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 5;
+                return 7;
             }
         };
     }
@@ -183,7 +181,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
 
         ++progress;
         craftingTime = recipe.getCraftingTime();
-        if (Mth.floor(progress * this.getSpeedModifier()) < craftingTime) {
+        if (Mth.floor(progress * this.getBoostedSpeedModifier()) < craftingTime) {
             return false;
         }
         ItemStack outputStack = outputInventory.getStackInSlot(0);
@@ -194,7 +192,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         if (!outputStack.isEmpty() && !ItemStack.isSameItemSameTags(outputStack, nbtResultStack)) return false;
         progress = 0;
         int mult = 1;
-        int multChance = getMultChance();
+        int multChance = getBoostedMultChance();
         if (multChance > 0) {
             Random r = new Random();
             if (r.nextDouble() * 100 < multChance) mult = 2;
@@ -212,17 +210,27 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
             }
         }
         if (!inputStack.isEmpty()) inputStack.shrink(1);
-        this.bonusSpeed = 0;
+        if (recipe.getCraftingTime() > 30 || Math.random() < 0.25) {
+            this.bonusSpeed = 0;
+        }
         this.bonusMult = 0;
         return true;
+    }
+
+    public CraftStationRecipe getCurrentRecipe() {
+        Optional<CraftStationRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
+        if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
+            return recipe.get();
+        }
+        return null;
     }
 
     @Override
     public boolean canReceiveBonusMult() {
         if (this.hasBonusMult()) return false;
-        Optional<CraftStationRecipe> recipe = this.getMatchingRecipe(new RecipeWrapper(this.inputInventory));
-        if (recipe.isPresent() && this.canProcess(recipe.get()) && PokeUtils.validWorkerType(this, recipe.get().getElementalType(), level)) {
-            return recipe.get().getMultStat() != null;
+        CraftStationRecipe recipe = getCurrentRecipe();
+        if (recipe != null) {
+            return recipe.getMultStat() != null;
         }
         return false;
     }
@@ -333,7 +341,7 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
             return false;
         } else {
             int mult = 1;
-            int multChance = getMultChance();
+            int multChance = getBoostedMultChance();
             if (multChance >= 100) mult = 2;
             if (multChance >= 200) mult = 3;
             return outputInventory.getStackInSlot(0).getCount() + (resultStack.getCount() * mult) <= resultStack.getMaxStackSize();
@@ -351,7 +359,8 @@ public class CraftStationBlockEntity extends StationBaseBlockEntity implements M
         data.putString("PrimaryType", this.primaryType != null ? this.primaryType.getName() : "");
         data.putString("SecondaryType", this.secondaryType != null ? this.secondaryType.getName() : "");
         data.putInt("CraftingTime", craftingTime);
-        data.putInt("Progress", progress);;
+        data.putInt("Progress", progress);
+        ;
         data.putInt("BonusMult", this.bonusMult);
         data.putDouble("BonusSpeed", this.bonusSpeed);
         data.putBoolean("SwapPriority", swapPriority);

@@ -150,10 +150,8 @@ public class CrystalBallMenu extends AbstractWorkerMenu {
     }
 
 
-    public double getSpeedModifier() { return (double) this.data.get(2) / 100; }
-
-    public int getMultChance() {
-        return this.data.get(3);
+    public double getSpeedModifier() {
+        return (double) Math.round((this.data.get(2) + this.data.get(3))) / 100.0;
     }
 
     public ElementalType getPrimaryType() {
@@ -169,6 +167,11 @@ public class CrystalBallMenu extends AbstractWorkerMenu {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
                 pPlayer, CobblemonFarmersRegistery.BlockRegistry.CRYSTAL_BALL.get());
     }
+
+    public int getAoeRadius() {
+        return this.data.get(4);
+    }
+
 
     private class PartySlot extends WorkstationPartySlot {
         public PartySlot(Container container, int slot, int x, int y) {

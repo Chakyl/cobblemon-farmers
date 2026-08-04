@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.CRYSTAL_BALL;
-import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.emiWordWrap;
 
 public class EMICrystalBallRecipe implements EmiRecipe {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/jei/crystal_ball.png");

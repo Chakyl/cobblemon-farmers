@@ -1,9 +1,6 @@
 package io.github.chakyl.cobblemonfarmers.recipe;
 
 
-import com.cobblemon.mod.common.api.types.ElementalType;
-import com.cobblemon.mod.common.api.types.ElementalTypes;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
@@ -17,18 +14,15 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EnergyPylonRecipe implements Recipe<RecipeWrapper> {
     private final Ingredient ingredient;
     private final ItemStack input;
     private final ItemStack result;
     private final float consumeChance;
-    private final float bonusSpeed;
+    private final double bonusSpeed;
     private final ResourceLocation id;
 
-    public EnergyPylonRecipe(Ingredient ingredient, ItemStack input, float consumeChance, float bonusSpeed,  ItemStack result, ResourceLocation id) {
+    public EnergyPylonRecipe(Ingredient ingredient, ItemStack input, float consumeChance, double bonusSpeed,  ItemStack result, ResourceLocation id) {
         this.ingredient = ingredient;
         this.input = input;
         this.result = result;
@@ -68,7 +62,7 @@ public class EnergyPylonRecipe implements Recipe<RecipeWrapper> {
         return consumeChance;
     }
 
-    public float getBonusSpeed() {
+    public double getBonusSpeed() {
         return bonusSpeed;
     }
 
@@ -112,7 +106,7 @@ public class EnergyPylonRecipe implements Recipe<RecipeWrapper> {
         public @Nullable EnergyPylonRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
             Ingredient recipeIngredient = Ingredient.fromNetwork(pBuffer);
             float consumeChance = pBuffer.readFloat();
-            float bonusSpeed = pBuffer.readFloat();
+            double bonusSpeed = pBuffer.readDouble();
             ItemStack input = pBuffer.readItem();
             ItemStack result = pBuffer.readItem();
 
@@ -124,7 +118,7 @@ public class EnergyPylonRecipe implements Recipe<RecipeWrapper> {
             pRecipe.ingredient.toNetwork(pBuffer);
 
             pBuffer.writeFloat(pRecipe.getConsumeChance());
-            pBuffer.writeFloat(pRecipe.getBonusSpeed());
+            pBuffer.writeDouble(pRecipe.getBonusSpeed());
             pBuffer.writeItemStack(pRecipe.getInputItem(null), false);
             pBuffer.writeItemStack(pRecipe.getResultItem(null), false);
         }

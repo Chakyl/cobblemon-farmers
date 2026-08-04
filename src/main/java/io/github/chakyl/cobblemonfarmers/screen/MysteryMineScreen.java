@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.network.PacketHandler;
 import io.github.chakyl.cobblemonfarmers.network.ServerBoundSwapPriorityPacket;
+import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.StateSwitchingButton;
@@ -19,6 +20,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemon;
 
@@ -119,6 +123,27 @@ public class MysteryMineScreen extends AbstractContainerScreen<MysteryMineMenu> 
             Component tooltip = getCraftingTimeTooltip();
             guiGraphics.renderTooltip(this.font, tooltip, mouseX, mouseY);
         }
+
+        if (isMouseOverStatArea(mouseX, mouseY)) {
+            List<Component> tooltipComponents = getStatImpactTooltip();
+            if (!tooltipComponents.isEmpty()) {
+                guiGraphics.renderComponentTooltip(this.font, tooltipComponents, mouseX, mouseY);
+            }
+        }
+    }
+
+    private List<Component> getStatImpactTooltip() {
+        MysteryMineRecipe recipe = this.menu.getCurrentRecipe();
+        if (recipe != null) {
+            List<Component> tooltipComponents = new ArrayList<>(List.of(
+                    Component.translatable("jei.cobblemon_farmers.mystery_mine.speed_stat", recipe.getSpeedStat().getDisplayName()).withStyle(ChatFormatting.AQUA)
+            ));
+            if (recipe.getMultStat() != null) {
+                tooltipComponents.add(Component.translatable("jei.cobblemon_farmers.mystery_mine.mult_stat", recipe.getMultStat().getDisplayName()).withStyle(ChatFormatting.GREEN));
+            }
+            return tooltipComponents;
+        }
+        return List.of();
     }
 
     private boolean isMouseOverCraftingTimeArea(int mouseX, int mouseY) {
@@ -129,6 +154,15 @@ public class MysteryMineScreen extends AbstractContainerScreen<MysteryMineMenu> 
 
         return mouseX >= craftingTimeAreaLeft && mouseX <= craftingTimeAreaRight &&
                 mouseY >= craftingTimeAreaTop && mouseY <= craftingTimeAreaBottom;
+    }
+
+    private boolean isMouseOverStatArea(int mouseX, int mouseY) {
+        int statAreaLeft = this.leftPos + 4;
+        int statAreaTop = this.topPos + 42;
+        int statAreaRight = this.leftPos + 80;
+        int statAreaBottom = this.topPos + 72;
+        return mouseX >= statAreaLeft && mouseX <= statAreaRight &&
+                mouseY >= statAreaTop && mouseY <= statAreaBottom;
     }
 
     private Component getCraftingTimeTooltip() {

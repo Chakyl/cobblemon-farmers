@@ -13,10 +13,8 @@ import cool.bot.botslib.util.Util;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.block.GardeningStationBlock;
 import io.github.chakyl.cobblemonfarmers.block.MysteryMineBlock;
-import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.GardeningStationMenu;
-import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -44,11 +42,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cool.bot.dewdropfarmland.utils.CropHandlerUtils.growCrop;
@@ -92,8 +88,9 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                     case 0 -> getDataSendableTime(GardeningStationBlockEntity.this.progress);
                     case 1 -> getDataSendableTime(GardeningStationBlockEntity.this.actionTime);
                     case 2 -> Mth.floor(GardeningStationBlockEntity.this.speedModifier * 100);
-                    case 3 -> GardeningStationBlockEntity.this.aoeRadius;
-                    case 4 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
+                    case 3 -> Mth.floor(GardeningStationBlockEntity.this.bonusSpeed * 100);
+                    case 4 -> GardeningStationBlockEntity.this.aoeRadius;
+                    case 5 -> GardeningStationBlockEntity.this.swapPriority ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -104,15 +101,16 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
                     case 0 -> GardeningStationBlockEntity.this.progress = pValue;
                     case 1 -> GardeningStationBlockEntity.this.actionTime = pValue;
                     case 2 -> GardeningStationBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> GardeningStationBlockEntity.this.aoeRadius = pValue;
-                    case 4 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
+                    case 3 -> GardeningStationBlockEntity.this.bonusSpeed = (double) pValue / 100;
+                    case 4 -> GardeningStationBlockEntity.this.aoeRadius = pValue;
+                    case 5 -> GardeningStationBlockEntity.this.swapPriority = pValue == 1;
                 }
 
             }
 
             @Override
             public int getCount() {
-                return 5;
+                return 6;
             }
         };
     }
@@ -134,7 +132,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     public void tick(Level level, BlockPos pos, BlockState state) {
         super.tick(level, pos, state);
         if (!level.isClientSide() && hasWorker()) {
-            if (this.getSpeedModifier() == 0.0 && getActionType() != null) {
+            if (this.getBoostedSpeedModifier() == 0.0 && getActionType() != null) {
                 ElementalType type = getActionType();
                 this.fetchSpeedModifier(getScalingStat(type));
                 this.fetchAoeRadius();
@@ -278,7 +276,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
 
-    private ElementalType getActionType() {
+    public ElementalType getActionType() {
         boolean hasSecondary = this.secondaryType != null && getScalingStat(this.secondaryType) != null;
         if (this.swapPriority && hasSecondary) return secondaryType;
         if (getScalingStat(this.primaryType) != null) return this.primaryType;
@@ -298,7 +296,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
         return -1;
     }
 
-    private Stats getScalingStat(ElementalType type) {
+    public Stats getScalingStat(ElementalType type) {
         if (type == null) return null;
         ElementalTypes types = ElementalTypes.INSTANCE;
         if (CobblemonFarmers.GROWTH_EDITION_INSTALLED && type.equals(types.getGRASS())) return Stats.SPEED;
@@ -325,7 +323,7 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
     }
 
     private int getActionProgress(ElementalType type) {
-        return Mth.floor(progress * getSpeedModifier());
+        return Mth.floor(progress * getBoostedSpeedModifier());
     }
 
     @Override

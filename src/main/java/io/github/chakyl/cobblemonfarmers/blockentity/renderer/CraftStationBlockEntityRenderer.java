@@ -1,6 +1,5 @@
 package io.github.chakyl.cobblemonfarmers.blockentity.renderer;
 
-import com.cobblemon.mod.common.client.render.models.blockbench.pose.Pose;
 import com.cobblemon.mod.common.client.render.pokemon.PokemonRenderer;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -32,6 +31,7 @@ import java.util.*;
 
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
 import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderBonusParticles;
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderTheyOrb;
 
 public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<CraftStationBlockEntity> {
     private final Map<Item, Float> itemRotations = new HashMap<>();
@@ -98,9 +98,7 @@ public class CraftStationBlockEntityRenderer implements BlockEntityRenderer<Craf
         }
 
         if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusMult()) {
-            if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.08F) {
-                renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos().above(), ParticleTypes.ENCHANT);
-            }
+            renderTheyOrb(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, (float) pBlockEntity.getLevel().getGameTime() + pPartialTick);
         }
         if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusSpeed()) {
             if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.01F) {

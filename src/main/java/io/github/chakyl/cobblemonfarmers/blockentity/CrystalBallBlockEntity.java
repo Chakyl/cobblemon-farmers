@@ -5,7 +5,6 @@ import com.cobblemon.mod.common.api.types.ElementalTypes;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.mixin.CWRecipeManagerAccessor;
 import io.github.chakyl.cobblemonfarmers.recipe.CrystalBallRecipe;
-import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.CrystalBallMenu;
 import io.github.chakyl.cobblemonfarmers.utils.PokeUtils;
@@ -38,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.getBetweenManhattan;
+import static io.github.chakyl.cobblemonfarmers.utils.GeneralUtils.isSamePos;
 
 public class CrystalBallBlockEntity extends StationBaseBlockEntity implements MenuProvider {
     public static int CRAFTING_TIME = 4800;
@@ -82,7 +82,8 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
                     case 0 -> getDataSendableTime(CrystalBallBlockEntity.this.progress);
                     case 1 -> getDataSendableTime(CRAFTING_TIME);
                     case 2 -> Mth.floor(CrystalBallBlockEntity.this.speedModifier * 100);
-                    case 3 -> CrystalBallBlockEntity.this.aoeRadius;
+                    case 3 -> Mth.floor(CrystalBallBlockEntity.this.bonusSpeed * 100);
+                    case 4 -> CrystalBallBlockEntity.this.aoeRadius;
                     default -> 0;
                 };
             }
@@ -93,7 +94,8 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
                     case 0 -> CrystalBallBlockEntity.this.progress = pValue;
                     case 1 -> CRAFTING_TIME = pValue;
                     case 2 -> CrystalBallBlockEntity.this.speedModifier = (double) pValue / 100;
-                    case 3 -> CrystalBallBlockEntity.this.aoeRadius = pValue;
+                    case 3 -> CrystalBallBlockEntity.this.bonusSpeed = (double) pValue / 100;
+                    case 4 -> CrystalBallBlockEntity.this.aoeRadius = pValue;
                 }
 
             }
@@ -149,20 +151,24 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
     private boolean processRecipe(CrystalBallRecipe recipe) {
         if (level == null) return false;
         ++progress;
-        if (Mth.floor(progress * this.getSpeedModifier()) < CRAFTING_TIME) {
+        if (Mth.floor(progress * this.getBoostedSpeedModifier()) < CRAFTING_TIME) {
             return false;
         }
         if (buffNearestStation(this.getBlockPos(), this.aoeRadius, recipe)) {
             ItemStack inputStack = inputInventory.getStackInSlot(0);
             if (!inputStack.isEmpty() && Math.random() < recipe.getConsumeChance()) inputStack.shrink(1);
+            progress = 0;
+            this.bonusSpeed = 0;
+            return true;
+        } else {
+            progress -= 20;
+            return false;
         }
-        progress = 0;
-        return true;
     }
 
     private boolean buffNearestStation(BlockPos centerPos, int radius, CrystalBallRecipe recipe) {
         for (BlockPos pos : getBetweenManhattan(centerPos, radius, radius)) {
-            if (this.level.getBlockEntity(pos) instanceof StationBaseBlockEntity stationBaseBlockEntity && stationBaseBlockEntity.hasWorker() && stationBaseBlockEntity.canReceiveBonusMult()) {
+            if (!isSamePos(pos, centerPos) && this.level.getBlockEntity(pos) instanceof StationBaseBlockEntity stationBaseBlockEntity && stationBaseBlockEntity.hasWorker() && stationBaseBlockEntity.canReceiveBonusMult()) {
                 if (recipe.canAffectType(stationBaseBlockEntity.getPrimaryType()) || recipe.canAffectType(stationBaseBlockEntity.getSecondaryType())) {
                     stationBaseBlockEntity.setBonusMult((int) (recipe.getBonusChance() * 100));
                     return true;
@@ -181,7 +187,8 @@ public class CrystalBallBlockEntity extends StationBaseBlockEntity implements Me
                     return Optional.of((CrystalBallRecipe) recipe);
                 }
             }
-        }        if (checkNewRecipe) {
+        }
+        if (checkNewRecipe) {
             List<CrystalBallRecipe> validRecipes = level.getRecipeManager().getRecipesFor(CrystalBallRecipe.Type.INSTANCE, inventoryWrapper, level);
             CrystalBallRecipe foundRecipe = null;
             for (CrystalBallRecipe recipe : validRecipes) {

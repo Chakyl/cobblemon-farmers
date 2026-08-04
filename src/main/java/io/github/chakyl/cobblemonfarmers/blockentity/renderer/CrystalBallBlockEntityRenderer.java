@@ -3,35 +3,30 @@ package io.github.chakyl.cobblemonfarmers.blockentity.renderer;
 import com.cobblemon.mod.common.client.render.pokemon.PokemonRenderer;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.blockentity.CrystalBallBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.github.chakyl.cobblemonfarmers.event.ClientEvents.ClientModBusEvents.CRYSTAL_BALL_BALL;
 import static io.github.chakyl.cobblemonfarmers.utils.PokeUtils.getPokemonOffset;
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderBonusParticles;
+import static io.github.chakyl.cobblemonfarmers.utils.RenderUtils.renderTheyOrb;
 
 public class CrystalBallBlockEntityRenderer implements BlockEntityRenderer<CrystalBallBlockEntity> {
 
@@ -67,39 +62,10 @@ public class CrystalBallBlockEntityRenderer implements BlockEntityRenderer<Cryst
         pPoseStack.popPose();
     }
 
-    private static void renderCustomCube(CrystalBallBlockEntity pBlockEntity, PoseStack pPoseStack, MultiBufferSource pBuffer, int packedLight, int combinedOverlay, float partialTick) {
-        float time = (float) pBlockEntity.getLevel().getGameTime() + partialTick;
-        float rotationSpeed = time * 2.0F;
-        float normalassBob = Mth.sin(time * 0.1F) * 0.05F;
-
-        pPoseStack.pushPose();
-        pPoseStack.translate(0.5D, 1.3D + normalassBob, 0.5D);
-
-        pPoseStack.mulPose(Axis.YP.rotationDegrees(rotationSpeed));
-        pPoseStack.translate(-0.5D, -0.5D, -0.5D);
-
-        BakedModel bakedModel = Minecraft.getInstance().getModelManager().getModel(CRYSTAL_BALL_BALL);
-        VertexConsumer consumer = pBuffer.getBuffer(RenderType.entityTranslucentCull(bakedModel.getQuads(null, null, RandomSource.create(), ModelData.EMPTY, null).get(0).getSprite().atlasLocation()));
-        Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
-                pPoseStack.last(),
-                consumer,
-                null,
-                bakedModel,
-                1.0F, 1.0F, 1.0F,
-                packedLight,
-                combinedOverlay,
-                ModelData.EMPTY,
-                null
-        );
-
-        pPoseStack.popPose();
-    }
-
-
     @Override
     public void render(CrystalBallBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         renderItem(pBlockEntity.getRenderItem(), pBlockEntity, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pPartialTick);
-        renderCustomCube(pBlockEntity, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pPartialTick);
+        renderTheyOrb(pPoseStack, pBuffer, pPackedLight, pPackedOverlay, (float) pBlockEntity.getLevel().getGameTime() + pPartialTick);
         PokemonEntity pokemonEntity = pBlockEntity.getWorkerEntity();
         if (pokemonEntity != null) {
             Set<String> workerAspects = pBlockEntity.getWorkerAspects();
@@ -120,6 +86,11 @@ public class CrystalBallBlockEntityRenderer implements BlockEntityRenderer<Cryst
                 pRenderer.render(pokemonEntity, 0, pPartialTick, pPoseStack, pBuffer, pPackedLight);
             }
             pPoseStack.popPose();
+        }
+        if (pBlockEntity.hasLevel() && pBlockEntity.hasBonusSpeed()) {
+            if (pBlockEntity.getLevel().getRandom().nextFloat() < 0.01F) {
+                renderBonusParticles(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), ParticleTypes.ANGRY_VILLAGER);
+            }
         }
     }
 

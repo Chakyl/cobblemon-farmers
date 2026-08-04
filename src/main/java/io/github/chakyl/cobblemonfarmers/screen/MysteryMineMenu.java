@@ -6,6 +6,7 @@ import com.cobblemon.mod.common.api.storage.PokemonStoreManager;
 import com.cobblemon.mod.common.api.storage.party.PlayerPartyStore;
 import com.cobblemon.mod.common.api.types.ElementalType;
 import io.github.chakyl.cobblemonfarmers.blockentity.MysteryMineBlockEntity;
+import io.github.chakyl.cobblemonfarmers.recipe.MysteryMineRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkerSlot;
 import io.github.chakyl.cobblemonfarmers.screen.helpers.WorkstationPartySlot;
@@ -42,7 +43,7 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     private final ArrayList<Slot> partySlots = new ArrayList<>(6);
 
     public MysteryMineMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(5));
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(7));
     }
 
     public MysteryMineMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -89,6 +90,9 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
         return Mth.floor(this.data.get(1) * (1.0 / this.getSpeedModifier()));
     }
 
+    public MysteryMineRecipe getCurrentRecipe() {
+        return this.blockEntity.getCurrentRecipe();
+    }
 
     @Override
     public boolean getPrioritySwapped() {
@@ -159,11 +163,11 @@ public class MysteryMineMenu extends AbstractWorkerMenu {
     }
 
     public double getSpeedModifier() {
-        return (double) this.data.get(2) / 100;
+        return (double) Math.round((this.data.get(2) + this.data.get(3))) / 100.0;
     }
 
     public int getMultChance() {
-        return this.data.get(3);
+        return (int) (this.data.get(4) * (this.data.get(5) > 0 ? 1 + (this.data.get(5) * 0.01) : 1));
     }
 
     public ElementalType getPrimaryType() {

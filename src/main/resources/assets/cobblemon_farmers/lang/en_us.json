@@ -27,12 +27,10 @@
     "item.cobblemon_farmers.booster_battery": "Booster Battery",
     "item.cobblemon_farmers.spectral_battery": "Spectral Battery",
     "item.cobblemon_farmers.endless_battery": "Endless Battery",
-    "item.cobblemon_farmers.worker_permit.description": "Increases worker cap by 1 when used",
-    "item.cobblemon_farmers.public_contract.description": "Infuse a worker slot into the workstation, allowing anyone to manage the worker.",
-    "item.cobblemon_farmers.public_contract.warn": "Allows anyone to retrieve the worker inside!",
     "item.cobblemon_farmers.public_contract.used": "This workstation is now public!",
     "item.cobblemon_farmers.public_contract.already_used": "This workstation is already public!",
     "item.cobblemon_farmers.worker_permit.used": "Worker limit increased to %s!",
+    "item.cobblemon_farmers.public_contract.not_enough": "You don't have any free worker slots!",
 
     "block.cobblemon_farmers.craft_station": "Craft Station",
     "block.cobblemon_farmers.gardening_station": "Gardening Station",
@@ -49,6 +47,7 @@
     "gui.cobblemon_farmers.party": "Party",
     "gui.cobblemon_farmers.speed": "Speed: x%s",
     "gui.cobblemon_farmers.mult_chance": "Mult Chance: %s",
+    "gui.cobblemon_farmers.bonus_mult_chance": "Bonus Mult: %s",
     "gui.cobblemon_farmers.working_radius": "Area: %sx%sx%s",
     "gui.cobblemon_farmers.swap_priority": "Swap Priority",
     "gui.cobblemon_farmers.prioritize_primary": "Prioritize Primary Type",
@@ -58,8 +57,23 @@
     "tooltip.cobblemon_farmers.gardening_station.processing_time": "Gardening Time left: %s",
     "tooltip.cobblemon_farmers.craft_station.processing_time": "Crafting Time left: %s",
     "tooltip.cobblemon_farmers.crystal_ball.processing_time": "Divination Time: %s",
+    "tooltip.cobblemon_farmers.energy_pylon.processing_time": "Boost Time: %s",
     "tooltip.cobblemon_farmers.ranching_station.ranching_power": "%s/10 Affection",
     "tooltip.cobblemon_farmers.ranching_station.ranching_power_desc": "Scales off of friendship and HP",
+
+    "tooltip.always.cobblemon_farmers.worker_permit.0" : "Increases worker cap by 1 when used",
+    "tooltip.always.cobblemon_farmers.public_contract.0" : "Infuse a worker slot into the workstation, allowing anyone to manage the worker.",
+    "tooltip.always.cobblemon_farmers.public_contract.1" : "Allows anyone to retrieve the worker inside!",
+    "tooltip.always.cobblemon_farmers.mystery_mine.0" : "Certain types of Pokémon can enter the mine to find ores, loot, and mob drops.",
+    "tooltip.cobblemon_farmers.mystery_mine.1" : "Pokémon insert items into inventory its facing if possible.",
+    "tooltip.always.cobblemon_farmers.gardening_station.0" : "Allows certain types of Pokémon to perform in-world actions.",
+    "tooltip.cobblemon_farmers.gardening_station.1" : "Pokémon insert items into inventory its facing if possible.",
+    "tooltip.always.cobblemon_farmers.craft_station.0" : "Allows certain types of Pokémon to craft items.",
+    "tooltip.always.cobblemon_farmers.crystal_ball.0" : "Allows Psychic type Pokémon to increase the chances of other workstations.",
+    "tooltip.cobblemon_farmers.crystal_ball.1" : "Can affect: Mystery Mine, Craft Station, Ranching Station",
+    "tooltip.always.cobblemon_farmers.energy_pylon.0" : "Allows Electric type Pokémon to increase the speed of other workstations.",
+    "tooltip.cobblemon_farmers.energy_pylon.1" : "Can affect: Mystery Mine, Craft Station, Gardening Station, Crystal Ball, Energy Pylon",
+    "tooltip.always.cobblemon_farmers.ranching_station.0" : "Allows Pokémon to be farmed for their drops, forage items, and milk.",
 
     "message.cobblemon_farmers.ranching_station.no_drops": "You didn't get anything this time...",
     "message.cobblemon_farmers.ranching_station.cannot_be_magic_sheared": "This Pokémon has no drops!",
@@ -124,9 +138,13 @@
     "info.cobblemon_farmers.mystery_mine.type.dark": "Can't work here",
     "info.cobblemon_farmers.mystery_mine.type.fairy": "Can't work here",
 
-    "info.cobblemon_farmers.crystal_ball.type.psychic": "Boosts chances of Cobblemon Farmers workstations",
+    "info.cobblemon_farmers.crystal_ball.type.psychic": "Boosts chances of poke-workstations",
+    "info.cobblemon_farmers.crystal_ball.type.psychic.short": "Boosts chances",
+    "info.cobblemon_farmers.crystal_ball.type.other": "Can't work here",
 
-    "info.cobblemon_farmers.energy_pylon.type.electric": "Boosts speed of Cobblemon Farmers workstations",
+    "info.cobblemon_farmers.energy_pylon.type.electric": "Boosts speed of poke-workstations",
+    "info.cobblemon_farmers.energy_pylon.type.electric.short": "Boosts speed",
+    "info.cobblemon_farmers.energy_pylon.type.other": "Can't work here",
 
     "message.cobblemon_farmers.in_battle": "You can't access this while battling!",
     "message.cobblemon_farmers.has_pokemon": "Remove worker before breaking!",
@@ -184,6 +202,14 @@
     "jei.cobblemon_farmers.gardening_station.level_scaling.dark": "Experienced dropped and working area increases by 2 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.level_scaling.flying": "Berry eating chance decreases and working area increases by 2 every 10 levels",
     "jei.cobblemon_farmers.gardening_station.elemental_type": "%s",
+
+    "jei.cobblemon_farmers.gardening_station.type.normal": "Harvests milk and forages from nearby Ranching Stations.",
+    "jei.cobblemon_farmers.gardening_station.type.water": "Waters farmland in an area around the station.",
+    "jei.cobblemon_farmers.gardening_station.type.grass": "Grows farmland crops in an area around the station.",
+    "jei.cobblemon_farmers.gardening_station.type.flying": "Harvests nearby berry bushes. Lower level workers have a chance to eat berries.",
+    "jei.cobblemon_farmers.gardening_station.type.dark": "Harvests experience candies by defeating nearby Pokémon.",
+    "jei.cobblemon_farmers.gardening_station.type.fairy": "Magically harvests drops from nearby Ranching Stations.",
+
     "gui.cobblemon_farmers.actions": "Actions",
     "gui.cobblemon_farmers.friendship_hearts": "Friendship: %s/5",
     "gui.cobblemon_farmers.hp_hearts": "HP: %s/5",
@@ -195,9 +221,10 @@
     "jade.cobblemon_farmers.workstation.no_worker": "No worker assigned",
     "jade.cobblemon_farmers.workstation.public": "Public Workstation",
     "jade.cobblemon_farmers.owner": "Owner: %s",
-    "item.cobblemon_farmers.public_contract.not_enough": "You don't have any free worker slots!",
+
     "tooltip.cobblemon_farmers.ranching_station.can_shear": "This Pokémon's drops can be harvested with shears at 5+ affection",
     "tooltip.cobblemon_farmers.ranching_station.can_forage": "This Pokémon has a chance to forages for items daily",
     "tooltip.cobblemon_farmers.ranching_station.can_milk": "This Pokémon can be milked with a bucket",
-    "gui.cobblemon_farmers.bonus_mult_chance": "Bonus Mult: %s"
+    "command.cobblemon_farmers.setowner.failed": "This block does not accept an owner",
+    "command.cobblemon_farmers.setowner.success": "Set the owner of the workstation at %s to %s."
 }

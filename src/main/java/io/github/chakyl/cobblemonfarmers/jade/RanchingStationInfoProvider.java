@@ -1,6 +1,7 @@
 package io.github.chakyl.cobblemonfarmers.jade;
 
 import io.github.chakyl.cobblemonfarmers.blockentity.RanchingStationBlockEntity;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,10 @@ public enum RanchingStationInfoProvider implements IBlockComponentProvider, ISer
             if (rp > 0)
                 tooltip.add(Component.translatable("tooltip.cobblemon_farmers.ranching_station.ranching_power", (int) rp));
         }
+
+        if (accessor.getServerData().contains("bonusMult")) {
+            tooltip.add(Component.translatable("gui.cobblemon_farmers.bonus_mult_chance", accessor.getServerData().getDouble("bonusMult") + "%").withStyle(ChatFormatting.GREEN ));
+        }
         tooltip.add(Component.empty());
     }
 
@@ -32,6 +37,7 @@ public enum RanchingStationInfoProvider implements IBlockComponentProvider, ISer
     public void appendServerData(CompoundTag data, BlockAccessor accessor) {
         RanchingStationBlockEntity stationBaseBlockEntity = (RanchingStationBlockEntity) accessor.getBlockEntity();
         data.putInt("ranchingPower", stationBaseBlockEntity.getRanchingPower());
+        data.putInt("bonusMult", stationBaseBlockEntity.getBonusMult());
     }
 
     @Override
