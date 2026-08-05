@@ -94,7 +94,7 @@ public class EnergyPylonRecipe implements Recipe<RecipeWrapper> {
         public EnergyPylonRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "result"));
             float consumeChance = GsonHelper.getAsFloat(pSerializedRecipe, "consume_chance");
-            float bonusSpeed = GsonHelper.getAsFloat(pSerializedRecipe, "bonus_speed");
+            double bonusSpeed = GsonHelper.getAsDouble(pSerializedRecipe, "bonus_speed");
 
             ItemStack inputItem = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "ingredient"));
             Ingredient ingredientItem = Ingredient.fromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "ingredient"));

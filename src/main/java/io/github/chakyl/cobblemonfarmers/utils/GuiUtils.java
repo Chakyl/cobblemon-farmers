@@ -51,16 +51,4 @@ public class GuiUtils {
         int blitOffset = pokemon.getPrimaryType().getTextureXMultiplier();
         pGuiGraphics.blit(ELEMENT_TEXTURE, pMouseX + 35, pMouseY + 14, 0, blitOffset * 18, 18, 18, 18, 324, 18);
     }
-
-    public static void emiWordWrap(WidgetHolder widgets, Component text, int x, int y, int color, int maxWidth, boolean shadow) {
-        Font font = Minecraft.getInstance().font;
-        List<FormattedCharSequence> lines = font.split(text, maxWidth);
-
-        int yOffset = y;
-        for (var line : lines) {
-            widgets.addText(line, x, yOffset, color, shadow);
-            yOffset += font.lineHeight + 1;
-        }
-
-    }
 }

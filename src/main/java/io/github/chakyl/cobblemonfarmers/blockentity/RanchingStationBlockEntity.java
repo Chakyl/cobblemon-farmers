@@ -267,7 +267,7 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
         RanchingStationForageRecipe currentRecipe = getForageRecipe();
         if (currentRecipe != null) {
             this.dayLastForaged = getDay(level);
-            List<ItemStack> drops = currentRecipe.getScaledDrops(this.getRanchingPower(), ((double) this.bonusMult / 100));
+            List<ItemStack> drops = currentRecipe.getScaledDrops(this.getRanchingPower(), this.getWorkerEntity().getPokemon().getShiny(), ((double) this.bonusMult / 100));
             if (!drops.isEmpty()) {
                 BlockPos pos = this.getBlockPos();
                 for (ItemStack drop : drops) {
@@ -308,20 +308,20 @@ public class RanchingStationBlockEntity extends StationBaseBlockEntity implement
             this.dayLastMagicSheared = getDay(level);
             List<DropEntry> drops = dropTable.getDrops(dropTable.getAmount());
             this.level.playSound(null, this.getBlockPos(), SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
+            if (drops.isEmpty() && this.getWorkerEntity().getPokemon().getShiny()) drops = dropTable.getDrops(dropTable.getAmount());
             if (!drops.isEmpty()) {
                 BlockPos pos = this.getBlockPos();
                 for (DropEntry drop : drops) {
-                    if (overridePos != null && overrideDirection != null && drop instanceof ItemDropEntry) {
-                        ItemDropEntry itemDropEntry = ((ItemDropEntry) drop);
-                        ItemStack item = new ItemStack(ForgeRegistries.ITEMS.getValue(itemDropEntry.getItem()), itemDropEntry.getQuantityRange() == null ? itemDropEntry.getQuantity() :
-                                itemDropEntry.getQuantityRange().getFirst());
+                    if (overridePos != null && overrideDirection != null && drop instanceof ItemDropEntry itemDropEntry) {
+                        Item dropItem = ForgeRegistries.ITEMS.getValue(itemDropEntry.getItem());
+                        if (dropItem == null) continue;
+                        ItemStack item = new ItemStack(dropItem, itemDropEntry.getQuantityRange() == null ? itemDropEntry.getQuantity() :  itemDropEntry.getQuantityRange().getFirst());
                         if (itemDropEntry.getNbt() != null) {
                             item.setTag(itemDropEntry.getNbt());
                         }
                         if (!item.isEmpty()) insertIntoFacingOrPopOut(level, overridePos, overrideDirection, item);
                     } else {
                         drop.drop(null, (ServerLevel) level, this.getBlockPos().getCenter(), null);
-
                     }
                 }
                 generateParticles((ServerLevel) level, pos, ParticleTypes.WAX_ON);

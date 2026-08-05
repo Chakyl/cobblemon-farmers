@@ -1,0 +1,9 @@
+{
+  "type": "cobblemon_farmers:crystal_ball",
+  "affected_types": ["fairy", "psychic", "ghost"],
+  "consume_chance": 1,
+  "bonus_chance": 0.08,
+  "ingredient": {
+    "item": "minecraft:amethyst_shard"
+  }
+}

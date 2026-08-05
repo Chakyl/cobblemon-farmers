@@ -19,26 +19,25 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MysteryMineCategory implements IRecipeCategory<MysteryMineRecipe> {
+public class JEIMysteryMineCategory implements IRecipeCategory<MysteryMineRecipe> {
     public static final RecipeType<MysteryMineRecipe> TYPE = RecipeType.create(CobblemonFarmers.MODID, "mystery_mine", MysteryMineRecipe.class);
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/jei/mystery_mine.png");
-    public static final ResourceLocation ELEMENT_TEXTURE = new ResourceLocation("cobblemon:textures/gui/types_small.png");
 
     private final IDrawable background;
     private final IDrawable icon;
     private final Component name;
 
-    private int ticks = 0;
-    private long lastTickTime = 0;
+    private final int displayWidth = 160;
+    private final int displayHeight = 94;
 
-    public MysteryMineCategory(IGuiHelper guiHelper) {
-        this.background = guiHelper.createDrawable(TEXTURE, 0, 0, 160, 112);
+    public JEIMysteryMineCategory(IGuiHelper guiHelper) {
+        this.background = guiHelper.createDrawable(TEXTURE, 0, 0, displayWidth, displayHeight);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get()));
         this.name = Component.translatable(CobblemonFarmersRegistery.BlockRegistry.MYSTERY_MINE.get().getDescriptionId());
     }
@@ -47,7 +46,6 @@ public class MysteryMineCategory implements IRecipeCategory<MysteryMineRecipe> {
     public IDrawable getBackground() {
         return this.background;
     }
-
 
     @Override
     public IDrawable getIcon() {
@@ -66,17 +64,18 @@ public class MysteryMineCategory implements IRecipeCategory<MysteryMineRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, MysteryMineRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 0, 0).addIngredients(recipe.getIngredient()).addRichTooltipCallback((view, tooltip) -> {
-            tooltip.add(Component.translatable("jei.cobblemon_farmers.mystery_mine.consume_chance", Math.round(recipe.getConsumeChance() * 100) + "%").withStyle(ChatFormatting.GREEN));
-        });
-        builder.addSlot(RecipeIngredientRole.INPUT, 21, 0).addItemStack(ElementalTypeUtils.getItemFromElementalType(recipe.getElementalType()).getDefaultInstance());
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 0).addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.cobblemon_farmers.mystery_mine.consume_chance", Math.round(recipe.getConsumeChance() * 100) + "%").withStyle(ChatFormatting.GREEN)));
+
+        builder.addSlot(RecipeIngredientRole.INPUT, 22, 0).addItemStack(ElementalTypeUtils.getItemFromElementalType(recipe.getElementalType()).getDefaultInstance());
         int row = 0;
         int rowLength = 8;
-        for (int i = 0; i < recipe.getResults(null).toArray().length; i++) {
+        List<ItemStack> allOutput = recipe.getResults(null);
+        List<Integer> weights = recipe.getWeights(null);
+
+        for (int i = 0; i < allOutput.toArray().length; i++) {
             if (i % rowLength == 0) row++;
             int finalI1 = i;
-            builder.addSlot(RecipeIngredientRole.OUTPUT, (16 * rowLength) + 26 + ((i - (row * rowLength)) * 18), 54 + ((18 * (i / rowLength)))).addItemStack(recipe.getResults(null).get(i)).addRichTooltipCallback((view, tooltip) -> {
-                List<Integer> weights = recipe.getWeights(null);
+            builder.addSlot(RecipeIngredientRole.OUTPUT, (16 * rowLength) + 24 + ((i - (row * rowLength)) * 18), 35 + ((18 * (i / rowLength)))).addItemStack(allOutput.get(i)).addRichTooltipCallback((view, tooltip) -> {
                 int weightTotal = 0;
                 int currentWeight = weights.get(finalI1);
                 for (Integer weight : weights) weightTotal += weight;
@@ -90,12 +89,15 @@ public class MysteryMineCategory implements IRecipeCategory<MysteryMineRecipe> {
         IRecipeCategory.super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
         ElementalType elementalType = recipe.getElementalType();
         guiGraphics.drawString(Minecraft.getInstance().font, Language.getInstance().getVisualOrder(Component.translatable("jei.cobblemon_farmers.mystery_mine.elemental_type", elementalType.getDisplayName())), 42, 5, elementalType.getHue(), true);
-        guiGraphics.drawString(Minecraft.getInstance().font, Language.getInstance().getVisualOrder(Component.translatable("jei.cobblemon_farmers.mystery_mine.crafting_time", recipe.getCraftingTime() / 20)), 92, 5, 0xFF4b3658, false);
-
-        guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobblemon_farmers.mystery_mine.speed_stat", recipe.getSpeedStat().getDisplayName()).getString()), 0, 22, 78, 0xFF4b3658);
-        if (recipe.getMultStat() != null) {
-            guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(Component.translatable("jei.cobblemon_farmers.mystery_mine.mult_stat", recipe.getMultStat().getDisplayName()).getString()), 82, 22, 78, 0xFF4b3658);
+        guiGraphics.drawString(Minecraft.getInstance().font,  Language.getInstance().getVisualOrder(Component.translatable("jei.cobblemon_farmers.mystery_mine.crafting_time", recipe.getCraftingTime() / 20)), 110, 22, 0xFF4b3658, false);
+        if (mouseX >= displayWidth - 16 && mouseX <= displayWidth && mouseY >= 0 && mouseY <= 16) {
+            List<Component> tooltip = new ArrayList<>();
+            tooltip.add(Component.translatable("info.cobblemon_farmers.mystery_mine.type." + elementalType.getName(), recipe.getSpeedStat().getDisplayName()).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("jei.cobblemon_farmers.mystery_mine.speed_stat", recipe.getSpeedStat().getDisplayName()).withStyle(ChatFormatting.AQUA));
+            if (recipe.getMultStat() != null) {
+                tooltip.add(Component.translatable("jei.cobblemon_farmers.mystery_mine.mult_stat", recipe.getMultStat().getDisplayName()).withStyle(ChatFormatting.GREEN));
+            }
+            guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, java.util.Optional.empty(), (int) mouseX, (int) mouseY);
         }
     }
-
 }

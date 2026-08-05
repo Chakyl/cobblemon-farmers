@@ -10,6 +10,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import io.github.chakyl.cobblemonfarmers.CobblemonFarmers;
 import io.github.chakyl.cobblemonfarmers.blockentity.CrystalBallBlockEntity;
+import io.github.chakyl.cobblemonfarmers.blockentity.EnergyPylonBlockEntity;
 import io.github.chakyl.cobblemonfarmers.recipe.EnergyPylonRecipe;
 import io.github.chakyl.cobblemonfarmers.registry.CobblemonFarmersRegistery;
 import io.github.chakyl.cobblemonfarmers.utils.ElementalTypeUtils;
@@ -108,7 +109,7 @@ public class EMIEnergyPylonRecipe implements EmiRecipe {
         widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.bonus_speed", this.bonusSpeed), 6, 58, 0xFFFFFFFF, false);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.consume_chance", Math.round(this.consumeChance * 100) + "%"), 6, 68, 0xFFFFFFFF, false);
 
-        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.crafting_time", CrystalBallBlockEntity.CRAFTING_TIME  / 20), 72, 17, 0xFF4b3658, false);
+        widgets.addText(Component.translatable("jei.cobblemon_farmers.energy_pylon.crafting_time", EnergyPylonBlockEntity.CRAFTING_TIME  / 20), 72, 17, 0xFF4b3658, false);
 
 
     }

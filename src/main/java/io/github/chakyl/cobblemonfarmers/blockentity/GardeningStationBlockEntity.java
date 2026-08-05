@@ -239,19 +239,16 @@ public class GardeningStationBlockEntity extends StationBaseBlockEntity implemen
 
     private void generateExp(int radius) {
         List<PokemonEntity> nearbyMons = level.getEntitiesOfClass(PokemonEntity.class, new AABB(this.getBlockPos()).inflate((double) radius / 2));
-        int spawnedXP = 0;
+
         for (PokemonEntity pokemon : nearbyMons) {
             if (!pokemon.isBattling() && !pokemon.isDeadOrDying() & pokemon.getPokemon().getOwnerPlayer() == null) {
-                insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(GardeningStationBlock.FACING), CobblemonItems.EXPERIENCE_CANDY_S.getDefaultInstance());
                 pokemon.kill();
-                ++spawnedXP;
             }
         }
-        if (spawnedXP < radius / 2) {
-            for (int i = 0; i < (radius / 2) - spawnedXP; i++) {
-                insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(GardeningStationBlock.FACING), CobblemonItems.EXPERIENCE_CANDY_XS.getDefaultInstance());
-            }
+        for (int i = 0; i < (radius / 2); i++) {
+            insertIntoFacingOrPopOut(level, this.getBlockPos(), this.getBlockState().getValue(GardeningStationBlock.FACING), radius >= 5 ? CobblemonItems.EXPERIENCE_CANDY_S.getDefaultInstance() : CobblemonItems.EXPERIENCE_CANDY_XS.getDefaultInstance());
         }
+
     }
 
     private void runAction(ElementalType actionType, Pokemon pokemon) {

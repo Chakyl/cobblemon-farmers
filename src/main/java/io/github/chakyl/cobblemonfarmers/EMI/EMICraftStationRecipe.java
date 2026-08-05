@@ -107,7 +107,6 @@ public class EMICraftStationRecipe implements EmiRecipe {
         widgets.addTooltip(tooltipComponents, 96-16, 0, 16, 16);
         widgets.addText(Component.translatable("jei.cobblemon_farmers.craft_station.crafting_time", this.recipeTime / 20), 8, 49, 0xFFFFFFFF, false);
 
-
     }
 
 }

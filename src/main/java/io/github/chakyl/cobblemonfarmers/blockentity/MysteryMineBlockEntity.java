@@ -282,10 +282,13 @@ public class MysteryMineBlockEntity extends StationBaseBlockEntity implements Me
                 int mult = 1;
                 int multChance = getBoostedMultChance();
                 if (multChance > 0) {
-                    Random r = new Random();
-                    if (r.nextDouble() * 100 < multChance) mult = 2;
-                    if (r.nextDouble() * 100 < (multChance - 100)) mult = 3;
-                    if (r.nextDouble() * 100 < (multChance - 200)) mult = 4;
+                    int currentChance = multChance;
+                    while (currentChance > 0) {
+                        if (level.getRandom().nextDouble() * 100 <  Math.min(currentChance, 100)) {
+                            mult++;
+                        }
+                        currentChance -= 100;
+                    }
                 }
                 outputItem = results.get(i).copy();
                 outputItem.setCount(Mth.clamp(outputItem.getCount() * mult, 0, outputItem.getMaxStackSize()));

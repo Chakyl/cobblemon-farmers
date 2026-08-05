@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.chakyl.cobblemonfarmers.EMI.CobblemonFarmersEMIPlugin.GARDENING_STATION;
-import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.emiWordWrap;
-
+import static io.github.chakyl.cobblemonfarmers.utils.CobblemonEMIUtils.emiWordWrap;
 public class EMIGardeningStationRecipe implements EmiRecipe {
     public static final ResourceLocation TEXTURE = new ResourceLocation(CobblemonFarmers.MODID, "textures/jei/gardening_station.png");
     ResourceLocation id;

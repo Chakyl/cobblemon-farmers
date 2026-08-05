@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " ir",
+    "iri",
+    "ri "
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "r": {
+      "item": "minecraft:redstone_dust"
+    }
+  },
+  "result": {
+    "item": "cobblemon_farmers:uncharged_battery"
+  },
+  "show_notification": true
+}

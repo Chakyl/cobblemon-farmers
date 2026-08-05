@@ -69,11 +69,11 @@ public class RanchingStationForageRecipe implements Recipe<RecipeWrapper> {
         return CobblemonFarmersRegistery.RecipeRegistry.RANCHING_STATION_FORAGE_SERIALIZER.get();
     }
 
-    public List<ItemStack> getScaledDrops(int hearts, double bonusMult) {
+    public List<ItemStack> getScaledDrops(int hearts, boolean shiny, double bonusMult) {
         List<ItemStack> drops = new ArrayList<>(this.forages.size());
         for (RanchingForage forage : forages) {
             if (forage.getMinHearts() <= hearts) {
-                if (Math.random() < (forage.getChance() * (bonusMult > 0 ? 1 + (bonusMult * 0.01) : 1))) {
+                if (Math.random() < ((forage.getChance() * (shiny ? 2 : 1)) * (bonusMult > 0 ? 1 + (bonusMult * 0.01) : 1))) {
                     ItemStack result = forage.getItem();
                     if (forage.hasQuality()) {
                         result = applyQuality(result, hearts);

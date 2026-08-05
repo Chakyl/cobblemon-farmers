@@ -19,10 +19,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraftforge.fml.ModList;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.github.chakyl.cobblemonfarmers.utils.CobblemonEMIUtils.addEmiViewDropsButton;
 import static io.github.chakyl.cobblemonfarmers.utils.CobblemonEMIUtils.getEmiPokemon;
 import static io.github.chakyl.cobblemonfarmers.utils.GuiUtils.renderPokemonTypesOnly;
 
@@ -55,12 +57,9 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         super.init();
         this.inventoryLabelY = 10000;
         this.titleLabelY = 10000;
-        this.addRenderableWidget(new RanchingStationScreen.ViewRecipesButton(this.leftPos + 122, this.topPos + 19, 42, 16, Component.translatable("gui.cobblemon_farmers.view_recipes"), (button) -> {
-            if (this.menu.getWorkerPokemon() != null) {
-                CobblemonStack stack = getEmiPokemon(this.menu.getWorkerPokemon());
-                EmiApi.displayUses(stack);
-            }
-        }));
+        if (ModList.get().isLoaded("emi")) {
+            this.addRenderableWidget(addEmiViewDropsButton(this, this.leftPos, this.topPos));
+        }
     }
 
     @Override
@@ -159,7 +158,7 @@ public class RanchingStationScreen extends AbstractContainerScreen<RanchingStati
         guiGraphics.renderComponentTooltip(this.font, tooltipList, mouseX, mouseY);
     }
 
-    private class ViewRecipesButton extends Button {
+    public static class ViewRecipesButton extends Button {
         public ViewRecipesButton(int x, int y, int width, int height, Component message, OnPress onPress) {
             super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
         }
